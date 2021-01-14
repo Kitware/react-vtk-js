@@ -1,0 +1,35 @@
+{
+  "name": "react-vtk-js-usage",
+  "private": true,
+  "description": "Usage of react-vtk-js via examples",
+  "author": "Kitware Inc",
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "react-vtk-js": ".."
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/plugin-transform-react-constant-elements": "^7.12.1",
+    "@babel/plugin-transform-react-inline-elements": "^7.12.1",
+    "@babel/plugin-transform-runtime": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "@babel/preset-react": "^7.12.10",
+    "@babel/runtime": "^7.12.5",
+    "babel-loader": "^8.2.2",
+    "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
+    "html-webpack-plugin": "^4.5.1",
+    "prop-types": "^15.7.2",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "serve": "^11.3.2",
+    "terser-webpack-plugin": "^5.1.1",
+    "webpack": "^5.14.0",
+    "webpack-cli": "^4.3.1"
+  },
+  "scripts": {
+    "build": "webpack",
+    "serve": "npm run build && serve ./build-usage"
+  }
+}
