@@ -7,6 +7,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const entry = {
   PolyDataViewer: './Geometry/PolyDataViewer.js',
+  OBJViewer: './Geometry/OBJViewer.js',
 };
 
 function toHtmlPlugin() {
