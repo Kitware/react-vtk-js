@@ -14,7 +14,9 @@ function toHtmlPlugin() {
     .keys(entry)
     .map((name) => new HtmlWebpackPlugin({
         chunks: [name],
-        filename: `${name}.html`
+        title: name,
+        filename: `${name}.html`,
+        template: 'template.html',
       })
     );
 }
@@ -33,6 +35,13 @@ module.exports = function(_env, argv) {
     plugins: toHtmlPlugin(),
     module: {
       rules: [
+        {
+          test: require.resolve('react'),
+          loader: 'expose-loader',
+          options: {
+            exposes: ['React'],
+          },
+        },
         {
           test: /\.jsx?$/,
           exclude: /node_modules/,
@@ -53,5 +62,10 @@ module.exports = function(_env, argv) {
         buffer: false,
       },
     },
+    devServer: {
+      contentBase: path.join(__dirname, 'build-usage'),
+      compress: true,
+      port: 9000
+    }
   };
 };

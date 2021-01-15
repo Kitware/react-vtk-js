@@ -39,7 +39,7 @@ export default class Reader extends Component {
               this.view = view;
               return (
                 <DownstreamContext.Provider value={this.reader}>
-                  <div id={this.props.id}>
+                  <div key={this.props.id} id={this.props.id}>
                     {this.props.children}
                   </div>
                 </DownstreamContext.Provider>

@@ -29,6 +29,7 @@ export default class DataArray extends Component {
           if (!this.fields) {
             this.fields = fields;
           }
+          return (<div key={this.props.id} name={this.props.name} />)
         }}
       </FieldsContext.Consumer>
     );

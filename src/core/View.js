@@ -67,6 +67,7 @@ export default class View extends Component {
 
         return (
             <div
+                key={id}
                 id={id}
                 style={CONTAINER_STYLE}
             >
@@ -98,6 +99,7 @@ export default class View extends Component {
         this.interactor.bindEvents(container);
         this.onResize();
         this.resizeObserver.observe(container);
+        this.resetCamera();
     }
 
     componentWillUnmount() {

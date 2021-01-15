@@ -34,7 +34,7 @@ export default class VolumeRepresentation extends Component {
           return (
             <RepresentationContext.Provider value={this}>
               <DownstreamContext.Provider value={this.mapper}>
-                <div id={this.props.id}>
+                <div key={this.props.id} id={this.props.id}>
                   {this.props.children}
                 </div>
               </DownstreamContext.Provider>

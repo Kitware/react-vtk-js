@@ -36,7 +36,7 @@ export default class PolyData extends Component {
               }
               return (
                 <DataSetContext.Provider value={this.polydata}>
-                  <div id={this.props.id}>
+                  <div key={this.props.id} id={this.props.id}>
                     {this.props.children}
                   </div>
                 </DataSetContext.Provider>

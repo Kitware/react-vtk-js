@@ -32,7 +32,7 @@ export default class ImageData extends Component {
               }
               return (
                 <DataSetContext.Provider value={this.imageData}>
-                  <div id={this.props.id}>
+                  <div key={this.props.id} id={this.props.id}>
                     {this.props.children}
                   </div>
                 </DataSetContext.Provider>
