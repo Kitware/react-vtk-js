@@ -6,46 +6,46 @@ import ReactDOM from 'react-dom';
 
 // Works...
 import 'react-vtk-js';
-const { View, GeometryRepresentation, PolyData } = ReactVtkJs;
+const { View, GeometryRepresentation, PolyData, PointData, DataArray } = ReactVtkJs;
 
 // React complains about unique key prop but I don't see why
 
 function Example(props) {
   return (
     <div style={{width: '100vw', height: '100vh'}}>
-      <View id="0" background={[0.1, 0.5, 0.9]}>
+      <View>
         <GeometryRepresentation
-          id="1"
-          property={{
-            opacity: 0.5,
-            color: [0.7, 0, 0],
+          mapper={{
+            // colorByArrayName: 'Pressure',
+            // scalarMode: 3,
+            interpolateScalarsBeforeMapping: true,
           }}
+          colorDataRange={[0, 0.7]}
+          colorMapPreset="Black-Body Radiation"
         >
           <PolyData
-            id="2"
             points={[
               0, 0, 0,
               1, 0, 0,
               1, 1, 0,
               0, 1, 0,
-              0, 0, 1,
-              1, 0, 1,
-              1, 1, 1,
-              0, 1, 1,
-            ]}
-            lines={[
-              2, 0, 6,
-              2, 1, 7,
-              2, 2, 4,
-              2, 3, 5,
             ]}
             polys={[
               4, 0, 3, 2, 1,
-              4, 4, 5, 6, 7,
-              4, 2, 3, 7, 6,
-              4, 0, 1, 5, 4,
             ]}
-          />
+          >
+            <PointData>
+              <DataArray
+                registration="setScalars"
+                name="Temperature"
+                values={[0, 0.7, 0.3, 1]}
+              />
+              <DataArray
+                name="Pressure"
+                values={[1, 0.3, 0.7, 0]}
+              />
+            </PointData>
+          </PolyData>
         </GeometryRepresentation>
       </View>
     </div>

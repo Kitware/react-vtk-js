@@ -7,7 +7,11 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const entry = {
   PolyDataViewer: './Geometry/PolyDataViewer.js',
+  PolyDataWithData: './Geometry/PolyDataWithData.js',
+  SourceViewer: './Geometry/SourceViewer.js',
+  ProcessingPipeline: './Geometry/ProcessingPipeline.js',
   OBJViewer: './Geometry/OBJViewer.js',
+  PointCloud: './Geometry/PointCloud.js',
 };
 
 function toHtmlPlugin() {

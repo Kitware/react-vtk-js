@@ -8,6 +8,7 @@ import vtkImageData from './ImageData';
 import vtkDataArray from './DataArray';
 import vtkFieldData from './FieldData';
 import vtkAlgorithm from './Algorithm';
+import vtkCalculator from './Calculator';
 import vtkCellData from './CellData';
 
 export const VolumeRepresentation = vtkVolumeRepresentation;
@@ -20,6 +21,7 @@ export const ImageData = vtkImageData;
 export const DataArray = vtkDataArray;
 export const FieldData = vtkFieldData;
 export const Algorithm = vtkAlgorithm;
+export const Calculator = vtkCalculator;
 export const CellData = vtkCellData;
 
 export default {
@@ -33,5 +35,6 @@ export default {
   DataArray: vtkDataArray,
   FieldData: vtkFieldData,
   Algorithm: vtkAlgorithm,
+  Calculator: vtkCalculator,
   CellData: vtkCellData,
 };

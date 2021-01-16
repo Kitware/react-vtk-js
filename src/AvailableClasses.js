@@ -4,9 +4,11 @@
 // Sources
 import 'vtk.js/Sources/Filters/Sources/ConeSource';
 import 'vtk.js/Sources/Filters/Sources/ConcentricCylinderSource';
+import 'vtk.js/Sources/Filters/Sources/SphereSource';
+import 'vtk.js/Sources/Filters/Sources/PlaneSource';
 
 // Filters
-// ...
+import 'vtk.js/Sources/Filters/General/WarpScalar';
 
 // Readers
 import 'vtk.js/Sources/IO/Geometry/PLYReader';

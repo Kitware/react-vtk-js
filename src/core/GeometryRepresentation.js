@@ -5,6 +5,9 @@ import { ViewContext, RepresentationContext, DownstreamContext } from './View';
 
 import vtkActor from 'vtk.js/Sources/Rendering/Core/Actor';
 import vtkMapper from 'vtk.js/Sources/Rendering/Core/Mapper';
+import vtkColorMaps from 'vtk.js/Sources/Rendering/Core/ColorTransferFunction/ColorMaps';
+import vtkColorTransferFunction from 'vtk.js/Sources/Rendering/Core/ColorTransferFunction';
+
 
 /**
  * GeometryRepresentation is responsible to convert a vtkPolyData into rendering
@@ -19,7 +22,11 @@ export default class GeometryRepresentation extends Component {
 
     // Create vtk.js actor/mapper
     this.actor = vtkActor.newInstance();
-    this.mapper = vtkMapper.newInstance();
+    this.lookupTable = vtkColorTransferFunction.newInstance();
+    this.mapper = vtkMapper.newInstance({
+      lookupTable: this.lookupTable,
+      useLookupTableScalarRange: true,
+    });
     this.actor.setMapper(this.mapper);
   }
 
@@ -63,58 +70,40 @@ export default class GeometryRepresentation extends Component {
 
     this.mapper.delete();
     this.mapper = null;
+
+    this.lookupTable.delete();
+    this.lookupTable = null;
   }
 
   update(props, previous) {
-    const { pointSize, color, colorBy } = props;
-    if (pointSize && (!previous || pointSize !== previous.pointSize)) {
-      this.actor.getProperty().setPointSize(pointSize);
+    const { actor, mapper, property, colorMapPreset, colorDataRange } = props;
+    if (actor && (!previous || actor !== previous.actor)) {
+      this.actor.set(actor);
     }
-    if (color && (!previous || color !== previous.color)) {
-      this.actor.getProperty().setColor(color);
+    if (mapper && (!previous || mapper !== previous.mapper)) {
+      this.mapper.set(mapper);
     }
-    if (colorBy && (!previous || colorBy !== previous.colorBy)) {
-      this.setColorBy(...colorBy)
+    if (property && (!previous || property !== previous.property)) {
+      this.actor.getProperty().set(property);
+    }
+
+    if (colorMapPreset && (!previous || colorMapPreset !== previous.colorMapPreset)) {
+      const preset = vtkColorMaps.getPresetByName(colorMapPreset);
+      this.lookupTable.applyColorMap(preset);
+      this.lookupTable.setMappingRange(...colorDataRange);
+      this.lookupTable.updateRange();
+    }
+
+    if (colorDataRange && (!previous || colorDataRange !== previous.colorDataRange)) {
+      this.lookupTable.setMappingRange(...colorDataRange);
+      this.lookupTable.updateRange();
     }
   }
-
-  setColorBy(arrayLocation, arrayName) {
-    let colorMode = vtkMapper.ColorMode.DEFAULT;
-    let scalarMode = vtkMapper.ScalarMode.DEFAULT;
-    const colorByArrayName = arrayName;
-    const dataset = this.mapper.getInputData();
-    if (!dataset) {
-      return;
-    }
-    const fields = dataset.getReferenceByName(arrayLocation);
-    const activeArray = fields && fields.getArray(arrayName);
-    const scalarVisibility = !!activeArray;
-
-    if (scalarVisibility) {
-      colorMode = vtkMapper.ColorMode.MAP_SCALARS;
-      scalarMode =
-        arrayLocation === 'pointData'
-          ? vtkMapper.ScalarMode.USE_POINT_FIELD_DATA
-          : vtkMapper.ScalarMode.USE_CELL_FIELD_DATA;
-    }
-
-    // Not all mappers have those fields
-    this.mapper.set(
-      {
-        colorByArrayName,
-        colorMode,
-        scalarMode,
-        scalarVisibility,
-      },
-      true
-    );
-  };
 }
 
 GeometryRepresentation.defaultProps = {
-  colorBy: ['pointData', ''],
-  pointSize: 1,
-  color: [1, 1, 1],
+  colorMapPreset: 'erdc_rainbow_bright',
+  colorDataRange: [0, 1],
 };
 
 GeometryRepresentation.propTypes = {
@@ -124,21 +113,29 @@ GeometryRepresentation.propTypes = {
   id: PropTypes.string,
 
   /**
-   * Choose which array to color the output with.
-   * - ['pointData', 'temperature']
-   * - ['cellData', 'pressure']
+   * Properties to set to the actor
    */
-  colorBy: PropTypes.arrayOf(PropTypes.string),
+  actor: PropTypes.object,
 
   /**
-   * pointSize for vertex rendering
+   * Properties to set to the actor
    */
-  pointSize: PropTypes.number,
+  mapper: PropTypes.object,
 
   /**
-   * When no colorBy array is provided use provided solid color
+   * Properties to set to the actor.property
    */
-  color: PropTypes.arrayOf(PropTypes.number),
+  property: PropTypes.object,
+
+  /**
+   * Preset name for the lookup table color map
+   */
+  colorMapPreset: PropTypes.string,
+
+  /**
+   * Data range use for the colorMap
+   */
+  colorDataRange: PropTypes.arrayOf(PropTypes.number),
 
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
