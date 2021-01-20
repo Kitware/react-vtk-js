@@ -3,8 +3,11 @@ import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext, DownstreamContext } from './View';
 
-import vtkActor from 'vtk.js/Sources/Rendering/Core/Actor';
-import vtkMapper from 'vtk.js/Sources/Rendering/Core/Mapper';
+import vtkVolume from 'vtk.js/Sources/Rendering/Core/Volume';
+import vtkVolumeMapper from 'vtk.js/Sources/Rendering/Core/VolumeMapper';
+import vtkColorMaps from 'vtk.js/Sources/Rendering/Core/ColorTransferFunction/ColorMaps';
+import vtkColorTransferFunction from 'vtk.js/Sources/Rendering/Core/ColorTransferFunction';
+import vtkPiecewiseFunction from 'vtk.js/Sources/Common/DataModel/PiecewiseFunction';
 
 /**
  * VolumeRepresentation is responsible to convert a vtkPolyData into rendering
@@ -17,10 +20,16 @@ export default class VolumeRepresentation extends Component {
   constructor(props) {
     super(props);
 
-    // Create vtk.js actor/mapper
-    this.actor = vtkActor.newInstance();
-    this.mapper = vtkMapper.newInstance();
-    this.actor.setMapper(this.mapper);
+    // Create vtk.js objects
+    this.lookupTable = vtkColorTransferFunction.newInstance();
+    this.piecewiseFunction = vtkPiecewiseFunction.newInstance();
+    this.volume = vtkVolume.newInstance();
+    this.mapper = vtkVolumeMapper.newInstance();
+    this.volume.setMapper(this.mapper);
+
+    this.volume.getProperty().setRGBTransferFunction(0, this.lookupTable);
+    this.volume.getProperty().setScalarOpacity(0, this.piecewiseFunction);
+    this.volume.getProperty().setInterpolationTypeToLinear();
   }
 
   render() {
@@ -28,7 +37,7 @@ export default class VolumeRepresentation extends Component {
       <ViewContext.Consumer>
         {(view) => {
           if (!this.view) {
-            view.renderer.addActor(this.actor);
+            view.renderer.addVolume(this.volume);
             this.view = view;
           }
           return (
@@ -55,66 +64,85 @@ export default class VolumeRepresentation extends Component {
 
   componentWillUnmount() {
     if (this.view) {
-      this.view.renderer.remoteActor(this.actor);
+      this.view.renderer.removeVolume(this.volume);
     }
 
-    this.actor.delete();
-    this.actor = null;
+    this.volume.delete();
+    this.volume = null;
 
     this.mapper.delete();
     this.mapper = null;
   }
 
   update(props, previous) {
-    const { pointSize, color, colorBy } = props;
-    if (pointSize && (!previous || pointSize !== previous.pointSize)) {
-      this.actor.getProperty().setPointSize(pointSize);
+    const { volume, property, mapper, colorMapPreset, colorDataRange } = props;
+    if (volume && (!previous || volume !== previous.volume)) {
+      this.volume.set(volume);
     }
-    if (color && (!previous || color !== previous.color)) {
-      this.actor.getProperty().setColor(color);
+    if (property && (!previous || property !== previous.property)) {
+      this.volume.getProperty().set(property);
     }
-    if (colorBy && (!previous || colorBy !== previous.colorBy)) {
-      this.setColorBy(...colorBy)
+    if (mapper && (!previous || mapper !== previous.mapper)) {
+      this.mapper.set(mapper);
+    }
+    if (colorMapPreset && (!previous || colorMapPreset !== previous.colorMapPreset)) {
+      const preset = vtkColorMaps.getPresetByName(colorMapPreset);
+      this.lookupTable.applyColorMap(preset);
+      this.lookupTable.setMappingRange(...colorDataRange);
+      this.lookupTable.updateRange();
+    }
+
+    if (colorDataRange && (!previous || colorDataRange !== previous.colorDataRange)) {
+      if (typeof colorDataRange === 'string') {
+        if (previous) {
+          console.log('from update');
+          this.dataChanged();
+        } else {
+          this.lookupTable.setMappingRange(0, 1);
+          this.lookupTable.updateRange();
+
+          this.piecewiseFunction.setNodes([
+           { x: 0, y: 0, midpoint: 0.5, sharpness: 0 },
+           { x: 1, y: 1, midpoint: 0.5, sharpness: 0 },
+          ]);
+        }
+      } else {
+        this.lookupTable.setMappingRange(...colorDataRange);
+        this.lookupTable.updateRange();
+
+        this.piecewiseFunction.setNodes([
+         { x: colorDataRange[0], y: 0, midpoint: 0.5, sharpness: 0 },
+         { x: colorDataRange[1], y: 1, midpoint: 0.5, sharpness: 0 },
+        ]);
+      }
     }
   }
 
-  setColorBy(arrayLocation, arrayName) {
-    let colorMode = vtkMapper.ColorMode.DEFAULT;
-    let scalarMode = vtkMapper.ScalarMode.DEFAULT;
-    const colorByArrayName = arrayName;
-    const dataset = this.mapper.getInputData();
-    if (!dataset) {
-      return;
-    }
-    const fields = dataset.getReferenceByName(arrayLocation);
-    const activeArray = fields && fields.getArray(arrayName);
-    const scalarVisibility = !!activeArray;
+  dataChanged() {
+    if (this.props.colorDataRange === 'auto') {
+      this.mapper.update();
+      const input = this.mapper.getInputData();
+      const array = input && input.getPointData().getScalars();
+      const dataRange = array && array.getRange();
+      if (dataRange) {
+        this.lookupTable.setMappingRange(...dataRange);
+        this.lookupTable.updateRange();
+        this.piecewiseFunction.setNodes([
+         { x: dataRange[0], y: 0, midpoint: 0.5, sharpness: 0 },
+         { x: dataRange[1], y: 1, midpoint: 0.5, sharpness: 0 },
+        ]);
+      }
 
-    if (scalarVisibility) {
-      colorMode = vtkMapper.ColorMode.MAP_SCALARS;
-      scalarMode =
-        arrayLocation === 'pointData'
-          ? vtkMapper.ScalarMode.USE_POINT_FIELD_DATA
-          : vtkMapper.ScalarMode.USE_CELL_FIELD_DATA;
+      if (this.view) {
+        this.view.renderView();
+      }
     }
-
-    // Not all mappers have those fields
-    this.mapper.set(
-      {
-        colorByArrayName,
-        colorMode,
-        scalarMode,
-        scalarVisibility,
-      },
-      true
-    );
-  };
+  }
 }
 
 VolumeRepresentation.defaultProps = {
-  colorBy: ['pointData', ''],
-  pointSize: 1,
-  color: [1, 1, 1],
+  colorMapPreset: 'erdc_rainbow_bright',
+  colorDataRange: 'auto',
 };
 
 VolumeRepresentation.propTypes = {
@@ -124,24 +152,35 @@ VolumeRepresentation.propTypes = {
   id: PropTypes.string,
 
   /**
-   * Choose which array to color the output with.
-   * - ['pointData', 'temperature']
-   * - ['cellData', 'pressure']
+   * Properties to set to the mapper
    */
-  colorBy: PropTypes.arrayOf(PropTypes.string),
+  mapper: PropTypes.object,
 
   /**
-   * pointSize for vertex rendering
+   * Properties to set to the volume
    */
-  pointSize: PropTypes.number,
+  volume: PropTypes.object,
 
   /**
-   * When no colorBy array is provided use provided solid color
+   * Properties to set to the volume.property
    */
-  color: PropTypes.arrayOf(PropTypes.number),
+  property: PropTypes.object,
+
+  /**
+   * Preset name for the lookup table color map
+   */
+  colorMapPreset: PropTypes.string,
+
+  /**
+   * Data range use for the colorMap
+   */
+  colorDataRange: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.number),
+    PropTypes.string,
+  ]),
 
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node
+    PropTypes.node,
   ]),
 };

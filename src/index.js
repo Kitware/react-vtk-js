@@ -15,6 +15,7 @@ import {
 
 // Core
 export const VolumeRepresentation = Core.VolumeRepresentation;
+export const VolumeController = Core.VolumeController;
 export const PointData = Core.PointData;
 export const PolyData = Core.PolyData;
 export const Reader = Core.Reader;
@@ -29,6 +30,7 @@ export const CellData = Core.CellData;
 
 // Representations
 export const PointCloudRepresentation = Representations.PointCloudRepresentation;
+export const VolumeDataRepresentation = Representations.VolumeDataRepresentation
 
 // Context
 export const Contexts = {

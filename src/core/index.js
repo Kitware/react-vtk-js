@@ -1,4 +1,5 @@
 import vtkVolumeRepresentation from './VolumeRepresentation';
+import vtkVolumeController from './VolumeController';
 import vtkPointData from './PointData';
 import vtkPolyData from './PolyData';
 import vtkReader from './Reader';
@@ -12,6 +13,7 @@ import vtkCalculator from './Calculator';
 import vtkCellData from './CellData';
 
 export const VolumeRepresentation = vtkVolumeRepresentation;
+export const VolumeController = vtkVolumeController;
 export const PointData = vtkPointData;
 export const PolyData = vtkPolyData;
 export const Reader = vtkReader;
@@ -26,6 +28,7 @@ export const CellData = vtkCellData;
 
 export default {
   VolumeRepresentation: vtkVolumeRepresentation,
+  VolumeController: vtkVolumeController,
   PointData: vtkPointData,
   PolyData: vtkPolyData,
   Reader: vtkReader,

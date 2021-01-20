@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import { ViewContext, DownstreamContext } from './View';
+import { ViewContext, RepresentationContext, DownstreamContext } from './View';
 
 import vtk from 'vtk.js/Sources/vtk';
 import Base64 from 'vtk.js/Sources/Common/Core/Base64';
@@ -26,26 +26,33 @@ export default class Reader extends Component {
     return (
       <ViewContext.Consumer>
         {(view) => (
-          <DownstreamContext.Consumer>
-            {(downstream) => {
-              if (!this.reader) {
-                const { vtkClass } = this.props;
-                this.reader = vtk({ vtkClass });
-              }
-              if (!this.downstream) {
-                downstream.setInputConnection(this.reader.getOutputPort(), this.props.port);
-                this.downstream = downstream;
-              }
-              this.view = view;
+          <RepresentationContext.Consumer>
+            {(representation) => {
+              this.representation = representation;
               return (
-                <DownstreamContext.Provider value={this.reader}>
-                  <div key={this.props.id} id={this.props.id}>
-                    {this.props.children}
-                  </div>
-                </DownstreamContext.Provider>
+                <DownstreamContext.Consumer>
+                  {(downstream) => {
+                    if (!this.reader) {
+                      const { vtkClass } = this.props;
+                      this.reader = vtk({ vtkClass });
+                    }
+                    if (!this.downstream) {
+                      downstream.setInputConnection(this.reader.getOutputPort(), this.props.port);
+                      this.downstream = downstream;
+                    }
+                    this.view = view;
+                    return (
+                      <DownstreamContext.Provider value={this.reader}>
+                        <div key={this.props.id} id={this.props.id}>
+                          {this.props.children}
+                        </div>
+                      </DownstreamContext.Provider>
+                    );
+                  }}
+                </DownstreamContext.Consumer>
               );
             }}
-          </DownstreamContext.Consumer>
+          </RepresentationContext.Consumer>
         )}
       </ViewContext.Consumer>
     );
@@ -74,6 +81,9 @@ export default class Reader extends Component {
 
     if (url && (!previous || url !== previous.url)) {
       this.reader.setUrl(url).then(() => {
+        if (this.representation) {
+          this.representation.dataChanged();
+        }
         if (this.view) {
           if (this.props.resetCameraOnUpdate) {
             this.view.resetCamera();
@@ -87,10 +97,16 @@ export default class Reader extends Component {
 
     if (parseAsText && (!previous || parseAsText !== previous.parseAsText)) {
       this.reader.parseAsText(parseAsText);
+      if (this.representation) {
+        this.representation.dataChanged();
+      }
     }
 
     if (parseAsArrayBuffer && (!previous || parseAsArrayBuffer !== previous.parseAsArrayBuffer)) {
       this.reader.parseAsArrayBuffer(Base64.toArrayBuffer(parseAsArrayBuffer));
+      if (this.representation) {
+        this.representation.dataChanged();
+      }
     }
 
     if (this.view) {

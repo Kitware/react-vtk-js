@@ -138,6 +138,12 @@ export default class PolyData extends Component {
 
     if (changeDetected) {
       this.polydata.modified();
+
+      // Let the representation know that data has changed in case auto
+      // rendering configs needs to be triggered with the new data.
+      if (this.representation) {
+        this.representation.dataChanged();
+      }
     }
 
     // // Force prop update now that the downstream has data

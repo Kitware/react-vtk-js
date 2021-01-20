@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import { FieldsContext } from './View';
-
+import { RepresentationContext, FieldsContext } from './View';
 import vtkDataArray from 'vtk.js/Sources/Common/Core/DataArray';
 import { TYPED_ARRAYS } from 'vtk.js/Sources/macro';
 
@@ -24,14 +23,21 @@ export default class DataArray extends Component {
 
   render() {
     return (
-      <FieldsContext.Consumer>
-        {(fields) => {
-          if (!this.fields) {
-            this.fields = fields;
-          }
-          return (<div key={this.props.id} name={this.props.name} />)
+      <RepresentationContext.Consumer>
+        {(representation) => {
+          this.representation = representation;
+          return (
+            <FieldsContext.Consumer>
+              {(fields) => {
+                if (!this.fields) {
+                  this.fields = fields;
+                }
+                return (<div key={this.props.id} name={this.props.name} />)
+              }}
+            </FieldsContext.Consumer>
+          );
         }}
-      </FieldsContext.Consumer>
+      </RepresentationContext.Consumer>
     );
   }
 
@@ -68,6 +74,10 @@ export default class DataArray extends Component {
 
     if (values && (changeDetected || !previous || values !== previous.values)) {
       this.array.setData(klass.from(values), numberOfComponents);
+
+      if (this.representation) {
+        this.representation.dataChanged();
+      }
     }
   }
 }

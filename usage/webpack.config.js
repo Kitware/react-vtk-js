@@ -12,6 +12,8 @@ const entry = {
   ProcessingPipeline: './Geometry/ProcessingPipeline.js',
   OBJViewer: './Geometry/OBJViewer.js',
   PointCloud: './Geometry/PointCloud.js',
+  VolumeRendering: './Volume/VolumeRendering.js',
+  SyntheticVolumeRendering: './Volume/SyntheticVolumeRendering.js',
 };
 
 function toHtmlPlugin() {

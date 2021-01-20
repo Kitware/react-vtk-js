@@ -99,6 +99,10 @@ export default class GeometryRepresentation extends Component {
       this.lookupTable.updateRange();
     }
   }
+
+  dataChanged() {
+    console.log('dataChanged');
+  }
 }
 
 GeometryRepresentation.defaultProps = {
