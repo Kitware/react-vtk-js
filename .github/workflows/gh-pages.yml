@@ -24,7 +24,6 @@ jobs:
       - name: Publish docs
         if: github.ref == 'refs/heads/master'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GIT_PUBLISH_URL: https://${{ secrets.GH_PUBLISH_CREDS }}@github.com/Kitware/react-vtk-js.git
         run: |
           git config --global user.name "Github Actions"

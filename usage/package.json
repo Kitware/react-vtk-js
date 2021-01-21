@@ -36,6 +36,6 @@
     "dev": "webpack serve",
     "serve": "serve ./build-usage",
     "predoc": "npm run build && cp index.html ./build-usage/",
-    "doc": "gh-pages -d ./build-usage -r $GIT_PUBLISH_URL"
+    "doc": "gh-pages -d ./build-usage -f -r $GIT_PUBLISH_URL"
   }
 }
