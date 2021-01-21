@@ -1,0 +1,31 @@
+<html>
+  <body style="padding: 0; margin: 0;">
+    <select style="position: absolute; top: 5px; left: 5px;">
+      <option>Geometry/OBJViewer</option>
+      <option>Geometry/PointCloud</option>
+      <option>Geometry/PolyDataViewer</option>
+      <option>Geometry/PolyDataWithData</option>
+      <option>Geometry/ProcessingPipeline</option>
+      <option>Geometry/SourceViewer</option>
+      <option>Volume/SliceRendering</option>
+      <option>Volume/SyntheticVolumeRendering</option>
+      <option>Volume/VolumeRendering</option>
+    </select>
+    <iframe class="js-src" src="" style="border: 0; margin: 0; padding: 0; width: 49vw; height: 100vh; display: inline-block;" ></iframe>
+    <iframe class="js-usage" src="" style="border: 0; margin: 0; padding: 0; width: 50vw; height: 100vh; display: inline-block;" ></iframe>
+    <script>
+      var srcFrame = document.querySelector('.js-src');
+      var usageFrame = document.querySelector('.js-usage');
+      var select = document.querySelector('select');
+
+      function selectUsage() {
+        const value = select.value;
+        const appName = value.split('/').pop();
+        srcFrame.src = `https://raw.githubusercontent.com/Kitware/react-vtk-js/master/usage/${value}.js`;
+        usageFrame.src = `${appName}.html`;
+      }
+      selectUsage();
+      select.addEventListener('change', selectUsage);
+    </script>
+  </body>
+</html>
