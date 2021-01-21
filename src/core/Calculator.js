@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 
 import { DownstreamContext } from './View';
 
-import vtkCalculator from 'vtk.js/Sources/Filters/General/Calculator';
-import vtkDataSet from 'vtk.js/Sources/Common/DataModel/DataSet';
+import vtkCalculator from 'vtk.js/Filters/General/Calculator';
+import vtkDataSet from 'vtk.js/Common/DataModel/DataSet';
 
 const { FieldDataTypes } = vtkDataSet;
 /**

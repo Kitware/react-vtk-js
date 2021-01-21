@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import { RepresentationContext, DownstreamContext, DataSetContext } from './View';
 
-import vtkImageData from 'vtk.js/Sources/Common/DataModel/ImageData';
+import vtkImageData from 'vtk.js/Common/DataModel/ImageData';
 
 /**
  * ImageData is exposing a vtkImageData to a downstream filter

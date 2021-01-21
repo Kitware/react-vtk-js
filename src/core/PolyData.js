@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import { RepresentationContext, DownstreamContext, DataSetContext } from './View';
 
-import vtkPolyData from 'vtk.js/Sources/Common/DataModel/PolyData';
+import vtkPolyData from 'vtk.js/Common/DataModel/PolyData';
 
 /**
  * PolyData is exposing a vtkPolyData to a downstream filter

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import { DownstreamContext } from './View';
 
-import vtk from 'vtk.js/Sources/vtk';
+import vtk from 'vtk.js/vtk';
 
 /**
  * Algorithm is exposing a source or filter to a downstream filter

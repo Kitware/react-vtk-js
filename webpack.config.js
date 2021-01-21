@@ -36,35 +36,6 @@ module.exports = function(_env, argv) {
             }
           }
         },
-        {
-          test: /\.glsl$/i,
-          loader: 'shader-loader',
-        },
-        {
-          test: /\.worker\.js$/,
-          use: [
-              { loader: 'worker-loader', options: { inline: 'no-fallback' } },
-          ],
-        },
-        {
-          test: /\.module\.css$/,
-          use: [
-            { loader: 'style-loader' },
-            {
-              loader: 'css-loader',
-              options: {
-                modules: {
-                  localIdentName: '[name]-[local]_[sha512:hash:base64:5]',
-                },
-              },
-            },
-            { loader: 'postcss-loader' },
-          ],
-        },
-        {
-          test: /\.svg$/,
-          use: [{ loader: 'raw-loader' }],
-        },
       ]
     },
     resolve: {

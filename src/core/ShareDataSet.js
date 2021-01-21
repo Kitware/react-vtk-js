@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import macro from 'vtk.js/Sources/macro';
+
+import macro from 'vtk.js/macro';
+
 import { DownstreamContext } from './View';
 
 function vtkTrivialProducer(publicAPI, model) {

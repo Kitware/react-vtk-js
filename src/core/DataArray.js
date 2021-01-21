@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { RepresentationContext, FieldsContext } from './View';
-import vtkDataArray from 'vtk.js/Sources/Common/Core/DataArray';
-import { TYPED_ARRAYS } from 'vtk.js/Sources/macro';
+import vtkDataArray from 'vtk.js/Common/Core/DataArray';
+import { TYPED_ARRAYS } from 'vtk.js/macro';
 
 /**
  * DataArray is creating a vtkDataArray for the container fields

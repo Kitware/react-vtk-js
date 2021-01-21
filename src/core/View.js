@@ -15,20 +15,20 @@ export const DownstreamContext = React.createContext(null);
 // vtk.js Rendering stack
 // ----------------------------------------------------------------------------
 
-import vtkOpenGLRenderWindow from 'vtk.js/Sources/Rendering/OpenGL/RenderWindow';
-import vtkRenderWindow from 'vtk.js/Sources/Rendering/Core/RenderWindow';
-import vtkRenderWindowInteractor from 'vtk.js/Sources/Rendering/Core/RenderWindowInteractor';
-import vtkRenderer from 'vtk.js/Sources/Rendering/Core/Renderer';
-import vtkInteractorStyleManipulator from 'vtk.js/Sources/Interaction/Style/InteractorStyleManipulator';
+import vtkOpenGLRenderWindow from 'vtk.js/Rendering/OpenGL/RenderWindow';
+import vtkRenderWindow from 'vtk.js/Rendering/Core/RenderWindow';
+import vtkRenderWindowInteractor from 'vtk.js/Rendering/Core/RenderWindowInteractor';
+import vtkRenderer from 'vtk.js/Rendering/Core/Renderer';
+import vtkInteractorStyleManipulator from 'vtk.js/Interaction/Style/InteractorStyleManipulator';
 
 // Style modes
-import vtkMouseCameraTrackballMultiRotateManipulator from 'vtk.js/Sources/Interaction/Manipulators/MouseCameraTrackballMultiRotateManipulator';
-import vtkMouseCameraTrackballPanManipulator from 'vtk.js/Sources/Interaction/Manipulators/MouseCameraTrackballPanManipulator';
-import vtkMouseCameraTrackballRollManipulator from 'vtk.js/Sources/Interaction/Manipulators/MouseCameraTrackballRollManipulator';
-import vtkMouseCameraTrackballRotateManipulator from 'vtk.js/Sources/Interaction/Manipulators/MouseCameraTrackballRotateManipulator';
-import vtkMouseCameraTrackballZoomManipulator from 'vtk.js/Sources/Interaction/Manipulators/MouseCameraTrackballZoomManipulator';
-import vtkMouseCameraTrackballZoomToMouseManipulator from 'vtk.js/Sources/Interaction/Manipulators/MouseCameraTrackballZoomToMouseManipulator';
-import vtkGestureCameraManipulator from 'vtk.js/Sources/Interaction/Manipulators/GestureCameraManipulator';
+import vtkMouseCameraTrackballMultiRotateManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballMultiRotateManipulator';
+import vtkMouseCameraTrackballPanManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballPanManipulator';
+import vtkMouseCameraTrackballRollManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballRollManipulator';
+import vtkMouseCameraTrackballRotateManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballRotateManipulator';
+import vtkMouseCameraTrackballZoomManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballZoomManipulator';
+import vtkMouseCameraTrackballZoomToMouseManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballZoomToMouseManipulator';
+import vtkGestureCameraManipulator from 'vtk.js/Interaction/Manipulators/GestureCameraManipulator';
 
 // ----------------------------------------------------------------------------
 // Helper constants
