@@ -31,7 +31,7 @@ function Example(props) {
   const [resolution, setResolution] =  useState(24);
   return (
     <div style={{width: '100vw', height: '100vh'}}>
-      <View>
+      <View cameraViewUp={[0, 0, -1]} cameraPosition={[1, 1, 0]}>
         <Slider value={resolution} setValue={setResolution} />
         <GeometryRepresentation property={{ color: [0.3, 0.3, 1] }}>
           <Algorithm

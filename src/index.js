@@ -15,10 +15,12 @@ import {
 
 // Core
 export const VolumeRepresentation = Core.VolumeRepresentation;
+export const SliceRepresentation = Core.SliceRepresentation;
 export const VolumeController = Core.VolumeController;
 export const PointData = Core.PointData;
 export const PolyData = Core.PolyData;
 export const Reader = Core.Reader;
+export const ShareDataSet = Core.ShareDataSet;
 export const View = Core.View;
 export const GeometryRepresentation = Core.GeometryRepresentation;
 export const ImageData = Core.ImageData;

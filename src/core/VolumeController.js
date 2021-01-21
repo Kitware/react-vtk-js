@@ -60,6 +60,8 @@ export default class VolumeController extends Component {
       this.controller.setContainer(container);
       this.controller.setupContent(renderWindow, volume, isBackgroundDark);
       this.controller.render();
+      this.view.resetCamera();
+      this.view.renderView();
     } else {
       setTimeout(() => this.init(), 100);
     }

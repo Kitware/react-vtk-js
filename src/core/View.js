@@ -81,6 +81,9 @@ const HIDDEN_STYLE = { display: 'none' };
  * View is responsible to render vtk.js data.
  * It takes the following set of properties:
  *   - `background`: [0.2, 0.3, 0.4]
+ *   - `cameraPosition`: [0, 0, 1]
+ *   - `cameraViewUp`: [0, 1, 0]
+ *   - `cameraParallelProjection`: false
  */
 export default class View extends Component {
   constructor(props) {
@@ -121,7 +124,7 @@ export default class View extends Component {
             this.resetCamera();
             break;
           default:
-            console.log(e.code);
+            // console.log(e.code);
             break;
         }
       };
@@ -172,10 +175,9 @@ export default class View extends Component {
       this.interactor.bindEvents(container);
       this.onResize();
       this.resizeObserver.observe(container);
-      this.resetCamera();
-
       this.update(this.props);
       document.addEventListener('keyup', this.handleKey);
+      this.resetCamera();
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -210,13 +212,33 @@ export default class View extends Component {
   }
 
   update(props, previous) {
-    const { background, interactorSettings } = props;
+    const { background, interactorSettings, cameraPosition, cameraViewUp, cameraParallelProjection } = props;
     if (background && (!previous || background !== previous.background)) {
       this.renderer.setBackground(background);
     }
     if (interactorSettings && (!previous || interactorSettings !== previous.interactorSettings)) {
       assignManipulators(this.style, interactorSettings);
     }
+    if (cameraParallelProjection && (!previous || cameraParallelProjection !== previous.cameraParallelProjection)) {
+      const camera = this.renderer.getActiveCamera();
+      camera.setParallelProjection(cameraParallelProjection);
+      if (previous) {
+        this.resetCamera();
+      }
+    }
+    if (cameraPosition && (!previous || JSON.stringify(cameraPosition) !== JSON.stringify(previous.cameraPosition))) {
+      const camera = this.renderer.getActiveCamera();
+      camera.set({
+        position: cameraPosition,
+        viewUp: cameraViewUp,
+        focalPoint: [0, 0, 0],
+      });
+      if (previous) {
+        this.resetCamera();
+      }
+    }
+
+
   }
 
   resetCamera() {
@@ -228,6 +250,9 @@ export default class View extends Component {
 
 View.defaultProps = {
     background: [0.2, 0.3, 0.4],
+    cameraPosition: [0, 0, 1],
+    cameraViewUp: [0, 1, 0],
+    cameraParallelProjection: false,
     interactorSettings: [
       {
         button: 1,
@@ -282,6 +307,21 @@ View.propTypes = {
      * Configure the interactions
      */
     interactorSettings: PropTypes.array,
+
+    /**
+     * Initial camera position from an object in [0,0,0]
+     */
+    cameraPosition: PropTypes.array,
+
+    /**
+     * Initial camera position from an object in [0,0,0]
+     */
+    cameraViewUp: PropTypes.array,
+
+    /**
+     * Use parallel projection (default: false)
+     */
+    cameraParallelProjection: PropTypes.bool,
 
     /**
      * List of representation to show

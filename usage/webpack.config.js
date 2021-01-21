@@ -14,6 +14,7 @@ const entry = {
   PointCloud: './Geometry/PointCloud.js',
   VolumeRendering: './Volume/VolumeRendering.js',
   SyntheticVolumeRendering: './Volume/SyntheticVolumeRendering.js',
+  SliceRendering: './Volume/SliceRendering.js',
 };
 
 function toHtmlPlugin() {
