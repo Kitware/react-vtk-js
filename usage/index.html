@@ -21,7 +21,7 @@
       function selectUsage() {
         const value = select.value;
         const appName = value.split('/').pop();
-        srcFrame.src = `https://raw.githubusercontent.com/Kitware/react-vtk-js/master/usage/${value}.js`;
+        srcFrame.src = `https://github.com/Kitware/react-vtk-js/blob/master/usage/${value}.js`;
         usageFrame.src = `${appName}.html`;
       }
       selectUsage();
