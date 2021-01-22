@@ -5,38 +5,57 @@
   "author": "Kitware Inc",
   "license": "BSD-3-Clause",
   "repository": "Kitware/react-vtk-js",
-  "main": "dist/ReactVtkJs.js",
-  "module": "dist/ReactVtkJs.js",
+  "main": "dist/umd/react-vtk.js",
+  "module": "dist/esm/index.js",
   "source": "src/index.js",
   "dependencies": {
+    "@babel/runtime": "^7.12.5",
     "vtk.js": "17.0.0-beta.1"
+  },
+  "scripts": {
+    "build": "rollup ./src/index.js -c",
+    "prepare": "run-s build",
+    "test": "run-s test:lint test:build",
+    "test:build": "run-s build",
+    "test:lint": "eslint .",
+    "fix:prettier": "prettier --config .prettierrc --write \"src/**/*.js\"",
+    "fix:eslint": "eslint --fix src",
+    "predeploy": "cd usage && npm install && npm run build",
+    "deploy": "gh-pages -d usage/www -f -r $GIT_PUBLISH_URL"
+  },
+  "peerDependencies": {
+    "react": "^16.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
-    "@babel/plugin-proposal-class-properties": "^7.12.1",
-    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
-    "@babel/plugin-transform-react-constant-elements": "^7.12.1",
-    "@babel/plugin-transform-react-inline-elements": "^7.12.1",
     "@babel/plugin-transform-runtime": "^7.12.10",
     "@babel/preset-env": "^7.12.11",
     "@babel/preset-react": "^7.12.10",
-    "@babel/runtime": "^7.12.5",
-    "babel-loader": "^8.2.2",
-    "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
-    "prop-types": "^15.7.2",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "terser-webpack-plugin": "^5.1.1",
-    "webpack": "^5.14.0",
-    "webpack-cli": "^4.3.1"
-  },
-  "peerDependencies": {
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1"
-  },
-  "scripts": {
-    "build:debug": "webpack",
-    "build": "webpack --env production"
+    "@rollup/plugin-babel": "^5.2.2",
+    "@rollup/plugin-commonjs": "17.0.0",
+    "@rollup/plugin-eslint": "^8.0.1",
+    "@rollup/plugin-node-resolve": "^11.1.0",
+    "babel-eslint": "^10.0.3",
+    "commitizen": "4.2.2",
+    "cross-env": "^7.0.2",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.7.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-config-standard-react": "^9.2.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-react": "^7.17.0",
+    "eslint-plugin-standard": "^4.0.1",
+    "gh-pages": "^2.2.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.0.4",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "rollup": "^2.37.1",
+    "rollup-plugin-terser": "^7.0.2",
+    "semantic-release": "17.3.1"
   },
   "files": [
     "dist"

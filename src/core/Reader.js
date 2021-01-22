@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext, DownstreamContext } from './View';
 
-import vtk from 'vtk.js/vtk';
-import Base64 from 'vtk.js/Common/Core/Base64';
+import vtk from 'vtk.js/vtk.js';
+import Base64 from 'vtk.js/Common/Core/Base64/index.js';
 
 /**
  * Reader is exposing a reader to a downstream filter
@@ -37,7 +37,10 @@ export default class Reader extends Component {
                       this.reader = vtk({ vtkClass });
                     }
                     if (!this.downstream) {
-                      downstream.setInputConnection(this.reader.getOutputPort(), this.props.port);
+                      downstream.setInputConnection(
+                        this.reader.getOutputPort(),
+                        this.props.port
+                      );
                       this.downstream = downstream;
                     }
                     this.view = view;
@@ -76,7 +79,10 @@ export default class Reader extends Component {
 
     if (vtkClass && (!previous || vtkClass !== previous.vtkClass)) {
       this.reader = vtk({ vtkClass });
-      this.downstream.setInputConnection(this.reader.getOutputPort(), this.props.port);
+      this.downstream.setInputConnection(
+        this.reader.getOutputPort(),
+        this.props.port
+      );
     }
 
     if (url && (!previous || url !== previous.url)) {
@@ -102,7 +108,10 @@ export default class Reader extends Component {
       }
     }
 
-    if (parseAsArrayBuffer && (!previous || parseAsArrayBuffer !== previous.parseAsArrayBuffer)) {
+    if (
+      parseAsArrayBuffer &&
+      (!previous || parseAsArrayBuffer !== previous.parseAsArrayBuffer)
+    ) {
       this.reader.parseAsArrayBuffer(Base64.toArrayBuffer(parseAsArrayBuffer));
       if (this.representation) {
         this.representation.dataChanged();
@@ -170,6 +179,6 @@ Reader.propTypes = {
 
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node
+    PropTypes.node,
   ]),
 };

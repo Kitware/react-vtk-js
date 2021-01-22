@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import { RepresentationContext, DownstreamContext, DataSetContext } from './View';
+import {
+  RepresentationContext,
+  DownstreamContext,
+  DataSetContext,
+} from './View';
 
-import vtkPolyData from 'vtk.js/Common/DataModel/PolyData';
+import vtkPolyData from 'vtk.js/Common/DataModel/PolyData/index.js';
 
 /**
  * PolyData is exposing a vtkPolyData to a downstream filter
@@ -65,10 +69,8 @@ export default class PolyData extends Component {
   update(props, previous) {
     const { connectivity, points, verts, lines, polys, strips } = props;
     let changeDetected = false;
-    let pointChanged = false;
     if (points && (!previous || points !== previous.points)) {
       this.polydata.getPoints().setData(Float32Array.from(points), 3);
-      pointChanged = true;
       changeDetected = true;
     }
 
@@ -92,7 +94,10 @@ export default class PolyData extends Component {
       changeDetected = true;
     }
 
-    if (connectivity && (connectivity || !previous || connectivity !== previous.connectivity)) {
+    if (
+      connectivity &&
+      (connectivity || !previous || connectivity !== previous.connectivity)
+    ) {
       const nbPoints = points.length / 3;
       switch (connectivity) {
         case 'points':
@@ -108,9 +113,9 @@ export default class PolyData extends Component {
           break;
         case 'triangles':
           {
-            const values = new Uint16Array(nbPoints + (nbPoints / 3));
+            const values = new Uint16Array(nbPoints + nbPoints / 3);
             let offset = 0;
-            for (let i = 0; i < nbPoints; i+=3) {
+            for (let i = 0; i < nbPoints; i += 3) {
               values[offset++] = 3;
               values[offset++] = i + 0;
               values[offset++] = i + 1;
@@ -132,7 +137,7 @@ export default class PolyData extends Component {
           }
           break;
         default:
-          // do nothing for manual or anything else...
+        // do nothing for manual or anything else...
       }
     }
 
@@ -202,6 +207,6 @@ PolyData.propTypes = {
 
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node
+    PropTypes.node,
   ]),
 };

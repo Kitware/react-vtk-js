@@ -3,11 +3,10 @@ import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext, DownstreamContext } from './View';
 
-import vtkActor from 'vtk.js/Rendering/Core/Actor';
-import vtkMapper from 'vtk.js/Rendering/Core/Mapper';
+import vtkActor from 'vtk.js/Rendering/Core/Actor/index.js';
+import vtkMapper from 'vtk.js/Rendering/Core/Mapper/index.js';
 import vtkColorMaps from 'vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps';
-import vtkColorTransferFunction from 'vtk.js/Rendering/Core/ColorTransferFunction';
-
+import vtkColorTransferFunction from 'vtk.js/Rendering/Core/ColorTransferFunction/index.js';
 
 /**
  * GeometryRepresentation is responsible to convert a vtkPolyData into rendering
@@ -87,14 +86,20 @@ export default class GeometryRepresentation extends Component {
       this.actor.getProperty().set(property);
     }
 
-    if (colorMapPreset && (!previous || colorMapPreset !== previous.colorMapPreset)) {
+    if (
+      colorMapPreset &&
+      (!previous || colorMapPreset !== previous.colorMapPreset)
+    ) {
       const preset = vtkColorMaps.getPresetByName(colorMapPreset);
       this.lookupTable.applyColorMap(preset);
       this.lookupTable.setMappingRange(...colorDataRange);
       this.lookupTable.updateRange();
     }
 
-    if (colorDataRange && (!previous || colorDataRange !== previous.colorDataRange)) {
+    if (
+      colorDataRange &&
+      (!previous || colorDataRange !== previous.colorDataRange)
+    ) {
       this.lookupTable.setMappingRange(...colorDataRange);
       this.lookupTable.updateRange();
     }
@@ -143,6 +148,6 @@ GeometryRepresentation.propTypes = {
 
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node
+    PropTypes.node,
   ]),
 };

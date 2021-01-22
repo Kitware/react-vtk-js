@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext, DownstreamContext } from './View';
 
-import vtkVolume from 'vtk.js/Rendering/Core/Volume';
-import vtkVolumeMapper from 'vtk.js/Rendering/Core/VolumeMapper';
+import vtkVolume from 'vtk.js/Rendering/Core/Volume/index.js';
+import vtkVolumeMapper from 'vtk.js/Rendering/Core/VolumeMapper/index.js';
 import vtkColorMaps from 'vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps';
-import vtkColorTransferFunction from 'vtk.js/Rendering/Core/ColorTransferFunction';
-import vtkPiecewiseFunction from 'vtk.js/Common/DataModel/PiecewiseFunction';
+import vtkColorTransferFunction from 'vtk.js/Rendering/Core/ColorTransferFunction/index.js';
+import vtkPiecewiseFunction from 'vtk.js/Common/DataModel/PiecewiseFunction/index.js';
 
 /**
  * VolumeRepresentation is responsible to convert a vtkPolyData into rendering
@@ -85,14 +85,20 @@ export default class VolumeRepresentation extends Component {
     if (mapper && (!previous || mapper !== previous.mapper)) {
       this.mapper.set(mapper);
     }
-    if (colorMapPreset && (!previous || colorMapPreset !== previous.colorMapPreset)) {
+    if (
+      colorMapPreset &&
+      (!previous || colorMapPreset !== previous.colorMapPreset)
+    ) {
       const preset = vtkColorMaps.getPresetByName(colorMapPreset);
       this.lookupTable.applyColorMap(preset);
       this.lookupTable.setMappingRange(...colorDataRange);
       this.lookupTable.updateRange();
     }
 
-    if (colorDataRange && (!previous || colorDataRange !== previous.colorDataRange)) {
+    if (
+      colorDataRange &&
+      (!previous || colorDataRange !== previous.colorDataRange)
+    ) {
       if (typeof colorDataRange === 'string') {
         if (previous) {
           console.log('from update');
@@ -102,8 +108,8 @@ export default class VolumeRepresentation extends Component {
           this.lookupTable.updateRange();
 
           this.piecewiseFunction.setNodes([
-           { x: 0, y: 0, midpoint: 0.5, sharpness: 0 },
-           { x: 1, y: 1, midpoint: 0.5, sharpness: 0 },
+            { x: 0, y: 0, midpoint: 0.5, sharpness: 0 },
+            { x: 1, y: 1, midpoint: 0.5, sharpness: 0 },
           ]);
         }
       } else {
@@ -111,8 +117,8 @@ export default class VolumeRepresentation extends Component {
         this.lookupTable.updateRange();
 
         this.piecewiseFunction.setNodes([
-         { x: colorDataRange[0], y: 0, midpoint: 0.5, sharpness: 0 },
-         { x: colorDataRange[1], y: 1, midpoint: 0.5, sharpness: 0 },
+          { x: colorDataRange[0], y: 0, midpoint: 0.5, sharpness: 0 },
+          { x: colorDataRange[1], y: 1, midpoint: 0.5, sharpness: 0 },
         ]);
       }
     }
@@ -128,8 +134,8 @@ export default class VolumeRepresentation extends Component {
         this.lookupTable.setMappingRange(...dataRange);
         this.lookupTable.updateRange();
         this.piecewiseFunction.setNodes([
-         { x: dataRange[0], y: 0, midpoint: 0.5, sharpness: 0 },
-         { x: dataRange[1], y: 1, midpoint: 0.5, sharpness: 0 },
+          { x: dataRange[0], y: 0, midpoint: 0.5, sharpness: 0 },
+          { x: dataRange[1], y: 1, midpoint: 0.5, sharpness: 0 },
         ]);
       }
 

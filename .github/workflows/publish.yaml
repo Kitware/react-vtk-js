@@ -6,7 +6,7 @@ on:
 
 jobs:
   publish:
-    name: GHPages
+    name: Publish
     runs-on: ubuntu-18.04
     steps:
       - name: Checkout
@@ -21,11 +21,13 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
-      - name: Publish docs
-        if: github.ref == 'refs/heads/master'
+      - name: Test
+        run: npm run test
+      - name: Release
         env:
-          GIT_PUBLISH_URL: https://${{ secrets.GH_PUBLISH_CREDS }}@github.com/Kitware/react-vtk-js.git
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           git config --global user.name "Github Actions"
           git config --global user.email "sebastien.jourdain@kitware.com"
-          npm run publish
+          npm run semantic-release

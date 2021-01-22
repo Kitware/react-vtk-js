@@ -1,12 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-// Do not work...
-// import { View, GeometryRepresentation, PolyData } from 'react-vtk-js';
-
-// Works...
-import 'react-vtk-js';
-const { View, VolumeDataRepresentation } = ReactVtkJs;
+import { View, VolumeDataRepresentation } from 'react-vtk-js';
 
 function Example(props) {
   const array = [];
