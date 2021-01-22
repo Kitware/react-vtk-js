@@ -28,4 +28,4 @@ jobs:
         run: |
           git config --global user.name "Github Actions"
           git config --global user.email "sebastien.jourdain@kitware.com"
-          npm run publish
+          npm run deploy
