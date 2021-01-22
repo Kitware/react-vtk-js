@@ -21,7 +21,9 @@
     "fix:prettier": "prettier --config .prettierrc --write \"src/**/*.js\"",
     "fix:eslint": "eslint --fix src",
     "predeploy": "cd usage && npm install && npm run build",
-    "deploy": "gh-pages -d usage/www -f -r $GIT_PUBLISH_URL"
+    "deploy": "gh-pages -d usage/www -f -r $GIT_PUBLISH_URL",
+    "commit": "git cz",
+    "semantic-release": "semantic-release"
   },
   "peerDependencies": {
     "react": "^16.0.0"
