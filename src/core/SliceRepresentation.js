@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext, DownstreamContext } from './View';
 
-import vtkImageSlice from 'vtk.js/Sources/Rendering/Core/ImageSlice';
-import vtkImageMapper from 'vtk.js/Sources/Rendering/Core/ImageMapper';
-import vtkColorMaps from 'vtk.js/Sources/Rendering/Core/ColorTransferFunction/ColorMaps';
-import vtkColorTransferFunction from 'vtk.js/Sources/Rendering/Core/ColorTransferFunction';
-import vtkPiecewiseFunction from 'vtk.js/Sources/Common/DataModel/PiecewiseFunction';
+import vtkImageSlice from 'vtk.js/Rendering/Core/ImageSlice/index.js';
+import vtkImageMapper from 'vtk.js/Rendering/Core/ImageMapper/index.js';
+import vtkColorMaps from 'vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps';
+import vtkColorTransferFunction from 'vtk.js/Rendering/Core/ColorTransferFunction/index.js';
+import vtkPiecewiseFunction from 'vtk.js/Common/DataModel/PiecewiseFunction/index.js';
 
 /**
  * SliceRepresentation is responsible to convert a vtkPolyData into rendering
@@ -81,8 +81,12 @@ export default class SliceRepresentation extends Component {
       mapper,
       colorMapPreset,
       colorDataRange,
-      iSlice, jSlice, kSlice,
-      xSlice, ySlice, zSlice,
+      iSlice,
+      jSlice,
+      kSlice,
+      xSlice,
+      ySlice,
+      zSlice,
     } = props;
     if (actor && (!previous || actor !== previous.actor)) {
       this.actor.set(actor);
@@ -93,14 +97,20 @@ export default class SliceRepresentation extends Component {
     if (mapper && (!previous || mapper !== previous.mapper)) {
       this.mapper.set(mapper);
     }
-    if (colorMapPreset && (!previous || colorMapPreset !== previous.colorMapPreset)) {
+    if (
+      colorMapPreset &&
+      (!previous || colorMapPreset !== previous.colorMapPreset)
+    ) {
       const preset = vtkColorMaps.getPresetByName(colorMapPreset);
       this.lookupTable.applyColorMap(preset);
       this.lookupTable.setMappingRange(...colorDataRange);
       this.lookupTable.updateRange();
     }
 
-    if (colorDataRange && (!previous || colorDataRange !== previous.colorDataRange)) {
+    if (
+      colorDataRange &&
+      (!previous || colorDataRange !== previous.colorDataRange)
+    ) {
       if (typeof colorDataRange === 'string') {
         if (previous) {
           this.dataChanged();
@@ -109,8 +119,8 @@ export default class SliceRepresentation extends Component {
           this.lookupTable.updateRange();
 
           this.piecewiseFunction.setNodes([
-           { x: 0, y: 0, midpoint: 0.5, sharpness: 0 },
-           { x: 1, y: 1, midpoint: 0.5, sharpness: 0 },
+            { x: 0, y: 0, midpoint: 0.5, sharpness: 0 },
+            { x: 1, y: 1, midpoint: 0.5, sharpness: 0 },
           ]);
         }
       } else {
@@ -118,8 +128,8 @@ export default class SliceRepresentation extends Component {
         this.lookupTable.updateRange();
 
         this.piecewiseFunction.setNodes([
-         { x: colorDataRange[0], y: 0, midpoint: 0.5, sharpness: 0 },
-         { x: colorDataRange[1], y: 1, midpoint: 0.5, sharpness: 0 },
+          { x: colorDataRange[0], y: 0, midpoint: 0.5, sharpness: 0 },
+          { x: colorDataRange[1], y: 1, midpoint: 0.5, sharpness: 0 },
         ]);
       }
     }
@@ -156,8 +166,8 @@ export default class SliceRepresentation extends Component {
         this.lookupTable.setMappingRange(...dataRange);
         this.lookupTable.updateRange();
         this.piecewiseFunction.setNodes([
-         { x: dataRange[0], y: 0, midpoint: 0.5, sharpness: 0 },
-         { x: dataRange[1], y: 1, midpoint: 0.5, sharpness: 0 },
+          { x: dataRange[0], y: 0, midpoint: 0.5, sharpness: 0 },
+          { x: dataRange[1], y: 1, midpoint: 0.5, sharpness: 0 },
         ]);
       }
 

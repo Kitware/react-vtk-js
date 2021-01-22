@@ -9,12 +9,11 @@ import { DataSetContext, FieldsContext } from './View';
 export default function PointData(props) {
   return (
     <DataSetContext.Consumer>
-      {
-        (dataset) =>
-          <FieldsContext.Provider value={dataset.getPointData()}>
-            {props.children}
-          </FieldsContext.Provider>
-      }
+      {(dataset) => (
+        <FieldsContext.Provider value={dataset.getPointData()}>
+          {props.children}
+        </FieldsContext.Provider>
+      )}
     </DataSetContext.Consumer>
   );
 }
@@ -24,6 +23,6 @@ PointData.defaultProps = {};
 PointData.propTypes = {
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node
+    PropTypes.node,
   ]),
 };

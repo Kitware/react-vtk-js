@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import macro from 'vtk.js/Sources/macro';
+
+import macro from 'vtk.js/macro.js';
+
 import { DownstreamContext } from './View';
 
 function vtkTrivialProducer(publicAPI, model) {
@@ -34,10 +36,6 @@ const SHARED_INSTANCES = {};
 
  */
 export default class ShareDataSet extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   getTrivialProducer() {
     let trivialProducer = SHARED_INSTANCES[this.props.name];
     if (!trivialProducer) {
@@ -69,7 +67,10 @@ export default class ShareDataSet extends Component {
 
   componentDidMount() {
     if (this.downstream) {
-      this.downstream.setInputConnection(this.getTrivialProducer().getOutputPort(), this.props.port);
+      this.downstream.setInputConnection(
+        this.getTrivialProducer().getOutputPort(),
+        this.props.port
+      );
     }
   }
 }
@@ -97,6 +98,6 @@ ShareDataSet.propTypes = {
 
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node
+    PropTypes.node,
   ]),
 };

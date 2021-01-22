@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext } from './View';
 
-import vtkVolumeController from 'vtk.js/Sources/Interaction/UI/VolumeController';
+import vtkVolumeController from 'vtk.js/Interaction/UI/VolumeController/index.js';
 
 /**
  * VolumeController is a GUI to control the piecewise function
@@ -15,7 +15,10 @@ export default class VolumeController extends Component {
 
     // Create vtk.js object
     const { size, rescaleColorMap } = props;
-    this.controller = vtkVolumeController.newInstance({ size, rescaleColorMap });
+    this.controller = vtkVolumeController.newInstance({
+      size,
+      rescaleColorMap,
+    });
   }
 
   render() {
@@ -26,7 +29,7 @@ export default class VolumeController extends Component {
             {(representation) => {
               this.view = view;
               this.representation = representation;
-              return (<div ref={this.containerRef}></div>);
+              return <div ref={this.containerRef} />;
             }}
           </RepresentationContext.Consumer>
         )}
@@ -53,7 +56,8 @@ export default class VolumeController extends Component {
     const container = this.containerRef.current;
     const { renderWindow, props } = this.view;
     const { volume } = this.representation;
-    const isBackgroundDark = props.background[0] + props.background[1] + props.background[2] < 1.5;
+    const isBackgroundDark =
+      props.background[0] + props.background[1] + props.background[2] < 1.5;
 
     const ds = volume.getMapper().getInputData();
     if (ds) {

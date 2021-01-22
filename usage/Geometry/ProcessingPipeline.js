@@ -1,12 +1,7 @@
 import React, { useState, useContext } from 'react';
 import ReactDOM from 'react-dom';
 
-// Do not work...
-// import { View, GeometryRepresentation, Reader } from 'react-vtk-js';
-
-// Works...
-import 'react-vtk-js';
-const { View, GeometryRepresentation, Algorithm, Calculator, Contexts } = ReactVtkJs;
+import { View, GeometryRepresentation, Algorithm, Calculator, Contexts } from 'react-vtk-js';
 
 function Slider(props) {
   const view = useContext(Contexts.ViewContext);

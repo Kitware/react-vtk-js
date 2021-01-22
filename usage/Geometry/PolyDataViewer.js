@@ -1,15 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-// Do not work...
-// import { View, GeometryRepresentation, PolyData } from 'react-vtk-js';
-
-// Works...
-import 'react-vtk-js';
-const { View, GeometryRepresentation, PolyData } = ReactVtkJs;
+import { View, GeometryRepresentation, PolyData } from 'react-vtk-js';
 
 // React complains about unique key prop but I don't see why
-
 function Example(props) {
   return (
     <div style={{width: '100vw', height: '100vh'}}>

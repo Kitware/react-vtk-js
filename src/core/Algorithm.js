@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import { DownstreamContext } from './View';
 
-import vtk from 'vtk.js/Sources/vtk';
+import vtk from 'vtk.js/vtk.js';
 
 /**
  * Algorithm is exposing a source or filter to a downstream filter
@@ -28,7 +28,10 @@ export default class Algorithm extends Component {
             this.algo = vtk({ vtkClass, ...state });
           }
           if (!this.downstream) {
-            downstream.setInputConnection(this.algo.getOutputPort(), this.props.port);
+            downstream.setInputConnection(
+              this.algo.getOutputPort(),
+              this.props.port
+            );
             this.downstream = downstream;
           }
           return (
@@ -57,7 +60,10 @@ export default class Algorithm extends Component {
 
     if (vtkClass && (!previous || vtkClass !== previous.vtkClass)) {
       this.algo = vtk({ vtkClass, ...state });
-      this.downstream.setInputConnection(this.algo.getOutputPort(), this.props.port);
+      this.downstream.setInputConnection(
+        this.algo.getOutputPort(),
+        this.props.port
+      );
     }
 
     if (state && (!previous || state !== previous.state)) {
@@ -95,6 +101,6 @@ Algorithm.propTypes = {
 
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node
+    PropTypes.node,
   ]),
 };

@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 
 import { DownstreamContext } from './View';
 
-import vtkCalculator from 'vtk.js/Sources/Filters/General/Calculator';
-import vtkDataSet from 'vtk.js/Sources/Common/DataModel/DataSet';
+import vtkCalculator from 'vtk.js/Filters/General/Calculator/index.js';
+import vtkDataSet from 'vtk.js/Common/DataModel/DataSet/index.js';
 
 const { FieldDataTypes } = vtkDataSet;
 /**
@@ -29,13 +29,16 @@ export default class Calculator extends Component {
       FieldDataTypes[location],
       arrays,
       name,
-      formula,
+      formula
     );
     return (
       <DownstreamContext.Consumer>
         {(downstream) => {
           if (!this.downstream) {
-            downstream.setInputConnection(this.calculator.getOutputPort(), this.props.port);
+            downstream.setInputConnection(
+              this.calculator.getOutputPort(),
+              this.props.port
+            );
             this.downstream = downstream;
           }
           return (
@@ -97,6 +100,6 @@ Calculator.propTypes = {
 
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node
+    PropTypes.node,
   ]),
 };

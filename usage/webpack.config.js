@@ -33,23 +33,16 @@ function toHtmlPlugin() {
 
 module.exports = function(_env, argv) {
   return {
-    mode: 'development',
-    devtool: 'cheap-module-source-map',
+    mode: 'production',
+    devtool: 'source-map',
     entry,
     output: {
-      path: path.resolve(__dirname, 'build-usage'),
+      path: path.resolve(__dirname, 'www'),
       filename: 'js/[name].js',
     },
     plugins: toHtmlPlugin(),
     module: {
       rules: [
-        {
-          test: require.resolve('react'),
-          loader: 'expose-loader',
-          options: {
-            exposes: ['React'],
-          },
-        },
         {
           test: /\.jsx?$/,
           exclude: /node_modules/,
@@ -64,14 +57,8 @@ module.exports = function(_env, argv) {
         },
       ]
     },
-    resolve: {
-      fallback: {
-        stream: false,
-        buffer: false,
-      },
-    },
     devServer: {
-      contentBase: path.join(__dirname, 'build-usage'),
+      contentBase: path.join(__dirname, 'www'),
       compress: true,
       port: 9000
     }

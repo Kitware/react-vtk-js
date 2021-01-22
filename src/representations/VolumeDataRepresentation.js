@@ -45,7 +45,12 @@ export default function VolumneDataRepresentation(props) {
       mapper={props.mapper}
       volume={props.volume}
     >
-      { props.volumeController && <VolumeController rescaleColorMap={props.rescaleColorMap} size={props.controllerSize}/> }
+      {props.volumeController && (
+        <VolumeController
+          rescaleColorMap={props.rescaleColorMap}
+          size={props.controllerSize}
+        />
+      )}
       <ImageData
         dimensions={props.dimensions}
         origin={props.origin}
@@ -53,7 +58,7 @@ export default function VolumneDataRepresentation(props) {
       >
         <PointData>
           <DataArray
-            registration="setScalars"
+            registration='setScalars'
             numberOfComponents={nbComponents}
             values={values}
             type={type}
@@ -107,7 +112,6 @@ VolumneDataRepresentation.propTypes = {
    * Types of numbers provided in scalars
    */
   scalarsType: PropTypes.string,
-
 
   /**
    * Properties to set to the mapper

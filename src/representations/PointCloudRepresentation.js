@@ -39,17 +39,17 @@ export default function PointCloudRepresentation(props) {
       colorDataRange={props.colorDataRange}
       property={props.property}
     >
-      <PolyData points={props.xyz} connectivity="points">
-        { nbComponents &&
+      <PolyData points={props.xyz} connectivity='points'>
+        {nbComponents && (
           <PointData>
             <DataArray
-              registration="setScalars"
+              registration='setScalars'
               numberOfComponents={nbComponents}
               values={values}
               type={type}
             />
           </PointData>
-        }
+        )}
       </PolyData>
     </GeometryRepresentation>
   );

@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import { RepresentationContext, DownstreamContext, DataSetContext } from './View';
+import {
+  RepresentationContext,
+  DownstreamContext,
+  DataSetContext,
+} from './View';
 
-import vtkImageData from 'vtk.js/Sources/Common/DataModel/ImageData';
+import vtkImageData from 'vtk.js/Common/DataModel/ImageData/index.js';
 
 /**
  * ImageData is exposing a vtkImageData to a downstream filter
@@ -99,6 +103,6 @@ ImageData.propTypes = {
 
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node
+    PropTypes.node,
   ]),
 };
