@@ -35,6 +35,7 @@ export default function PointCloudRepresentation(props) {
   console.log('nbComponents', nbComponents);
   return (
     <GeometryRepresentation
+      id={props.id}
       colorMapPreset={props.colorMapPreset}
       colorDataRange={props.colorDataRange}
       property={props.property}
@@ -62,6 +63,10 @@ PointCloudRepresentation.defaultProps = {
 };
 
 PointCloudRepresentation.propTypes = {
+  /**
+   * The ID used to identify this component.
+   */
+  id: PropTypes.string,
   /**
    * Points coordinates
    */

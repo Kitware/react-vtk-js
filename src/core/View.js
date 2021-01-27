@@ -360,8 +360,8 @@ View.propTypes = {
   triggerRender: PropTypes.number,
 
   /**
-  * Property use to trigger a resetCamera when changing.
-  */
+   * Property use to trigger a resetCamera when changing.
+   */
   triggerResetCamera: PropTypes.number,
 
   /**

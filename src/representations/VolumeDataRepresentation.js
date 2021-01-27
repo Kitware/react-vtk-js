@@ -39,6 +39,7 @@ export default function VolumneDataRepresentation(props) {
   console.log('nbComponents', nbComponents);
   return (
     <VolumeRepresentation
+      id={props.id}
       colorMapPreset={props.colorMapPreset}
       colorDataRange={props.colorDataRange}
       property={props.property}
@@ -79,6 +80,10 @@ VolumneDataRepresentation.defaultProps = {
 };
 
 VolumneDataRepresentation.propTypes = {
+  /**
+   * The ID used to identify this component.
+   */
+  id: PropTypes.string,
   /**
    * Number of points along x, y, z
    */
