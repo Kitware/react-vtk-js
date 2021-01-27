@@ -61,7 +61,7 @@ export default class GeometryRepresentation extends Component {
 
   componentWillUnmount() {
     if (this.view) {
-      this.view.renderer.remoteActor(this.actor);
+      this.view.renderer.removeActor(this.actor);
     }
 
     this.actor.delete();

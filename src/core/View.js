@@ -219,6 +219,8 @@ export default class View extends Component {
       cameraPosition,
       cameraViewUp,
       cameraParallelProjection,
+      triggerRender,
+      triggerResetCamera,
     } = props;
     if (background && (!previous || background !== previous.background)) {
       this.renderer.setBackground(background);
@@ -256,6 +258,14 @@ export default class View extends Component {
         this.resetCamera();
       }
     }
+
+    // Allow to trigger method call from property change
+    if (previous && triggerRender !== previous.triggerRender) {
+      setTimeout(this.renderView, 0);
+    }
+    if (previous && triggerResetCamera !== previous.triggerResetCamera) {
+      setTimeout(this.resetCamera, 0);
+    }
   }
 
   resetCamera() {
@@ -272,6 +282,8 @@ View.defaultProps = {
   cameraPosition: [0, 0, 1],
   cameraViewUp: [0, 1, 0],
   cameraParallelProjection: false,
+  triggerRender: 0,
+  triggerResetCamera: 0,
   interactorSettings: [
     {
       button: 1,
@@ -341,6 +353,16 @@ View.propTypes = {
    * Use parallel projection (default: false)
    */
   cameraParallelProjection: PropTypes.bool,
+
+  /**
+   * Property use to trigger a render when changing.
+   */
+  triggerRender: PropTypes.number,
+
+  /**
+  * Property use to trigger a resetCamera when changing.
+  */
+  triggerResetCamera: PropTypes.number,
 
   /**
    * List of representation to show
