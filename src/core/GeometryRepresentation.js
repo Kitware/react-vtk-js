@@ -106,7 +106,9 @@ export default class GeometryRepresentation extends Component {
   }
 
   dataChanged() {
-    console.log('dataChanged');
+    if (this.view) {
+      this.view.renderView();
+    }
   }
 }
 

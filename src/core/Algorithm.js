@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import { DownstreamContext } from './View';
+import { RepresentationContext, DownstreamContext } from './View';
 
 import vtk from 'vtk.js/vtk.js';
 
@@ -21,28 +21,33 @@ export default class Algorithm extends Component {
 
   render() {
     return (
-      <DownstreamContext.Consumer>
-        {(downstream) => {
-          if (!this.algo) {
-            const { vtkClass, state } = this.props;
-            this.algo = vtk({ vtkClass, ...state });
-          }
-          if (!this.downstream) {
-            downstream.setInputConnection(
-              this.algo.getOutputPort(),
-              this.props.port
-            );
-            this.downstream = downstream;
-          }
-          return (
-            <DownstreamContext.Provider value={this.algo}>
-              <div key={this.props.id} id={this.props.id}>
-                {this.props.children}
-              </div>
-            </DownstreamContext.Provider>
-          );
-        }}
-      </DownstreamContext.Consumer>
+      <RepresentationContext.Consumer>
+        {(representation) => (
+          <DownstreamContext.Consumer>
+            {(downstream) => {
+              this.representation = representation;
+              if (!this.algo) {
+                const { vtkClass, state } = this.props;
+                this.algo = vtk({ vtkClass, ...state });
+              }
+              if (!this.downstream) {
+                downstream.setInputConnection(
+                  this.algo.getOutputPort(),
+                  this.props.port
+                );
+                this.downstream = downstream;
+              }
+              return (
+                <DownstreamContext.Provider value={this.algo}>
+                  <div key={this.props.id} id={this.props.id}>
+                    {this.props.children}
+                  </div>
+                </DownstreamContext.Provider>
+              );
+            }}
+          </DownstreamContext.Consumer>
+        )}
+      </RepresentationContext.Consumer>
     );
   }
 
@@ -68,6 +73,9 @@ export default class Algorithm extends Component {
 
     if (state && (!previous || state !== previous.state)) {
       this.algo.set(state);
+      if (this.representation) {
+        this.representation.dataChanged();
+      }
     }
   }
 }
