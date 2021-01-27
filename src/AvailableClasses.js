@@ -2,10 +2,14 @@
 // => this is required because of tree shacking
 
 // Sources
-import 'vtk.js/Filters/Sources/ConeSource/index.js';
 import 'vtk.js/Filters/Sources/ConcentricCylinderSource/index.js';
-import 'vtk.js/Filters/Sources/SphereSource/index.js';
+import 'vtk.js/Filters/Sources/ConeSource/index.js';
+import 'vtk.js/Filters/Sources/CubeSource/index.js';
+import 'vtk.js/Filters/Sources/CylinderSource/index.js';
+import 'vtk.js/Filters/Sources/LineSource/index.js';
 import 'vtk.js/Filters/Sources/PlaneSource/index.js';
+import 'vtk.js/Filters/Sources/PointSource/index.js';
+import 'vtk.js/Filters/Sources/SphereSource/index.js';
 
 // Filters
 import 'vtk.js/Filters/General/WarpScalar/index.js';
