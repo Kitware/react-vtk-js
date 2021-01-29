@@ -69,28 +69,29 @@ export default class PolyData extends Component {
   update(props, previous) {
     const { connectivity, points, verts, lines, polys, strips } = props;
     let changeDetected = false;
+    const cellFrom = points.length > 196608 ? Uint32Array.from : Uint16Array.from;
     if (points && (!previous || points !== previous.points)) {
-      this.polydata.getPoints().setData(Float32Array.from(points), 3);
+      this.polydata.getPoints().setData(Float64Array.from(points), 3);
       changeDetected = true;
     }
 
     if (verts && (!previous || verts !== previous.verts)) {
-      this.polydata.getVerts().setData(Uint16Array.from(verts));
+      this.polydata.getVerts().setData(cellFrom(verts));
       changeDetected = true;
     }
 
     if (lines && (!previous || lines !== previous.lines)) {
-      this.polydata.getLines().setData(Uint16Array.from(lines));
+      this.polydata.getLines().setData(cellFrom(lines));
       changeDetected = true;
     }
 
     if (polys && (!previous || polys !== previous.polys)) {
-      this.polydata.getPolys().setData(Uint16Array.from(polys));
+      this.polydata.getPolys().setData(cellFrom(polys));
       changeDetected = true;
     }
 
     if (strips && (!previous || strips !== previous.strips)) {
-      this.polydata.getStrips().setData(Uint16Array.from(strips));
+      this.polydata.getStrips().setData(cellFrom(strips));
       changeDetected = true;
     }
 
@@ -102,7 +103,7 @@ export default class PolyData extends Component {
       switch (connectivity) {
         case 'points':
           {
-            const values = new Uint16Array(nbPoints + 1);
+            const values = new Uint32Array(nbPoints + 1);
             values[0] = nbPoints;
             for (let i = 0; i < nbPoints; i++) {
               values[i + 1] = i;
@@ -113,7 +114,7 @@ export default class PolyData extends Component {
           break;
         case 'triangles':
           {
-            const values = new Uint16Array(nbPoints + nbPoints / 3);
+            const values = new Uint32Array(nbPoints + nbPoints / 3);
             let offset = 0;
             for (let i = 0; i < nbPoints; i += 3) {
               values[offset++] = 3;
@@ -127,7 +128,7 @@ export default class PolyData extends Component {
           break;
         case 'strips':
           {
-            const values = new Uint16Array(nbPoints + 1);
+            const values = new Uint32Array(nbPoints + 1);
             values[0] = nbPoints;
             for (let i = 0; i < nbPoints; i++) {
               values[i + 1] = i;
