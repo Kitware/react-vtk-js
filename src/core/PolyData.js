@@ -69,30 +69,30 @@ export default class PolyData extends Component {
   update(props, previous) {
     const { connectivity, points, verts, lines, polys, strips } = props;
     let changeDetected = false;
-    const cellFrom =
-      points.length > 196608 ? Uint32Array.from : Uint16Array.from;
+    const typedArray =
+      points && points.length > 196608 ? Uint32Array : Uint16Array;
     if (points && (!previous || points !== previous.points)) {
       this.polydata.getPoints().setData(Float64Array.from(points), 3);
       changeDetected = true;
     }
 
     if (verts && (!previous || verts !== previous.verts)) {
-      this.polydata.getVerts().setData(cellFrom(verts));
+      this.polydata.getVerts().setData(typedArray.from(verts));
       changeDetected = true;
     }
 
     if (lines && (!previous || lines !== previous.lines)) {
-      this.polydata.getLines().setData(cellFrom(lines));
+      this.polydata.getLines().setData(typedArray.from(lines));
       changeDetected = true;
     }
 
     if (polys && (!previous || polys !== previous.polys)) {
-      this.polydata.getPolys().setData(cellFrom(polys));
+      this.polydata.getPolys().setData(typedArray.from(polys));
       changeDetected = true;
     }
 
     if (strips && (!previous || strips !== previous.strips)) {
-      this.polydata.getStrips().setData(cellFrom(strips));
+      this.polydata.getStrips().setData(typedArray.from(strips));
       changeDetected = true;
     }
 
