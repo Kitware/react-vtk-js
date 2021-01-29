@@ -69,7 +69,8 @@ export default class PolyData extends Component {
   update(props, previous) {
     const { connectivity, points, verts, lines, polys, strips } = props;
     let changeDetected = false;
-    const cellFrom = points.length > 196608 ? Uint32Array.from : Uint16Array.from;
+    const cellFrom =
+      points.length > 196608 ? Uint32Array.from : Uint16Array.from;
     if (points && (!previous || points !== previous.points)) {
       this.polydata.getPoints().setData(Float64Array.from(points), 3);
       changeDetected = true;
