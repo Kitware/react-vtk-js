@@ -11,6 +11,7 @@ const entry = {
   SourceViewer: './Geometry/SourceViewer.js',
   ProcessingPipeline: './Geometry/ProcessingPipeline.js',
   OBJViewer: './Geometry/OBJViewer.js',
+  Glyph: './Geometry/Glyph.js',
   PointCloud: './Geometry/PointCloud.js',
   VolumeRendering: './Volume/VolumeRendering.js',
   SyntheticVolumeRendering: './Volume/SyntheticVolumeRendering.js',
@@ -18,15 +19,15 @@ const entry = {
 };
 
 function toHtmlPlugin() {
-  return Object
-    .keys(entry)
-    .map((name) => new HtmlWebpackPlugin({
+  return Object.keys(entry).map(
+    (name) =>
+      new HtmlWebpackPlugin({
         chunks: [name],
         title: name,
         filename: `${name}.html`,
         template: 'template.html',
       })
-    );
+  );
 }
 
 // ----------------------------------------------------------------------------
@@ -51,16 +52,16 @@ module.exports = function(_env, argv) {
             options: {
               cacheDirectory: true,
               cacheCompression: false,
-              envName: 'development'
-            }
-          }
+              envName: 'development',
+            },
+          },
         },
-      ]
+      ],
     },
     devServer: {
       contentBase: path.join(__dirname, 'www'),
       compress: true,
-      port: 9000
-    }
+      port: 9000,
+    },
   };
 };
