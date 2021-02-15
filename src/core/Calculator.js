@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 
 import { DownstreamContext } from './View';
 
-import vtkCalculator from 'vtk.js/Filters/General/Calculator/index.js';
-import vtkDataSet from 'vtk.js/Common/DataModel/DataSet/index.js';
+import vtkCalculator from 'vtk.js/Filters/General/Calculator.js';
+import vtkDataSet from 'vtk.js/Common/DataModel/DataSet.js';
 
 const { FieldDataTypes } = vtkDataSet;
+
 /**
  * Calculator is exposing a source or filter to a downstream filter
  * It takes the following set of properties:

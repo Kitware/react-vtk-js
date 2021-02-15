@@ -20,14 +20,20 @@ function Example(props) {
           }}
         >
           <ShareDataSet>
-            <Algorithm vtkClass='vtkSphereSource' />
+            <Algorithm 
+              vtkClass='vtkSphereSource' 
+              state={{
+                phiResolution: 10,
+                thetaResolution: 20,
+              }}
+            />
           </ShareDataSet>
           <Algorithm
             vtkClass='vtkConeSource'
             state={{
-              resolution: 60,
-              height: 0.1,
-              radius: 0.05,
+              resolution: 30,
+              height: 0.25,
+              radius: 0.08,
             }}
             port='1'
           />

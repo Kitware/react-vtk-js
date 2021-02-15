@@ -5,20 +5,20 @@ import PropTypes from 'prop-types';
 // vtk.js Rendering stack
 // ----------------------------------------------------------------------------
 
-import vtkOpenGLRenderWindow from 'vtk.js/Rendering/OpenGL/RenderWindow/index.js';
-import vtkRenderWindow from 'vtk.js/Rendering/Core/RenderWindow/index.js';
-import vtkRenderWindowInteractor from 'vtk.js/Rendering/Core/RenderWindowInteractor/index.js';
-import vtkRenderer from 'vtk.js/Rendering/Core/Renderer/index.js';
-import vtkInteractorStyleManipulator from 'vtk.js/Interaction/Style/InteractorStyleManipulator/index.js';
+import vtkOpenGLRenderWindow from 'vtk.js/Rendering/OpenGL/RenderWindow.js';
+import vtkRenderWindow from 'vtk.js/Rendering/Core/RenderWindow.js';
+import vtkRenderWindowInteractor from 'vtk.js/Rendering/Core/RenderWindowInteractor.js';
+import vtkRenderer from 'vtk.js/Rendering/Core/Renderer.js';
+import vtkInteractorStyleManipulator from 'vtk.js/Interaction/Style/InteractorStyleManipulator.js';
 
 // Style modes
-import vtkMouseCameraTrackballMultiRotateManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballMultiRotateManipulator/index.js';
-import vtkMouseCameraTrackballPanManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballPanManipulator/index.js';
-import vtkMouseCameraTrackballRollManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballRollManipulator/index.js';
-import vtkMouseCameraTrackballRotateManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballRotateManipulator/index.js';
-import vtkMouseCameraTrackballZoomManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballZoomManipulator/index.js';
-import vtkMouseCameraTrackballZoomToMouseManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballZoomToMouseManipulator/index.js';
-import vtkGestureCameraManipulator from 'vtk.js/Interaction/Manipulators/GestureCameraManipulator/index.js';
+import vtkMouseCameraTrackballMultiRotateManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballMultiRotateManipulator.js';
+import vtkMouseCameraTrackballPanManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballPanManipulator.js';
+import vtkMouseCameraTrackballRollManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballRollManipulator.js';
+import vtkMouseCameraTrackballRotateManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballRotateManipulator.js';
+import vtkMouseCameraTrackballZoomManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballZoomManipulator.js';
+import vtkMouseCameraTrackballZoomToMouseManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballZoomToMouseManipulator.js';
+import vtkGestureCameraManipulator from 'vtk.js/Interaction/Manipulators/GestureCameraManipulator.js';
 
 // ----------------------------------------------------------------------------
 // Context to pass parent variables to children

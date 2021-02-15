@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext, DownstreamContext } from './View';
 
-import vtkImageSlice from 'vtk.js/Rendering/Core/ImageSlice/index.js';
-import vtkImageMapper from 'vtk.js/Rendering/Core/ImageMapper/index.js';
-import vtkColorMaps from 'vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps';
-import vtkColorTransferFunction from 'vtk.js/Rendering/Core/ColorTransferFunction/index.js';
-import vtkPiecewiseFunction from 'vtk.js/Common/DataModel/PiecewiseFunction/index.js';
+import vtkImageSlice from 'vtk.js/Rendering/Core/ImageSlice.js';
+import vtkImageMapper from 'vtk.js/Rendering/Core/ImageMapper.js';
+import vtkColorMaps from 'vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps.js';
+import vtkColorTransferFunction from 'vtk.js/Rendering/Core/ColorTransferFunction.js';
+import vtkPiecewiseFunction from 'vtk.js/Common/DataModel/PiecewiseFunction.js';
 
 /**
  * SliceRepresentation is responsible to convert a vtkPolyData into rendering

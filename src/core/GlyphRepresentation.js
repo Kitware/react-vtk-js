@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext, DownstreamContext } from './View';
 
-import vtkActor from 'vtk.js/Rendering/Core/Actor/index.js';
-import vtkGlyph3DMapper from 'vtk.js/Rendering/Core/Glyph3DMapper/index.js';
-import vtkColorMaps from 'vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps';
-import vtkColorTransferFunction from 'vtk.js/Rendering/Core/ColorTransferFunction/index.js';
+import vtkActor from 'vtk.js/Rendering/Core/Actor.js';
+import vtkGlyph3DMapper from 'vtk.js/Rendering/Core/Glyph3DMapper.js';
+import vtkColorMaps from 'vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps.js';
+import vtkColorTransferFunction from 'vtk.js/Rendering/Core/ColorTransferFunction.js';
 
 /**
  * GeometryRepresentation is responsible to convert a vtkPolyData into rendering

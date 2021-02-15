@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext, DownstreamContext } from './View';
 
-import vtkVolume from 'vtk.js/Rendering/Core/Volume/index.js';
-import vtkVolumeMapper from 'vtk.js/Rendering/Core/VolumeMapper/index.js';
-import vtkColorMaps from 'vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps';
-import vtkColorTransferFunction from 'vtk.js/Rendering/Core/ColorTransferFunction/index.js';
-import vtkPiecewiseFunction from 'vtk.js/Common/DataModel/PiecewiseFunction/index.js';
+import vtkVolume from 'vtk.js/Rendering/Core/Volume.js';
+import vtkVolumeMapper from 'vtk.js/Rendering/Core/VolumeMapper.js';
+import vtkColorMaps from 'vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps.js';
+import vtkColorTransferFunction from 'vtk.js/Rendering/Core/ColorTransferFunction.js';
+import vtkPiecewiseFunction from 'vtk.js/Common/DataModel/PiecewiseFunction.js';
 
 /**
  * VolumeRepresentation is responsible to convert a vtkPolyData into rendering

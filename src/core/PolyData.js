@@ -7,7 +7,7 @@ import {
   DataSetContext,
 } from './View';
 
-import vtkPolyData from 'vtk.js/Common/DataModel/PolyData/index.js';
+import vtkPolyData from 'vtk.js/Common/DataModel/PolyData.js';
 
 /**
  * PolyData is exposing a vtkPolyData to a downstream filter

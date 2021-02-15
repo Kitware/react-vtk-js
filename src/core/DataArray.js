@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { RepresentationContext, FieldsContext } from './View';
-import vtkDataArray from 'vtk.js/Common/Core/DataArray/index.js';
+import vtkDataArray from 'vtk.js/Common/Core/DataArray.js';
 import { TYPED_ARRAYS } from 'vtk.js/macro.js';
 
 /**

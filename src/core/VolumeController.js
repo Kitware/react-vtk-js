@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext } from './View';
 
-import vtkVolumeController from 'vtk.js/Interaction/UI/VolumeController/index.js';
+import vtkVolumeController from 'vtk.js/Interaction/UI/VolumeController.js';
 
 /**
  * VolumeController is a GUI to control the piecewise function

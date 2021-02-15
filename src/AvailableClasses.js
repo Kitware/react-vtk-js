@@ -2,23 +2,23 @@
 // => this is required because of tree shacking
 
 // Sources
-import 'vtk.js/Filters/Sources/ConcentricCylinderSource/index.js';
-import 'vtk.js/Filters/Sources/ConeSource/index.js';
-import 'vtk.js/Filters/Sources/CubeSource/index.js';
-import 'vtk.js/Filters/Sources/CylinderSource/index.js';
-import 'vtk.js/Filters/Sources/LineSource/index.js';
-import 'vtk.js/Filters/Sources/PlaneSource/index.js';
-import 'vtk.js/Filters/Sources/PointSource/index.js';
-import 'vtk.js/Filters/Sources/SphereSource/index.js';
+import 'vtk.js/Filters/Sources/ConcentricCylinderSource.js';
+import 'vtk.js/Filters/Sources/ConeSource.js';
+import 'vtk.js/Filters/Sources/CubeSource.js';
+import 'vtk.js/Filters/Sources/CylinderSource.js';
+import 'vtk.js/Filters/Sources/LineSource.js';
+import 'vtk.js/Filters/Sources/PlaneSource.js';
+import 'vtk.js/Filters/Sources/PointSource.js';
+import 'vtk.js/Filters/Sources/SphereSource.js';
 
 // Filters
-import 'vtk.js/Filters/General/WarpScalar/index.js';
+import 'vtk.js/Filters/General/WarpScalar.js';
 
 // Readers
-import 'vtk.js/IO/Geometry/PLYReader/index.js';
-import 'vtk.js/IO/Geometry/STLReader/index.js';
-import 'vtk.js/IO/Misc/ElevationReader/index.js';
-import 'vtk.js/IO/Misc/OBJReader/index.js';
-import 'vtk.js/IO/Misc/PDBReader/index.js';
-import 'vtk.js/IO/XML/XMLImageDataReader/index.js';
-import 'vtk.js/IO/XML/XMLPolyDataReader/index.js';
+import 'vtk.js/IO/Geometry/PLYReader.js';
+import 'vtk.js/IO/Geometry/STLReader.js';
+import 'vtk.js/IO/Misc/ElevationReader.js';
+import 'vtk.js/IO/Misc/OBJReader.js';
+import 'vtk.js/IO/Misc/PDBReader.js';
+import 'vtk.js/IO/XML/XMLImageDataReader.js';
+import 'vtk.js/IO/XML/XMLPolyDataReader.js';
