@@ -15,6 +15,11 @@ import vtkImageData from 'vtk.js/Common/DataModel/ImageData/index.js';
  *   - dimensions: [nx, ny, nz],
  *   - origin: [0, 0, 0]
  *   - spacing: [1, 1, 1]
+ *   - direction: [
+ *       1, 0, 0,
+ *       0, 1, 0,
+ *       0, 0, 1
+ *     ]
  */
 export default class ImageData extends Component {
   constructor(props) {
@@ -63,8 +68,8 @@ export default class ImageData extends Component {
   }
 
   update(props, previous) {
-    const { dimensions, spacing, origin } = props;
-    this.imageData.set({ dimensions, spacing, origin });
+    const { dimensions, spacing, origin, direction } = props;
+    this.imageData.set({ dimensions, spacing, origin, direction });
   }
 }
 
@@ -73,6 +78,7 @@ ImageData.defaultProps = {
   dimensions: [1, 1, 1],
   spacing: [1, 1, 1],
   origin: [0, 0, 0],
+  direction: [1, 0, 0, 0, 1, 0, 0, 0, 1],
 };
 
 ImageData.propTypes = {
@@ -100,6 +106,11 @@ ImageData.propTypes = {
    * World coordinate of the lower left corner of your vtkImageData (i=0, j=0, k=0).
    */
   origin: PropTypes.arrayOf(PropTypes.number),
+
+  /**
+   * 3x3 matrix use to orient the image data
+   */
+  direction: PropTypes.arrayOf(PropTypes.number),
 
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),

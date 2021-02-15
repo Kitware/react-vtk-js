@@ -1,7 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { View, GlyphRepresentation, Algorithm } from 'react-vtk-js';
+import {
+  View,
+  GeometryRepresentation,
+  GlyphRepresentation,
+  Algorithm,
+  ShareDataSet,
+} from 'react-vtk-js';
 
 // React complains about unique key prop but I don't see why
 function Example(props) {
@@ -13,17 +19,22 @@ function Example(props) {
             orientationArray: 'Normals',
           }}
         >
-          <Algorithm vtkClass='vtkSphereSource' port='0' />
+          <ShareDataSet>
+            <Algorithm vtkClass='vtkSphereSource' />
+          </ShareDataSet>
           <Algorithm
             vtkClass='vtkConeSource'
             state={{
-              resolution: 20,
-              height: 0.3,
-              radius: 0.1,
+              resolution: 60,
+              height: 0.1,
+              radius: 0.05,
             }}
             port='1'
           />
         </GlyphRepresentation>
+        <GeometryRepresentation>
+          <ShareDataSet />
+        </GeometryRepresentation>
       </View>
     </div>
   );
