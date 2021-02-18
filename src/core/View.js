@@ -73,7 +73,6 @@ function assignManipulators(style, settings) {
 // Default css styles
 // ----------------------------------------------------------------------------
 
-const CONTAINER_STYLE = { width: '100%', height: '100%', position: 'relative' };
 const RENDERER_STYLE = {
   position: 'absolute',
   width: '100%',
@@ -140,13 +139,14 @@ export default class View extends Component {
   }
 
   render() {
-    const { id, children } = this.props;
+    const { id, children, style, className } = this.props;
 
     return (
       <div
         key={id}
         id={id}
-        style={CONTAINER_STYLE}
+        className={className}
+        style={{ position: 'relative', ...style }}
         onMouseEnter={this.onEnter}
         onMouseLeave={this.onLeave}
       >
@@ -278,6 +278,10 @@ export default class View extends Component {
 }
 
 View.defaultProps = {
+  style: {
+    width: '100%',
+    height: '100%',
+  },
   background: [0.2, 0.3, 0.4],
   cameraPosition: [0, 0, 1],
   cameraViewUp: [0, 1, 0],
@@ -327,6 +331,16 @@ View.propTypes = {
    * The ID used to identify this component.
    */
   id: PropTypes.string,
+
+  /**
+   * Allow user to override the default View style { width: '100%', height: '100%' }
+   */
+  style: PropTypes.object,
+
+  /**
+   * Allow user to provide custom className associated to root element
+   */
+  className: PropTypes.string,
 
   /**
    * The color of the view background using 3 floating numbers
