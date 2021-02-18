@@ -13,6 +13,7 @@
     "vtk.js": "17.0.0-beta.5"
   },
   "scripts": {
+    "prebuild": "npm run fix",
     "build": "rollup ./src/index.js -c",
     "prepare": "npm run build",
     "test": "npm run test:lint && npm run test:build",
@@ -20,6 +21,7 @@
     "test:lint": "eslint src",
     "fix:prettier": "prettier --config .prettierrc --write \"src/**/*.js\"",
     "fix:eslint": "eslint --fix src",
+    "fix": "npm run fix:prettier && npm run fix:eslint",
     "predeploy": "cd usage && npm install && npm run build",
     "deploy": "gh-pages -d usage/www -f -r $GIT_PUBLISH_URL",
     "commit": "git cz",
