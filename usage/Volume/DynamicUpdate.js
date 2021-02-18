@@ -54,7 +54,7 @@ function Slider(props) {
         position: 'absolute',
         zIndex: 100,
         right: '5px',
-        top: '5px',
+        top: '25px',
         ...props.style,
       }}
     />
