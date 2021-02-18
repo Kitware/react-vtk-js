@@ -16,6 +16,7 @@ const entry = {
   VolumeRendering: './Volume/VolumeRendering.js',
   SyntheticVolumeRendering: './Volume/SyntheticVolumeRendering.js',
   SliceRendering: './Volume/SliceRendering.js',
+  DynamicUpdate: './Volume/DynamicUpdate.js'
 };
 
 function toHtmlPlugin() {
