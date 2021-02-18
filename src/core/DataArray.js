@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import { RepresentationContext, FieldsContext } from './View';
+import { RepresentationContext, DataSetContext, FieldsContext } from './View';
 import vtkDataArray from 'vtk.js/Common/Core/DataArray.js';
 import { TYPED_ARRAYS } from 'vtk.js/macro.js';
 
@@ -24,19 +24,24 @@ export default class DataArray extends Component {
   render() {
     return (
       <RepresentationContext.Consumer>
-        {(representation) => {
-          this.representation = representation;
-          return (
-            <FieldsContext.Consumer>
-              {(fields) => {
-                if (!this.fields) {
-                  this.fields = fields;
-                }
-                return <div key={this.props.id} name={this.props.name} />;
-              }}
-            </FieldsContext.Consumer>
-          );
-        }}
+        {(representation) => (
+          <DataSetContext.Consumer>
+            {(dataset) => {
+              this.representation = representation;
+              this.dataset = dataset;
+              return (
+                <FieldsContext.Consumer>
+                  {(fields) => {
+                    if (!this.fields) {
+                      this.fields = fields;
+                    }
+                    return <div key={this.props.id} name={this.props.name} />;
+                  }}
+                </FieldsContext.Consumer>
+              );
+            }}
+          </DataSetContext.Consumer>
+        )}
       </RepresentationContext.Consumer>
     );
   }
@@ -77,6 +82,9 @@ export default class DataArray extends Component {
 
     if (values && (changeDetected || !previous || values !== previous.values)) {
       this.array.setData(klass.from(values), numberOfComponents);
+      if (this.dataset) {
+        this.dataset.modified();
+      }
 
       if (this.representation) {
         this.representation.dataChanged();

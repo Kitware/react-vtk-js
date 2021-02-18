@@ -11,6 +11,7 @@ import vtkVolumeController from 'vtk.js/Interaction/UI/VolumeController.js';
 export default class VolumeController extends Component {
   constructor(props) {
     super(props);
+    this.subscriptions = [];
     this.containerRef = React.createRef();
 
     // Create vtk.js object
@@ -47,6 +48,9 @@ export default class VolumeController extends Component {
   }
 
   componentWillUnmount() {
+    while (this.subscriptions.length) {
+      this.subscriptions.pop().unsubscribe();
+    }
     this.controller.setContainer(null);
     this.controller.delete();
     this.controller = null;
@@ -66,8 +70,21 @@ export default class VolumeController extends Component {
       this.controller.render();
       this.view.resetCamera();
       this.view.renderView();
+      this.subscriptions.push(ds.onModified(() => this.onDataChange(), -1));
     } else {
       setTimeout(() => this.init(), 100);
+    }
+  }
+
+  onDataChange() {
+    const widget = this.controller.getWidget();
+    if (this.representation && this.representation.volume) {
+      const { volume } = this.representation;
+      const sourceDS = volume.getMapper().getInputData();
+      const dataArray =
+        sourceDS.getPointData().getScalars() ||
+        sourceDS.getPointData().getArrays()[0];
+      widget.setDataArray(dataArray.getData());
     }
   }
 }

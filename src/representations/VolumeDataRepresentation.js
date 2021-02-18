@@ -36,7 +36,6 @@ export default function VolumneDataRepresentation(props) {
     nbComponents = 1;
     type = props.scalarsType;
   }
-  console.log('nbComponents', nbComponents);
   return (
     <VolumeRepresentation
       id={props.id}
