@@ -80,9 +80,9 @@ function Example(props) {
     <div style={{width: '100vw', height: '100vh'}}>
       <View id="0">
         <Slider max={FIELDS.length - 1} value={fieldIdx} setValue={setFieldIdx} />
-        <VolumeRepresentation>
+        <VolumeRepresentation key={fieldIdx}>
           <VolumeController rescaleColorMap={false} />
-          <ShareDataSet>
+          <ShareDataSet name={fieldIdx}>
             <ImageData
               spacing={[1, 1, 1]}
               dimensions={[10, 10, 10]}
@@ -102,7 +102,7 @@ function Example(props) {
       <div style={{ position: 'absolute', width: '20%', height: '20%', bottom: 0, right: 0 }}>
         <View background={[1,1,1]} triggerRender={fieldIdx}>
           <SliceRepresentation kSlice="5" property={{ colorWindow, colorLevel }}>
-            <ShareDataSet />
+            <ShareDataSet name={fieldIdx}/>
           </SliceRepresentation>
         </View>
       </div>
