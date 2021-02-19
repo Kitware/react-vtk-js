@@ -63,8 +63,8 @@ export default class VolumeController extends Component {
     const isBackgroundDark =
       props.background[0] + props.background[1] + props.background[2] < 1.5;
 
-    const ds = volume.getMapper().getInputData();
-    if (ds) {
+    if (volume && volume.getMapper() && volume.getMapper().getInputData()) {
+      const ds = volume.getMapper().getInputData();
       this.controller.setContainer(container);
       this.controller.setupContent(renderWindow, volume, isBackgroundDark);
       this.controller.render();

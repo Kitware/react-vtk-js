@@ -41,7 +41,6 @@ export default class ShareDataSet extends Component {
     if (!trivialProducer) {
       trivialProducer = newInstance();
       SHARED_INSTANCES[this.props.name] = trivialProducer;
-      console.log('new producer', this.props.name);
     }
     return trivialProducer;
   }
