@@ -10,7 +10,7 @@
   "source": "src/index.js",
   "dependencies": {
     "@babel/runtime": "^7.12.5",
-    "vtk.js": "17.0.0-beta.5"
+    "vtk.js": "17.0.0-beta.8"
   },
   "scripts": {
     "prebuild": "npm run fix",

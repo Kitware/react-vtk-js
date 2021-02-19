@@ -65,6 +65,7 @@ export default class VolumeRepresentation extends Component {
   componentWillUnmount() {
     if (this.view) {
       this.view.renderer.removeVolume(this.volume);
+      this.view = null;
     }
 
     this.volume.delete();
