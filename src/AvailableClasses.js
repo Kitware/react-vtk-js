@@ -13,6 +13,7 @@ import 'vtk.js/Filters/Sources/SphereSource.js';
 
 // Filters
 import 'vtk.js/Filters/General/WarpScalar.js';
+import 'vtk.js/Filters/General/TubeFilter.js';
 
 // Readers
 import 'vtk.js/IO/Geometry/PLYReader.js';
