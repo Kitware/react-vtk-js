@@ -38,20 +38,27 @@ export default class GeometryRepresentation extends Component {
       .getActors()
       .forEach(({ setVisibility }) => setVisibility(false));
 
-    this.subscriptions = [];
-    this.subscriptions.push(
-      this.mapper.onModified(() => {
-        if (this.mapper.getInputData()) {
-          const bounds = this.mapper.getInputData().getBounds();
-          if (bounds[0] < bounds[1]) {
-            this.cubeAxes.setDataBounds(bounds);
-            if (this.view) {
-              this.view.renderView();
-            }
+    const updateCubeAxes = () => {
+      if (this.mapper.getInputData()) {
+        if (this.subscriptions.length === 1) {
+          // add input data as well
+          this.subscriptions.push(
+            this.mapper.getInputData().onModified(updateCubeAxes)
+          );
+        }
+
+        const bounds = this.mapper.getInputData().getBounds();
+        if (bounds[0] < bounds[1]) {
+          this.cubeAxes.setDataBounds(bounds);
+          if (this.view) {
+            this.view.renderView();
           }
         }
-      })
-    );
+      }
+    };
+
+    this.subscriptions = [];
+    this.subscriptions.push(this.mapper.onModified(updateCubeAxes));
   }
 
   render() {

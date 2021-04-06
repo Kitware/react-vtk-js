@@ -190,7 +190,7 @@ export default class View extends Component {
       if ('setProps' in this.props) {
         this.props.setProps({ hoverInfo: selection[0] });
       }
-    }, 50);
+    }, 10);
 
     this.onClick = (e) => click(this.getScreenEventPositionFor(e));
     this.onMouseMove = (e) => hover(this.getScreenEventPositionFor(e));
@@ -363,44 +363,65 @@ export default class View extends Component {
         if (x1 !== x2 || y1 !== y2) {
           selectionType = 'frustrum';
           selectionBounds.push(
-            Array.from(this.renderer.viewToWorld(x1, y1, 0))
+            Array.from(
+              this.openglRenderWindow.displayToWorld(x1, y1, 0, this.renderer)
+            )
           );
           selectionBounds.push(
-            Array.from(this.renderer.viewToWorld(x2, y1, 0))
+            Array.from(
+              this.openglRenderWindow.displayToWorld(x2, y1, 0, this.renderer)
+            )
           );
           selectionBounds.push(
-            Array.from(this.renderer.viewToWorld(x2, y2, 0))
+            Array.from(
+              this.openglRenderWindow.displayToWorld(x2, y2, 0, this.renderer)
+            )
           );
           selectionBounds.push(
-            Array.from(this.renderer.viewToWorld(x1, y2, 0))
+            Array.from(
+              this.openglRenderWindow.displayToWorld(x1, y2, 0, this.renderer)
+            )
           );
           selectionBounds.push(
-            Array.from(this.renderer.viewToWorld(x1, y1, 1))
+            Array.from(
+              this.openglRenderWindow.displayToWorld(x1, y1, 1, this.renderer)
+            )
           );
           selectionBounds.push(
-            Array.from(this.renderer.viewToWorld(x2, y1, 1))
+            Array.from(
+              this.openglRenderWindow.displayToWorld(x2, y1, 1, this.renderer)
+            )
           );
           selectionBounds.push(
-            Array.from(this.renderer.viewToWorld(x2, y2, 1))
+            Array.from(
+              this.openglRenderWindow.displayToWorld(x2, y2, 1, this.renderer)
+            )
           );
           selectionBounds.push(
-            Array.from(this.renderer.viewToWorld(x1, y2, 1))
+            Array.from(
+              this.openglRenderWindow.displayToWorld(x1, y2, 1, this.renderer)
+            )
           );
         } else {
           selectionType = 'ray';
           selectionBounds.push(
-            Array.from(this.renderer.viewToWorld(x1, y1, 0))
+            Array.from(
+              this.openglRenderWindow.displayToWorld(x1, y1, 0, this.renderer)
+            )
           );
           selectionBounds.push(
-            Array.from(this.renderer.viewToWorld(x1, y1, 1))
+            Array.from(
+              this.openglRenderWindow.displayToWorld(x1, y1, 1, this.renderer)
+            )
           );
         }
         return {
           worldPosition: Array.from(
-            this.renderer.viewToWorld(
+            this.openglRenderWindow.displayToWorld(
               displayPosition[0],
               displayPosition[1],
-              displayPosition[2]
+              displayPosition[2],
+              this.renderer
             )
           ),
           displayPosition,
