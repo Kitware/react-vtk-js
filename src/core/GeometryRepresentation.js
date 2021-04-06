@@ -8,6 +8,8 @@ import vtkMapper from '@kitware/vtk.js/Rendering/Core/Mapper.js';
 import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps.js';
 import vtkColorTransferFunction from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction.js';
 
+import vtkCubeAxesActor from '@kitware/vtk.js/Rendering/Core/CubeAxesActor.js';
+
 /**
  * GeometryRepresentation is responsible to convert a vtkPolyData into rendering
  * It takes the following set of properties:
@@ -27,6 +29,29 @@ export default class GeometryRepresentation extends Component {
       useLookupTableScalarRange: true,
     });
     this.actor.setMapper(this.mapper);
+
+    this.cubeAxes = vtkCubeAxesActor.newInstance({
+      visibility: false,
+      dataBounds: [-1, 1, -1, 1, -1, 1],
+    });
+    this.cubeAxes
+      .getActors()
+      .forEach(({ setVisibility }) => setVisibility(false));
+
+    this.subscriptions = [];
+    this.subscriptions.push(
+      this.mapper.onModified(() => {
+        if (this.mapper.getInputData()) {
+          const bounds = this.mapper.getInputData().getBounds();
+          if (bounds[0] < bounds[1]) {
+            this.cubeAxes.setDataBounds(bounds);
+            if (this.view) {
+              this.view.renderView();
+            }
+          }
+        }
+      })
+    );
   }
 
   render() {
@@ -34,6 +59,8 @@ export default class GeometryRepresentation extends Component {
       <ViewContext.Consumer>
         {(view) => {
           if (!this.view) {
+            this.cubeAxes.setCamera(view.renderer.getActiveCamera());
+            view.renderer.addActor(this.cubeAxes);
             view.renderer.addActor(this.actor);
             this.view = view;
           }
@@ -60,7 +87,12 @@ export default class GeometryRepresentation extends Component {
   }
 
   componentWillUnmount() {
+    while (this.subscriptions.length) {
+      this.subscriptions.pop().unsubscribe();
+    }
+
     if (this.view) {
+      this.view.renderer.removeActor(this.cubeAxes);
       this.view.renderer.removeActor(this.actor);
     }
 
@@ -75,7 +107,16 @@ export default class GeometryRepresentation extends Component {
   }
 
   update(props, previous) {
-    const { actor, mapper, property, colorMapPreset, colorDataRange } = props;
+    let needRender = 0;
+    const {
+      cubeAxesStyle,
+      showCubeAxes,
+      actor,
+      mapper,
+      property,
+      colorMapPreset,
+      colorDataRange,
+    } = props;
     if (actor && (!previous || actor !== previous.actor)) {
       this.actor.set(actor);
     }
@@ -103,6 +144,26 @@ export default class GeometryRepresentation extends Component {
       this.lookupTable.setMappingRange(...colorDataRange);
       this.lookupTable.updateRange();
     }
+
+    if (
+      cubeAxesStyle &&
+      (!previous || cubeAxesStyle !== previous.cubeAxesStyle)
+    ) {
+      this.cubeAxes.set(cubeAxesStyle);
+      needRender++;
+    }
+
+    if (showCubeAxes !== this.cubeAxes.getVisibility()) {
+      this.cubeAxes.setVisibility(showCubeAxes);
+      this.cubeAxes
+        .getActors()
+        .forEach(({ setVisibility }) => setVisibility(showCubeAxes));
+      needRender++;
+    }
+
+    if (this.view && needRender) {
+      this.view.renderView();
+    }
   }
 
   dataChanged() {
@@ -115,6 +176,7 @@ export default class GeometryRepresentation extends Component {
 GeometryRepresentation.defaultProps = {
   colorMapPreset: 'erdc_rainbow_bright',
   colorDataRange: [0, 1],
+  showCubeAxes: false,
 };
 
 GeometryRepresentation.propTypes = {
@@ -147,6 +209,17 @@ GeometryRepresentation.propTypes = {
    * Data range use for the colorMap
    */
   colorDataRange: PropTypes.arrayOf(PropTypes.number),
+
+  /**
+   * Show/Hide Cube Axes for the given representation
+   */
+  showCubeAxes: PropTypes.bool,
+
+  /**
+   * Configure cube Axes style by overriding the set of properties defined
+   * https://github.com/Kitware/vtk-js/blob/HEAD/Sources/Rendering/Core/CubeAxesActor/index.js#L703-L719
+   */
+  cubeAxesStyle: PropTypes.object,
 
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),

@@ -102,6 +102,7 @@ export default class View extends Component {
     this.renderWindow = vtkRenderWindow.newInstance();
     this.renderer = vtkRenderer.newInstance();
     this.renderWindow.addRenderer(this.renderer);
+    this.camera = this.renderer.getActiveCamera();
 
     this.openglRenderWindow = vtkOpenGLRenderWindow.newInstance();
     this.renderWindow.addView(this.openglRenderWindow);
