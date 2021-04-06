@@ -20,7 +20,7 @@ export default class GeometryRepresentation extends Component {
     super(props);
 
     // Create vtk.js actor/mapper
-    this.actor = vtkActor.newInstance();
+    this.actor = vtkActor.newInstance({ representationId: props.id });
     this.lookupTable = vtkColorTransferFunction.newInstance();
     this.mapper = vtkMapper.newInstance({
       lookupTable: this.lookupTable,

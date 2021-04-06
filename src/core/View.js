@@ -5,6 +5,8 @@ import PropTypes from 'prop-types';
 // vtk.js Rendering stack
 // ----------------------------------------------------------------------------
 
+import { debounce } from 'vtk.js/macro.js';
+
 import vtkOpenGLRenderWindow from 'vtk.js/Rendering/OpenGL/RenderWindow.js';
 import vtkRenderWindow from 'vtk.js/Rendering/Core/RenderWindow.js';
 import vtkRenderWindowInteractor from 'vtk.js/Rendering/Core/RenderWindowInteractor.js';
@@ -19,6 +21,10 @@ import vtkMouseCameraTrackballRotateManipulator from 'vtk.js/Interaction/Manipul
 import vtkMouseCameraTrackballZoomManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballZoomManipulator.js';
 import vtkMouseCameraTrackballZoomToMouseManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballZoomToMouseManipulator.js';
 import vtkGestureCameraManipulator from 'vtk.js/Interaction/Manipulators/GestureCameraManipulator.js';
+
+// Picking handling
+import vtkOpenGLHardwareSelector from 'vtk.js/Rendering/OpenGL/HardwareSelector.js';
+import { FieldAssociations } from 'vtk.js/Common/DataModel/DataSet/Constants.js';
 
 // ----------------------------------------------------------------------------
 // Context to pass parent variables to children
@@ -108,6 +114,15 @@ export default class View extends Component {
     this.style = vtkInteractorStyleManipulator.newInstance();
     this.interactor.setInteractorStyle(this.style);
 
+    // Picking handler
+    this.selector = vtkOpenGLHardwareSelector.newInstance({
+      captureZValues: true,
+    });
+    this.selector.setFieldAssociation(
+      FieldAssociations.FIELD_ASSOCIATION_POINTS
+    );
+    this.selector.attach(this.openglRenderWindow, this.renderer);
+
     // Resize handling
     this.resizeObserver = new ResizeObserver(() => this.onResize());
 
@@ -136,6 +151,22 @@ export default class View extends Component {
     this.onLeave = () => {
       this.hasFocus = false;
     };
+    this.onClick = this.onClick.bind(this);
+    this.onMouseMove = debounce((e) => this.onHover(e), 50);
+    this.lastSelection = [];
+  }
+
+  getScreenEventPositionFor(source) {
+    const bounds = this.containerRef.current.getBoundingClientRect();
+    const [canvasWidth, canvasHeight] = this.openglRenderWindow.getSize();
+    const scaleX = canvasWidth / bounds.width;
+    const scaleY = canvasHeight / bounds.height;
+    const position = {
+      x: scaleX * (source.clientX - bounds.left),
+      y: scaleY * (bounds.height - source.clientY + bounds.top),
+      z: 0,
+    };
+    return position;
   }
 
   render() {
@@ -149,6 +180,8 @@ export default class View extends Component {
         style={{ position: 'relative', ...style }}
         onMouseEnter={this.onEnter}
         onMouseLeave={this.onLeave}
+        onClick={this.onClick}
+        onMouseMove={this.onMouseMove}
       >
         <div style={RENDERER_STYLE} ref={this.containerRef} />
         <div>
@@ -275,6 +308,93 @@ export default class View extends Component {
     );
     this.renderWindow.render();
   }
+
+  pick(x1, y1, x2, y2) {
+    this.selector.setArea(x1, y1, x2, y2);
+    this.selector.releasePixBuffers();
+    this.previousSelectedData = null;
+    if (this.selector.captureBuffers()) {
+      this.selections = this.selector.generateSelection(x1, y1, x2, y2) || [];
+      return this.selections.map((v) => {
+        const { prop, compositeID, displayPosition } = v.getProperties();
+        const selectionBounds = [];
+        let selectionType = '';
+        if (x1 !== x2 || y1 !== y2) {
+          selectionType = 'frustrum';
+          selectionBounds.push(this.renderer.viewToWorld(x1, y1, 0));
+          selectionBounds.push(this.renderer.viewToWorld(x2, y1, 0));
+          selectionBounds.push(this.renderer.viewToWorld(x2, y2, 0));
+          selectionBounds.push(this.renderer.viewToWorld(x1, y2, 0));
+          selectionBounds.push(this.renderer.viewToWorld(x1, y1, 1));
+          selectionBounds.push(this.renderer.viewToWorld(x2, y1, 1));
+          selectionBounds.push(this.renderer.viewToWorld(x2, y2, 1));
+          selectionBounds.push(this.renderer.viewToWorld(x1, y2, 1));
+        } else {
+          selectionType = 'ray';
+          selectionBounds.push(this.renderer.viewToWorld(x1, y1, 0));
+          selectionBounds.push(this.renderer.viewToWorld(x1, y1, 1));
+        }
+        return {
+          worldPosition: this.renderer.viewToWorld(
+            displayPosition[0],
+            displayPosition[1],
+            displayPosition[2]
+          ),
+          displayPosition,
+          compositeID, // Not yet useful unless GlyphRepresentation
+          ...prop.get('representationId'),
+          [selectionType]: selectionBounds,
+        };
+      });
+    }
+    return [];
+  }
+
+  onClick(e) {
+    if (this.props.pickingModes.indexOf('click') === -1) {
+      return;
+    }
+    const { x, y } = this.getScreenEventPositionFor(e);
+    const selection = this.pick(x, y, x, y);
+
+    // Guard against trigger of empty selection
+    if (this.lastSelection.length === 0 && selection.length === 0) {
+      return;
+    }
+    this.lastSelection = selection;
+
+    // Share the selection with the rest of the world
+    if (this.props.onClick) {
+      this.props.onClick(selection[0]);
+    }
+
+    if ('setProps' in this.props) {
+      this.props.setProps({ clickInfo: selection[0] });
+    }
+  }
+
+  onHover(e) {
+    if (this.props.pickingModes.indexOf('hover') === -1) {
+      return;
+    }
+    const { x, y } = this.getScreenEventPositionFor(e);
+    const selection = this.pick(x, y, x, y);
+
+    // Guard against trigger of empty selection
+    if (this.lastSelection.length === 0 && selection.length === 0) {
+      return;
+    }
+    this.lastSelection = selection;
+
+    // Share the selection with the rest of the world
+    if (this.props.onHover) {
+      this.props.onHover(selection[0]);
+    }
+
+    if ('setProps' in this.props) {
+      this.props.setProps({ hoverInfo: selection[0] });
+    }
+  }
 }
 
 View.defaultProps = {
@@ -324,6 +444,7 @@ View.defaultProps = {
       shift: true,
     },
   ],
+  pickingModes: [],
 };
 
 View.propTypes = {
@@ -385,4 +506,33 @@ View.propTypes = {
     PropTypes.arrayOf(PropTypes.node),
     PropTypes.node,
   ]),
+
+  /**
+   * List of picking listeners to bind. The supported values are `click` and `hover`. By default it is disabled (empty array).
+   */
+  pickingModes: PropTypes.arrayOf(PropTypes.string),
+
+  /**
+   * User callback function for click
+   */
+  onClick: PropTypes.func,
+
+  /**
+   * Read-only prop. To use this, make sure that `pickingModes` contains `click`.
+   * This prop is updated when an element in the map is clicked. This contains
+   * the picking info describing the object being clicked on.
+   */
+  clickInfo: PropTypes.object,
+
+  /**
+   * User callback function for hover
+   */
+  onHover: PropTypes.func,
+
+  /**
+   * Read-only prop. To use this, make sure that `pickingModes` contains `hover`.
+   * This prop is updated when an element in the map is hovered. This contains
+   * the picking info describing the object being hovered.
+   */
+  hoverInfo: PropTypes.object,
 };

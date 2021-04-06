@@ -11,6 +11,7 @@ const entry = {
   SourceViewer: './Geometry/SourceViewer.js',
   ProcessingPipeline: './Geometry/ProcessingPipeline.js',
   OBJViewer: './Geometry/OBJViewer.js',
+  Picking: './Geometry/Picking.js',
   Glyph: './Geometry/Glyph.js',
   PointCloud: './Geometry/PointCloud.js',
   VolumeRendering: './Volume/VolumeRendering.js',
