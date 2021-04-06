@@ -91,7 +91,7 @@ export default class GeometryRepresentation extends Component {
       this.subscriptions.pop().unsubscribe();
     }
 
-    if (this.view) {
+    if (this.view && this.view.renderer) {
       this.view.renderer.removeActor(this.cubeAxes);
       this.view.renderer.removeActor(this.actor);
     }

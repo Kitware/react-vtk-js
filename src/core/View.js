@@ -152,8 +152,48 @@ export default class View extends Component {
     this.onLeave = () => {
       this.hasFocus = false;
     };
-    this.onClick = this.onClick.bind(this);
-    this.onMouseMove = debounce((e) => this.onHover(e), 50);
+
+    // Handle picking
+    const click = ({ x, y }) => {
+      if (this.props.pickingModes.indexOf('click') === -1) {
+        return;
+      }
+      const selection = this.pick(x, y, x, y);
+
+      // Share the selection with the rest of the world
+      if (this.props.onClick) {
+        this.props.onClick(selection[0]);
+      }
+
+      if ('setProps' in this.props) {
+        this.props.setProps({ clickInfo: selection[0] });
+      }
+    };
+
+    const hover = debounce(({ x, y }) => {
+      if (this.props.pickingModes.indexOf('hover') === -1) {
+        return;
+      }
+      const selection = this.pick(x, y, x, y);
+
+      // Guard against trigger of empty selection
+      if (this.lastSelection.length === 0 && selection.length === 0) {
+        return;
+      }
+      this.lastSelection = selection;
+
+      // Share the selection with the rest of the world
+      if (this.props.onHover) {
+        this.props.onHover(selection[0]);
+      }
+
+      if ('setProps' in this.props) {
+        this.props.setProps({ hoverInfo: selection[0] });
+      }
+    }, 50);
+
+    this.onClick = (e) => click(this.getScreenEventPositionFor(e));
+    this.onMouseMove = (e) => hover(this.getScreenEventPositionFor(e));
     this.lastSelection = [];
   }
 
@@ -322,24 +362,46 @@ export default class View extends Component {
         let selectionType = '';
         if (x1 !== x2 || y1 !== y2) {
           selectionType = 'frustrum';
-          selectionBounds.push(this.renderer.viewToWorld(x1, y1, 0));
-          selectionBounds.push(this.renderer.viewToWorld(x2, y1, 0));
-          selectionBounds.push(this.renderer.viewToWorld(x2, y2, 0));
-          selectionBounds.push(this.renderer.viewToWorld(x1, y2, 0));
-          selectionBounds.push(this.renderer.viewToWorld(x1, y1, 1));
-          selectionBounds.push(this.renderer.viewToWorld(x2, y1, 1));
-          selectionBounds.push(this.renderer.viewToWorld(x2, y2, 1));
-          selectionBounds.push(this.renderer.viewToWorld(x1, y2, 1));
+          selectionBounds.push(
+            Array.from(this.renderer.viewToWorld(x1, y1, 0))
+          );
+          selectionBounds.push(
+            Array.from(this.renderer.viewToWorld(x2, y1, 0))
+          );
+          selectionBounds.push(
+            Array.from(this.renderer.viewToWorld(x2, y2, 0))
+          );
+          selectionBounds.push(
+            Array.from(this.renderer.viewToWorld(x1, y2, 0))
+          );
+          selectionBounds.push(
+            Array.from(this.renderer.viewToWorld(x1, y1, 1))
+          );
+          selectionBounds.push(
+            Array.from(this.renderer.viewToWorld(x2, y1, 1))
+          );
+          selectionBounds.push(
+            Array.from(this.renderer.viewToWorld(x2, y2, 1))
+          );
+          selectionBounds.push(
+            Array.from(this.renderer.viewToWorld(x1, y2, 1))
+          );
         } else {
           selectionType = 'ray';
-          selectionBounds.push(this.renderer.viewToWorld(x1, y1, 0));
-          selectionBounds.push(this.renderer.viewToWorld(x1, y1, 1));
+          selectionBounds.push(
+            Array.from(this.renderer.viewToWorld(x1, y1, 0))
+          );
+          selectionBounds.push(
+            Array.from(this.renderer.viewToWorld(x1, y1, 1))
+          );
         }
         return {
-          worldPosition: this.renderer.viewToWorld(
-            displayPosition[0],
-            displayPosition[1],
-            displayPosition[2]
+          worldPosition: Array.from(
+            this.renderer.viewToWorld(
+              displayPosition[0],
+              displayPosition[1],
+              displayPosition[2]
+            )
           ),
           displayPosition,
           compositeID, // Not yet useful unless GlyphRepresentation
@@ -349,52 +411,6 @@ export default class View extends Component {
       });
     }
     return [];
-  }
-
-  onClick(e) {
-    if (this.props.pickingModes.indexOf('click') === -1) {
-      return;
-    }
-    const { x, y } = this.getScreenEventPositionFor(e);
-    const selection = this.pick(x, y, x, y);
-
-    // Guard against trigger of empty selection
-    if (this.lastSelection.length === 0 && selection.length === 0) {
-      return;
-    }
-    this.lastSelection = selection;
-
-    // Share the selection with the rest of the world
-    if (this.props.onClick) {
-      this.props.onClick(selection[0]);
-    }
-
-    if ('setProps' in this.props) {
-      this.props.setProps({ clickInfo: selection[0] });
-    }
-  }
-
-  onHover(e) {
-    if (this.props.pickingModes.indexOf('hover') === -1) {
-      return;
-    }
-    const { x, y } = this.getScreenEventPositionFor(e);
-    const selection = this.pick(x, y, x, y);
-
-    // Guard against trigger of empty selection
-    if (this.lastSelection.length === 0 && selection.length === 0) {
-      return;
-    }
-    this.lastSelection = selection;
-
-    // Share the selection with the rest of the world
-    if (this.props.onHover) {
-      this.props.onHover(selection[0]);
-    }
-
-    if ('setProps' in this.props) {
-      this.props.setProps({ hoverInfo: selection[0] });
-    }
   }
 }
 
