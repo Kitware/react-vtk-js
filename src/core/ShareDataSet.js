@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import macro from 'vtk.js/macro.js';
+import macro from '@kitware/vtk.js/macro.js';
 
 import { DownstreamContext } from './View';
 

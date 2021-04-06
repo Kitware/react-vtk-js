@@ -5,26 +5,26 @@ import PropTypes from 'prop-types';
 // vtk.js Rendering stack
 // ----------------------------------------------------------------------------
 
-import { debounce } from 'vtk.js/macro.js';
+import { debounce } from '@kitware/vtk.js/macro.js';
 
-import vtkOpenGLRenderWindow from 'vtk.js/Rendering/OpenGL/RenderWindow.js';
-import vtkRenderWindow from 'vtk.js/Rendering/Core/RenderWindow.js';
-import vtkRenderWindowInteractor from 'vtk.js/Rendering/Core/RenderWindowInteractor.js';
-import vtkRenderer from 'vtk.js/Rendering/Core/Renderer.js';
-import vtkInteractorStyleManipulator from 'vtk.js/Interaction/Style/InteractorStyleManipulator.js';
+import vtkOpenGLRenderWindow from '@kitware/vtk.js/Rendering/OpenGL/RenderWindow.js';
+import vtkRenderWindow from '@kitware/vtk.js/Rendering/Core/RenderWindow.js';
+import vtkRenderWindowInteractor from '@kitware/vtk.js/Rendering/Core/RenderWindowInteractor.js';
+import vtkRenderer from '@kitware/vtk.js/Rendering/Core/Renderer.js';
+import vtkInteractorStyleManipulator from '@kitware/vtk.js/Interaction/Style/InteractorStyleManipulator.js';
 
 // Style modes
-import vtkMouseCameraTrackballMultiRotateManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballMultiRotateManipulator.js';
-import vtkMouseCameraTrackballPanManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballPanManipulator.js';
-import vtkMouseCameraTrackballRollManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballRollManipulator.js';
-import vtkMouseCameraTrackballRotateManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballRotateManipulator.js';
-import vtkMouseCameraTrackballZoomManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballZoomManipulator.js';
-import vtkMouseCameraTrackballZoomToMouseManipulator from 'vtk.js/Interaction/Manipulators/MouseCameraTrackballZoomToMouseManipulator.js';
-import vtkGestureCameraManipulator from 'vtk.js/Interaction/Manipulators/GestureCameraManipulator.js';
+import vtkMouseCameraTrackballMultiRotateManipulator from '@kitware/vtk.js/Interaction/Manipulators/MouseCameraTrackballMultiRotateManipulator.js';
+import vtkMouseCameraTrackballPanManipulator from '@kitware/vtk.js/Interaction/Manipulators/MouseCameraTrackballPanManipulator.js';
+import vtkMouseCameraTrackballRollManipulator from '@kitware/vtk.js/Interaction/Manipulators/MouseCameraTrackballRollManipulator.js';
+import vtkMouseCameraTrackballRotateManipulator from '@kitware/vtk.js/Interaction/Manipulators/MouseCameraTrackballRotateManipulator.js';
+import vtkMouseCameraTrackballZoomManipulator from '@kitware/vtk.js/Interaction/Manipulators/MouseCameraTrackballZoomManipulator.js';
+import vtkMouseCameraTrackballZoomToMouseManipulator from '@kitware/vtk.js/Interaction/Manipulators/MouseCameraTrackballZoomToMouseManipulator.js';
+import vtkGestureCameraManipulator from '@kitware/vtk.js/Interaction/Manipulators/GestureCameraManipulator.js';
 
 // Picking handling
-import vtkOpenGLHardwareSelector from 'vtk.js/Rendering/OpenGL/HardwareSelector.js';
-import { FieldAssociations } from 'vtk.js/Common/DataModel/DataSet/Constants.js';
+import vtkOpenGLHardwareSelector from '@kitware/vtk.js/Rendering/OpenGL/HardwareSelector.js';
+import { FieldAssociations } from '@kitware/vtk.js/Common/DataModel/DataSet/Constants.js';
 
 // ----------------------------------------------------------------------------
 // Context to pass parent variables to children

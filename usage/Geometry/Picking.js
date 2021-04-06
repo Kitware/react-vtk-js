@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import ReactDOM from 'react-dom';
 
 import { View, GeometryRepresentation, PolyData, PointData, DataArray } from 'react-vtk-js';
@@ -14,12 +14,17 @@ for (let i = 0; i < 1000; i++) {
 
 // React complains about unique key prop but I don't see why
 function Example(props) {
+  const tooltip = useRef(null);
+  const toTooltip = (txt) => {
+    tooltip.current.innerHTML = txt;
+  };
   return (
     <div style={{width: '100vw', height: '100vh'}}>
+      <pre style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 1, margin: 0 }} ref={tooltip} />
       <View
         pickingModes={['hover', 'click']}
-        onClick={(e) => console.log(`Click: ${JSON.stringify(e, null, 2)}`)}
-        onHover={(e) => console.log(`Hover: ${JSON.stringify(e, null, 2)}`)}
+        onClick={(e) => toTooltip(`Click: ${JSON.stringify(e, null, 2)}`)}
+        onHover={(e) => toTooltip(`Hover: ${JSON.stringify(e, null, 2)}`)}
       >
         <GeometryRepresentation
           id="plan"

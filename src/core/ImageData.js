@@ -7,7 +7,7 @@ import {
   DataSetContext,
 } from './View';
 
-import vtkImageData from 'vtk.js/Common/DataModel/ImageData.js';
+import vtkImageData from '@kitware/vtk.js/Common/DataModel/ImageData.js';
 
 /**
  * ImageData is exposing a vtkImageData to a downstream filter

@@ -6,19 +6,19 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 // ----------------------------------------------------------------------------
 
 const entry = {
-  PolyDataViewer: './Geometry/PolyDataViewer.js',
-  PolyDataWithData: './Geometry/PolyDataWithData.js',
-  SourceViewer: './Geometry/SourceViewer.js',
-  ProcessingPipeline: './Geometry/ProcessingPipeline.js',
-  OBJViewer: './Geometry/OBJViewer.js',
+  // PolyDataViewer: './Geometry/PolyDataViewer.js',
+  // PolyDataWithData: './Geometry/PolyDataWithData.js',
+  // SourceViewer: './Geometry/SourceViewer.js',
+  // ProcessingPipeline: './Geometry/ProcessingPipeline.js',
+  // OBJViewer: './Geometry/OBJViewer.js',
   Picking: './Geometry/Picking.js',
-  Glyph: './Geometry/Glyph.js',
-  PointCloud: './Geometry/PointCloud.js',
-  VolumeRendering: './Volume/VolumeRendering.js',
-  SyntheticVolumeRendering: './Volume/SyntheticVolumeRendering.js',
-  SliceRendering: './Volume/SliceRendering.js',
-  DynamicUpdate: './Volume/DynamicUpdate.js',
-  DynamicRepUpdate: './Volume/DynamicRepUpdate.js',
+  // Glyph: './Geometry/Glyph.js',
+  // PointCloud: './Geometry/PointCloud.js',
+  // VolumeRendering: './Volume/VolumeRendering.js',
+  // SyntheticVolumeRendering: './Volume/SyntheticVolumeRendering.js',
+  // SliceRendering: './Volume/SliceRendering.js',
+  // DynamicUpdate: './Volume/DynamicUpdate.js',
+  // DynamicRepUpdate: './Volume/DynamicRepUpdate.js',
 };
 
 function toHtmlPlugin() {

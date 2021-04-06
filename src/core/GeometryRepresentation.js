@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext, DownstreamContext } from './View';
 
-import vtkActor from 'vtk.js/Rendering/Core/Actor.js';
-import vtkMapper from 'vtk.js/Rendering/Core/Mapper.js';
-import vtkColorMaps from 'vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps.js';
-import vtkColorTransferFunction from 'vtk.js/Rendering/Core/ColorTransferFunction.js';
+import vtkActor from '@kitware/vtk.js/Rendering/Core/Actor.js';
+import vtkMapper from '@kitware/vtk.js/Rendering/Core/Mapper.js';
+import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps.js';
+import vtkColorTransferFunction from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction.js';
 
 /**
  * GeometryRepresentation is responsible to convert a vtkPolyData into rendering

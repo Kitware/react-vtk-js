@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext, DownstreamContext } from './View';
 
-import vtk from 'vtk.js/vtk.js';
-import Base64 from 'vtk.js/Common/Core/Base64.js';
+import vtk from '@kitware/vtk.js/vtk.js';
+import Base64 from '@kitware/vtk.js/Common/Core/Base64.js';
 
 /**
  * Reader is exposing a reader to a downstream filter

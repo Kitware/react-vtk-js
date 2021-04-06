@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext, DownstreamContext } from './View';
 
-import vtkActor from 'vtk.js/Rendering/Core/Actor.js';
-import vtkGlyph3DMapper from 'vtk.js/Rendering/Core/Glyph3DMapper.js';
-import vtkColorMaps from 'vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps.js';
-import vtkColorTransferFunction from 'vtk.js/Rendering/Core/ColorTransferFunction.js';
+import vtkActor from '@kitware/vtk.js/Rendering/Core/Actor.js';
+import vtkGlyph3DMapper from '@kitware/vtk.js/Rendering/Core/Glyph3DMapper.js';
+import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps.js';
+import vtkColorTransferFunction from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction.js';
 
 /**
  * GlyphRepresentation using a source on port=1 as Glyph and the points of the source on port=0 to position the given glyphs
