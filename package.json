@@ -58,6 +58,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "rollup": "^2.37.1",
+    "rollup-plugin-analyzer": "^4.0.0",
     "rollup-plugin-terser": "^7.0.2",
     "semantic-release": "17.3.1"
   },
