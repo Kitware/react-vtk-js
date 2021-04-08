@@ -27,7 +27,7 @@ function Example(props) {
   const [scaleFactor, setScaleFactor] =  useState(0);
   return (
     <div style={{width: '100vw', height: '100vh'}}>
-      <View>
+      <View showCubeAxes={true}>
         <Slider value={scaleFactor} setValue={setScaleFactor} />
         <GeometryRepresentation
           mapper={{

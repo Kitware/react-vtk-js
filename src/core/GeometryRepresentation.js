@@ -9,6 +9,7 @@ import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/C
 import vtkColorTransferFunction from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction.js';
 
 import vtkCubeAxesActor from '@kitware/vtk.js/Rendering/Core/CubeAxesActor.js';
+import vtkScalarBarActor from '@kitware/vtk.js/Rendering/Core/ScalarBarActor.js';
 
 /**
  * GeometryRepresentation is responsible to convert a vtkPolyData into rendering
@@ -30,6 +31,7 @@ export default class GeometryRepresentation extends Component {
     });
     this.actor.setMapper(this.mapper);
 
+    // Cube Axes
     this.cubeAxes = vtkCubeAxesActor.newInstance({
       visibility: false,
       dataBounds: [-1, 1, -1, 1, -1, 1],
@@ -37,6 +39,11 @@ export default class GeometryRepresentation extends Component {
     this.cubeAxes
       .getActors()
       .forEach(({ setVisibility }) => setVisibility(false));
+
+    // Scalar Bar
+    this.scalarBar = vtkScalarBarActor.newInstance();
+    this.scalarBar.setScalarsToColors(this.lookupTable);
+    this.scalarBar.setVisibility(false);
 
     const updateCubeAxes = () => {
       if (this.mapper.getInputData()) {
@@ -67,6 +74,7 @@ export default class GeometryRepresentation extends Component {
         {(view) => {
           if (!this.view) {
             this.cubeAxes.setCamera(view.renderer.getActiveCamera());
+            view.renderer.addActor(this.scalarBar);
             view.renderer.addActor(this.cubeAxes);
             view.renderer.addActor(this.actor);
             this.view = view;
@@ -99,9 +107,16 @@ export default class GeometryRepresentation extends Component {
     }
 
     if (this.view && this.view.renderer) {
+      this.view.renderer.removeActor(this.scalarBar);
       this.view.renderer.removeActor(this.cubeAxes);
       this.view.renderer.removeActor(this.actor);
     }
+
+    this.scalarBar.delete();
+    this.scalarBar = null;
+
+    this.cubeAxes.delete();
+    this.cubeAxes = null;
 
     this.actor.delete();
     this.actor = null;
@@ -168,6 +183,17 @@ export default class GeometryRepresentation extends Component {
       needRender++;
     }
 
+    // Only trigger a render if something is different
+    if (this.scalarBar.setVisibility(props.showScalarBar)) {
+      needRender++;
+    }
+    if (this.scalarBar.setAxisLabel(props.scalarBarTitle)) {
+      needRender++;
+    }
+    if (this.scalarBar.set(props.scalarBarStyle || {})) {
+      needRender++;
+    }
+
     if (this.view && needRender) {
       this.view.renderView();
     }
@@ -184,6 +210,8 @@ GeometryRepresentation.defaultProps = {
   colorMapPreset: 'erdc_rainbow_bright',
   colorDataRange: [0, 1],
   showCubeAxes: false,
+  showScalarBar: false,
+  scalarBarTitle: '',
 };
 
 GeometryRepresentation.propTypes = {
@@ -227,6 +255,22 @@ GeometryRepresentation.propTypes = {
    * https://github.com/Kitware/vtk-js/blob/HEAD/Sources/Rendering/Core/CubeAxesActor/index.js#L703-L719
    */
   cubeAxesStyle: PropTypes.object,
+
+  /**
+   * Show hide scalar bar for that representation
+   */
+  showScalarBar: PropTypes.bool,
+
+  /**
+   * Use given string as title for scalar bar. By default it is empty (no title).
+   */
+  scalarBarTitle: PropTypes.string,
+
+  /**
+   * Configure scalar bar style by overriding the set of properties defined
+   * https://github.com/Kitware/vtk-js/blob/master/Sources/Rendering/Core/ScalarBarActor/index.js#L776-L796
+   */
+  scalarBarStyle: PropTypes.object,
 
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),

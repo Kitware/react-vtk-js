@@ -12,6 +12,7 @@ function Example(props) {
           property={{ pointSize: 10 }}
           xyz={props.xyz}
           scalars={props.scalars}
+          showScalarBar={true}
         />
       </View>
     </div>

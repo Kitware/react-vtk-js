@@ -13,6 +13,9 @@ import vtkRenderWindowInteractor from '@kitware/vtk.js/Rendering/Core/RenderWind
 import vtkRenderer from '@kitware/vtk.js/Rendering/Core/Renderer.js';
 import vtkInteractorStyleManipulator from '@kitware/vtk.js/Interaction/Style/InteractorStyleManipulator.js';
 
+import vtkBoundingBox from '@kitware/vtk.js/Common/DataModel/BoundingBox.js';
+import vtkCubeAxesActor from '@kitware/vtk.js/Rendering/Core/CubeAxesActor.js';
+
 // Style modes
 import vtkMouseCameraTrackballMultiRotateManipulator from '@kitware/vtk.js/Interaction/Manipulators/MouseCameraTrackballMultiRotateManipulator.js';
 import vtkMouseCameraTrackballPanManipulator from '@kitware/vtk.js/Interaction/Manipulators/MouseCameraTrackballPanManipulator.js';
@@ -128,8 +131,28 @@ export default class View extends Component {
     this.resizeObserver = new ResizeObserver(() => this.onResize());
 
     // expose helper methods
-    this.renderView = this.renderWindow.render;
+    this.renderView = () => {
+      this.updateCubeBounds();
+      this.renderWindow.render();
+    };
     this.resetCamera = this.resetCamera.bind(this);
+    const bbox = vtkBoundingBox.newInstance({ bounds: [0, 0, 0, 0, 0, 0] });
+    this.updateCubeBounds = () => {
+      bbox.reset();
+      const { props } = this.renderer.get('props');
+      for (let i = 0; i < props.length; i++) {
+        const prop = props[i];
+        if (
+          prop.getVisibility() &&
+          prop.getUseBounds() &&
+          prop !== this.cubeAxes
+        ) {
+          bbox.addBounds(...prop.getBounds());
+        }
+      }
+      this.cubeAxes.setDataBounds(bbox.getBounds());
+    };
+    const debouncedCubeBounds = debounce(this.updateCubeBounds, 50);
 
     // Internal functions
     this.hasFocus = false;
@@ -195,6 +218,26 @@ export default class View extends Component {
     this.onClick = (e) => click(this.getScreenEventPositionFor(e));
     this.onMouseMove = (e) => hover(this.getScreenEventPositionFor(e));
     this.lastSelection = [];
+
+    // Cube Axes
+    this.cubeAxes = vtkCubeAxesActor.newInstance({
+      visibility: false,
+      dataBounds: [-1, 1, -1, 1, -1, 1],
+    });
+    this.cubeAxes
+      .getActors()
+      .forEach(({ setVisibility }) => setVisibility(false));
+    this.cubeAxes.setCamera(this.camera);
+    this.renderer.addActor(this.cubeAxes);
+
+    this.subscriptions = [];
+    this.subscriptions.push(
+      this.renderer.onEvent(({ type, renderer }) => {
+        if (renderer && type === 'ComputeVisiblePropBoundsEvent') {
+          debouncedCubeBounds();
+        }
+      })
+    );
   }
 
   getScreenEventPositionFor(source) {
@@ -260,6 +303,10 @@ export default class View extends Component {
   }
 
   componentWillUnmount() {
+    while (this.subscriptions.length) {
+      this.subscriptions.pop().unsubscribe();
+    }
+
     document.removeEventListener('keyup', this.handleKey);
     // Stop size listening
     this.resizeObserver.disconnect();
@@ -295,6 +342,8 @@ export default class View extends Component {
       cameraParallelProjection,
       triggerRender,
       triggerResetCamera,
+      showCubeAxes,
+      cubeAxesStyle,
     } = props;
     if (background && (!previous || background !== previous.background)) {
       this.renderer.setBackground(background);
@@ -331,6 +380,17 @@ export default class View extends Component {
       if (previous) {
         this.resetCamera();
       }
+    }
+
+    if (this.cubeAxes.setVisibility(showCubeAxes)) {
+      this.cubeAxes
+        .getActors()
+        .forEach(({ setVisibility }) => setVisibility(showCubeAxes));
+      this.renderView();
+    }
+
+    if (this.cubeAxes.set(cubeAxesStyle || {})) {
+      this.renderView();
     }
 
     // Allow to trigger method call from property change
@@ -483,6 +543,7 @@ View.defaultProps = {
     },
   ],
   pickingModes: [],
+  showCubeAxes: false,
 };
 
 View.propTypes = {
@@ -573,4 +634,15 @@ View.propTypes = {
    * the picking info describing the object being hovered.
    */
   hoverInfo: PropTypes.object,
+
+  /**
+   * Show/Hide Cube Axes for the given representation
+   */
+  showCubeAxes: PropTypes.bool,
+
+  /**
+   * Configure cube Axes style by overriding the set of properties defined
+   * https://github.com/Kitware/vtk-js/blob/HEAD/Sources/Rendering/Core/CubeAxesActor/index.js#L703-L719
+   */
+  cubeAxesStyle: PropTypes.object,
 };

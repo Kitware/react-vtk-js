@@ -35,6 +35,8 @@ function Example(props) {
           }}
           colorDataRange={[0, 0.7]}
           colorMapPreset="Black-Body Radiation"
+          showScalarBar={true}
+          scalarBarTitle="Plan"
         >
           <PolyData
             points={[
@@ -65,6 +67,13 @@ function Example(props) {
           id="cloud"
           colorDataRange={[0, 1]}
           property={{ pointSize: 5 }}
+          showScalarBar={true}
+          scalarBarTitle="Cloud"
+          scalarBarStyle={{
+            automated: false,
+            boxPosition: [-0.9, -0.95],
+            boxSize: [1.7, 0.25],
+          }}
         >
           <PolyData
             points={points}
