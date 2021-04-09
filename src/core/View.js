@@ -24,6 +24,7 @@ import vtkMouseCameraTrackballRotateManipulator from '@kitware/vtk.js/Interactio
 import vtkMouseCameraTrackballZoomManipulator from '@kitware/vtk.js/Interaction/Manipulators/MouseCameraTrackballZoomManipulator.js';
 import vtkMouseCameraTrackballZoomToMouseManipulator from '@kitware/vtk.js/Interaction/Manipulators/MouseCameraTrackballZoomToMouseManipulator.js';
 import vtkGestureCameraManipulator from '@kitware/vtk.js/Interaction/Manipulators/GestureCameraManipulator.js';
+import vtkMouseBoxSelectorManipulator from '@kitware/vtk.js/Interaction/Manipulators/MouseBoxSelectorManipulator.js';
 
 // Picking handling
 import vtkOpenGLHardwareSelector from '@kitware/vtk.js/Rendering/OpenGL/HardwareSelector.js';
@@ -51,9 +52,10 @@ const manipulatorFactory = {
   Rotate: vtkMouseCameraTrackballRotateManipulator,
   MultiRotate: vtkMouseCameraTrackballMultiRotateManipulator,
   ZoomToMouse: vtkMouseCameraTrackballZoomToMouseManipulator,
+  Select: vtkMouseBoxSelectorManipulator,
 };
 
-function assignManipulators(style, settings) {
+function assignManipulators(style, settings, view) {
   style.removeAllMouseManipulators();
   settings.forEach((item) => {
     const klass = manipulatorFactory[item.action];
@@ -71,6 +73,10 @@ function assignManipulators(style, settings) {
         manipulator.setDragEnabled(dragEnabled);
       }
       style.addMouseManipulator(manipulator);
+      if (manipulator.onBoxSelectChange && view.onBoxSelectChange) {
+        console.log('add onBoxSelectChange');
+        manipulator.onBoxSelectChange(view.onBoxSelectChange);
+      }
     }
   });
 
@@ -215,9 +221,28 @@ export default class View extends Component {
       }
     }, 10);
 
+    const select = ({ selection }) => {
+      if (this.props.pickingModes.indexOf('select') === -1) {
+        return;
+      }
+      const [x1, x2, y1, y2] = selection;
+      const pickResult = this.pick(x1, y1, x2, y2);
+
+      // Share the selection with the rest of the world
+      if (this.props.onSelect) {
+        this.props.onSelect(pickResult);
+      }
+
+      if ('setProps' in this.props) {
+        this.props.setProps({ selectInfo: pickResult });
+      }
+    };
+
     this.onClick = (e) => click(this.getScreenEventPositionFor(e));
     this.onMouseMove = (e) => hover(this.getScreenEventPositionFor(e));
     this.lastSelection = [];
+
+    this.onBoxSelectChange = select;
 
     // Cube Axes
     this.cubeAxes = vtkCubeAxesActor.newInstance({
@@ -352,7 +377,7 @@ export default class View extends Component {
       interactorSettings &&
       (!previous || interactorSettings !== previous.interactorSettings)
     ) {
-      assignManipulators(this.style, interactorSettings);
+      assignManipulators(this.style, interactorSettings, this);
     }
     if (
       cameraParallelProjection &&
@@ -412,69 +437,57 @@ export default class View extends Component {
 
   pick(x1, y1, x2, y2) {
     this.selector.setArea(x1, y1, x2, y2);
-    this.selector.releasePixBuffers();
     this.previousSelectedData = null;
     if (this.selector.captureBuffers()) {
       this.selections = this.selector.generateSelection(x1, y1, x2, y2) || [];
+      if (x1 !== x2 || y1 !== y2) {
+        const frustrum = [
+          Array.from(
+            this.openglRenderWindow.displayToWorld(x1, y1, 0, this.renderer)
+          ),
+          Array.from(
+            this.openglRenderWindow.displayToWorld(x2, y1, 0, this.renderer)
+          ),
+          Array.from(
+            this.openglRenderWindow.displayToWorld(x2, y2, 0, this.renderer)
+          ),
+          Array.from(
+            this.openglRenderWindow.displayToWorld(x1, y2, 0, this.renderer)
+          ),
+          Array.from(
+            this.openglRenderWindow.displayToWorld(x1, y1, 1, this.renderer)
+          ),
+          Array.from(
+            this.openglRenderWindow.displayToWorld(x2, y1, 1, this.renderer)
+          ),
+          Array.from(
+            this.openglRenderWindow.displayToWorld(x2, y2, 1, this.renderer)
+          ),
+          Array.from(
+            this.openglRenderWindow.displayToWorld(x1, y2, 1, this.renderer)
+          ),
+        ];
+        const representationIds = [];
+        this.selections.forEach((v) => {
+          const { prop } = v.getProperties();
+          const { representationId } = prop.get('representationId');
+          if (representationId) {
+            representationIds.push(representationId);
+          }
+        });
+        return { frustrum, representationIds };
+      }
+      const ray = [
+        Array.from(
+          this.openglRenderWindow.displayToWorld(x1, y1, 0, this.renderer)
+        ),
+        Array.from(
+          this.openglRenderWindow.displayToWorld(x1, y1, 1, this.renderer)
+        ),
+      ];
       return this.selections.map((v) => {
         const { prop, compositeID, displayPosition } = v.getProperties();
-        const selectionBounds = [];
-        let selectionType = '';
-        if (x1 !== x2 || y1 !== y2) {
-          selectionType = 'frustrum';
-          selectionBounds.push(
-            Array.from(
-              this.openglRenderWindow.displayToWorld(x1, y1, 0, this.renderer)
-            )
-          );
-          selectionBounds.push(
-            Array.from(
-              this.openglRenderWindow.displayToWorld(x2, y1, 0, this.renderer)
-            )
-          );
-          selectionBounds.push(
-            Array.from(
-              this.openglRenderWindow.displayToWorld(x2, y2, 0, this.renderer)
-            )
-          );
-          selectionBounds.push(
-            Array.from(
-              this.openglRenderWindow.displayToWorld(x1, y2, 0, this.renderer)
-            )
-          );
-          selectionBounds.push(
-            Array.from(
-              this.openglRenderWindow.displayToWorld(x1, y1, 1, this.renderer)
-            )
-          );
-          selectionBounds.push(
-            Array.from(
-              this.openglRenderWindow.displayToWorld(x2, y1, 1, this.renderer)
-            )
-          );
-          selectionBounds.push(
-            Array.from(
-              this.openglRenderWindow.displayToWorld(x2, y2, 1, this.renderer)
-            )
-          );
-          selectionBounds.push(
-            Array.from(
-              this.openglRenderWindow.displayToWorld(x1, y2, 1, this.renderer)
-            )
-          );
-        } else {
-          selectionType = 'ray';
-          selectionBounds.push(
-            Array.from(
-              this.openglRenderWindow.displayToWorld(x1, y1, 0, this.renderer)
-            )
-          );
-          selectionBounds.push(
-            Array.from(
-              this.openglRenderWindow.displayToWorld(x1, y1, 1, this.renderer)
-            )
-          );
-        }
+
         return {
           worldPosition: Array.from(
             this.openglRenderWindow.displayToWorld(
@@ -487,7 +500,7 @@ export default class View extends Component {
           displayPosition,
           compositeID, // Not yet useful unless GlyphRepresentation
           ...prop.get('representationId'),
-          [selectionType]: selectionBounds,
+          ray,
         };
       });
     }
@@ -523,17 +536,17 @@ View.defaultProps = {
     {
       button: 1,
       action: 'Pan',
-      shift: true,
-    },
-    {
-      button: 1,
-      action: 'Zoom',
       alt: true,
     },
     {
       button: 1,
-      action: 'ZoomToMouse',
+      action: 'Zoom',
       control: true,
+    },
+    {
+      button: 1,
+      action: 'Select',
+      shift: true,
     },
     {
       button: 1,
@@ -607,7 +620,7 @@ View.propTypes = {
   ]),
 
   /**
-   * List of picking listeners to bind. The supported values are `click` and `hover`. By default it is disabled (empty array).
+   * List of picking listeners to bind. The supported values are `click`, `hover` and `select`. By default it is disabled (empty array).
    */
   pickingModes: PropTypes.arrayOf(PropTypes.string),
 
@@ -634,6 +647,18 @@ View.propTypes = {
    * the picking info describing the object being hovered.
    */
   hoverInfo: PropTypes.object,
+
+  /**
+   * User callback function for box select
+   */
+  onSelect: PropTypes.func,
+
+  /**
+   * Read-only prop. To use this, make sure that `pickingModes` contains `select`.
+   * This prop is updated when an element in the view is select. This contains
+   * the picking info describing the object being select along with the frustrum.
+   */
+  selectInfo: PropTypes.object,
 
   /**
    * Show/Hide Cube Axes for the given representation

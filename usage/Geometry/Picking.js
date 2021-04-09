@@ -1,3 +1,4 @@
+import { P } from '@kitware/vtk.js/Common/Core/Math/index';
 import React, { useRef } from 'react';
 import ReactDOM from 'react-dom';
 
@@ -12,6 +13,8 @@ for (let i = 0; i < 1000; i++) {
   points.push(Math.random() - 0.5);
 }
 
+let isSelecting = 0;
+
 // React complains about unique key prop but I don't see why
 function Example(props) {
   const tooltip = useRef(null);
@@ -22,9 +25,24 @@ function Example(props) {
     <div style={{width: '100vw', height: '100vh'}}>
       <pre style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 1, margin: 0 }} ref={tooltip} />
       <View
-        pickingModes={['hover', 'click']}
-        onClick={(e) => toTooltip(`Click: ${JSON.stringify(e, null, 2)}`)}
-        onHover={(e) => toTooltip(`Hover: ${JSON.stringify(e, null, 2)}`)}
+        pickingModes={['hover', 'click', 'select']}
+        onClick={(e) => {
+          if (isSelecting) {
+            isSelecting--;
+            return;
+          }
+          toTooltip(`Click: ${JSON.stringify(e, null, 2)}`);
+        }}
+        onHover={(e) => {
+          if (isSelecting) {
+            return;
+          }
+          toTooltip(`Hover: ${JSON.stringify(e, null, 2)}`);
+        }}
+        onSelect={(e) => {
+          isSelecting = 2;
+          toTooltip(`Select: ${JSON.stringify(e, null, 2)}`);
+        }}
       >
         <GeometryRepresentation
           id="plan"
