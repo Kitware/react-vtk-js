@@ -5,7 +5,7 @@ import { ViewContext, RepresentationContext, DownstreamContext } from './View';
 
 import vtkActor from '@kitware/vtk.js/Rendering/Core/Actor.js';
 import vtkMapper from '@kitware/vtk.js/Rendering/Core/Mapper.js';
-import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps.js';
+import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMapsLite.js';
 import vtkColorTransferFunction from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction.js';
 
 import vtkCubeAxesActor from '@kitware/vtk.js/Rendering/Core/CubeAxesActor.js';
