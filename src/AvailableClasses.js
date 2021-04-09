@@ -20,6 +20,8 @@ import '@kitware/vtk.js/IO/Geometry/PLYReader.js';
 import '@kitware/vtk.js/IO/Geometry/STLReader.js';
 import '@kitware/vtk.js/IO/Misc/ElevationReader.js';
 import '@kitware/vtk.js/IO/Misc/OBJReader.js';
+// bring pdb definition (big)
 import '@kitware/vtk.js/IO/Misc/PDBReader.js';
+// bring zip (big++)
 import '@kitware/vtk.js/IO/XML/XMLImageDataReader.js';
 import '@kitware/vtk.js/IO/XML/XMLPolyDataReader.js';
