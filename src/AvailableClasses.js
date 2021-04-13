@@ -1,6 +1,10 @@
 // List classes that we want to have available
 // => this is required because of tree shacking
 
+// Data access helper
+import '@kitware/vtk.js/IO/Core/DataAccessHelper/HttpDataAccessHelper';
+import '@kitware/vtk.js/IO/Core/DataAccessHelper/JSZipDataAccessHelper';
+
 // Sources
 import '@kitware/vtk.js/Filters/Sources/ConcentricCylinderSource.js';
 import '@kitware/vtk.js/Filters/Sources/ConeSource.js';
