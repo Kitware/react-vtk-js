@@ -5,7 +5,7 @@ import { ViewContext, RepresentationContext, DownstreamContext } from './View';
 
 import vtkActor from '@kitware/vtk.js/Rendering/Core/Actor.js';
 import vtkGlyph3DMapper from '@kitware/vtk.js/Rendering/Core/Glyph3DMapper.js';
-import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMapsLite.js';
+import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps.js';
 import vtkColorTransferFunction from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction.js';
 
 /**
