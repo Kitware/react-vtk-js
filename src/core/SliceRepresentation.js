@@ -63,7 +63,7 @@ export default class SliceRepresentation extends Component {
   }
 
   componentWillUnmount() {
-    if (this.view) {
+    if (this.view && this.view.renderer) {
       this.view.renderer.removeActor(this.actor);
     }
 
