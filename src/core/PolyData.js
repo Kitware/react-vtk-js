@@ -39,7 +39,7 @@ export default class PolyData extends Component {
                 this.downstream = downstream;
               }
               return (
-                <DataSetContext.Provider value={this.polydata}>
+                <DataSetContext.Provider value={this}>
                   <div key={this.props.id} id={this.props.id}>
                     {this.props.children}
                   </div>
@@ -144,19 +144,22 @@ export default class PolyData extends Component {
     }
 
     if (changeDetected) {
-      this.polydata.modified();
-
-      // Let the representation know that data has changed in case auto
-      // rendering configs needs to be triggered with the new data.
-      if (this.representation) {
-        this.representation.dataChanged();
-      }
+      this.modified();
     }
+  }
 
-    // // Force prop update now that the downstream has data
-    // if (this.downstream === this.representation.mapper) {
-    //   this.representation.update(this.representation.props);
-    // }
+  getDataSet() {
+    return this.polydata;
+  }
+
+  modified() {
+    this.polydata.modified();
+
+    // Let the representation know that data has changed in case auto
+    // rendering configs needs to be triggered with the new data.
+    if (this.representation) {
+      this.representation.dataChanged();
+    }
   }
 }
 

@@ -40,7 +40,7 @@ export default class ImageData extends Component {
                 this.downstream = downstream;
               }
               return (
-                <DataSetContext.Provider value={this.imageData}>
+                <DataSetContext.Provider value={this}>
                   <div key={this.props.id} id={this.props.id}>
                     {this.props.children}
                   </div>
@@ -70,6 +70,20 @@ export default class ImageData extends Component {
   update(props, previous) {
     const { dimensions, spacing, origin, direction } = props;
     this.imageData.set({ dimensions, spacing, origin, direction });
+  }
+
+  getDataSet() {
+    return this.imageData;
+  }
+
+  modified() {
+    this.imageData.modified();
+
+    // Let the representation know that data has changed in case auto
+    // rendering configs needs to be triggered with the new data.
+    if (this.representation) {
+      this.representation.dataChanged();
+    }
   }
 }
 

@@ -10,7 +10,7 @@ export default function PointData(props) {
   return (
     <DataSetContext.Consumer>
       {(dataset) => (
-        <FieldsContext.Provider value={dataset.getPointData()}>
+        <FieldsContext.Provider value={dataset.getDataSet().getPointData()}>
           {props.children}
         </FieldsContext.Provider>
       )}

@@ -10,7 +10,7 @@ export default function CellData(props) {
   return (
     <DataSetContext.Consumer>
       {(dataset) => (
-        <FieldsContext.Provider value={dataset.getCellData()}>
+        <FieldsContext.Provider value={dataset.getDataSet().getCellData()}>
           {props.children}
         </FieldsContext.Provider>
       )}

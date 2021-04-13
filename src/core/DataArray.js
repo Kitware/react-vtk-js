@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import { RepresentationContext, DataSetContext, FieldsContext } from './View';
+import { DataSetContext, FieldsContext } from './View';
 import vtkDataArray from '@kitware/vtk.js/Common/Core/DataArray.js';
 import { TYPED_ARRAYS } from '@kitware/vtk.js/macro.js';
 
@@ -18,37 +18,32 @@ export default class DataArray extends Component {
     super(props);
 
     // Create vtk.js data array
-    this.array = vtkDataArray.newInstance({ empty: true });
+    this.array = vtkDataArray.newInstance({ name: 'scalars', empty: true });
+    this.arrayAttached = false;
   }
 
   render() {
     return (
-      <RepresentationContext.Consumer>
-        {(representation) => (
-          <DataSetContext.Consumer>
-            {(dataset) => {
-              this.representation = representation;
-              this.dataset = dataset;
-              return (
-                <FieldsContext.Consumer>
-                  {(fields) => {
-                    if (!this.fields) {
-                      this.fields = fields;
-                    }
-                    return <div key={this.props.id} name={this.props.name} />;
-                  }}
-                </FieldsContext.Consumer>
-              );
-            }}
-          </DataSetContext.Consumer>
-        )}
-      </RepresentationContext.Consumer>
+      <DataSetContext.Consumer>
+        {(dataset) => {
+          this.dataset = dataset;
+          return (
+            <FieldsContext.Consumer>
+              {(fields) => {
+                if (!this.fields) {
+                  this.fields = fields;
+                }
+                return <div key={this.props.id} name={this.props.name} />;
+              }}
+            </FieldsContext.Consumer>
+          );
+        }}
+      </DataSetContext.Consumer>
     );
   }
 
   componentDidMount() {
     this.update(this.props);
-    this.fields[this.props.registration](this.array);
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -82,12 +77,18 @@ export default class DataArray extends Component {
 
     if (values && (changeDetected || !previous || values !== previous.values)) {
       this.array.setData(klass.from(values), numberOfComponents);
+      changeDetected = true;
+    }
+
+    if (!this.arrayAttached) {
+      this.fields[this.props.registration](this.array);
+      this.arrayAttached = true;
+      changeDetected = true;
+    }
+
+    if (changeDetected) {
       if (this.dataset) {
         this.dataset.modified();
-      }
-
-      if (this.representation) {
-        this.representation.dataChanged();
       }
     }
   }

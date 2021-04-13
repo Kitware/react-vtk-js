@@ -74,7 +74,6 @@ function assignManipulators(style, settings, view) {
       }
       style.addMouseManipulator(manipulator);
       if (manipulator.onBoxSelectChange && view.onBoxSelectChange) {
-        console.log('add onBoxSelectChange');
         manipulator.onBoxSelectChange(view.onBoxSelectChange);
       }
     }
@@ -321,6 +320,9 @@ export default class View extends Component {
     this.update(this.props);
     document.addEventListener('keyup', this.handleKey);
     this.resetCamera();
+
+    // Give a chance for the first layout to properly reset the camera
+    setTimeout(() => this.resetCamera(), 100);
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
