@@ -105,6 +105,9 @@ export default class GeometryRepresentation extends Component {
       this.lookupTable.setMappingRange(...colorDataRange);
       this.lookupTable.updateRange();
     }
+
+    // trigger render
+    this.dataChanged();
   }
 
   dataChanged() {

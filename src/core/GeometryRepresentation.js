@@ -129,7 +129,6 @@ export default class GeometryRepresentation extends Component {
   }
 
   update(props, previous) {
-    let needRender = 0;
     const {
       cubeAxesStyle,
       showCubeAxes,
@@ -172,7 +171,6 @@ export default class GeometryRepresentation extends Component {
       (!previous || cubeAxesStyle !== previous.cubeAxesStyle)
     ) {
       this.cubeAxes.set(cubeAxesStyle);
-      needRender++;
     }
 
     if (showCubeAxes !== this.cubeAxes.getVisibility()) {
@@ -180,23 +178,15 @@ export default class GeometryRepresentation extends Component {
       this.cubeAxes
         .getActors()
         .forEach(({ setVisibility }) => setVisibility(showCubeAxes));
-      needRender++;
     }
 
     // Only trigger a render if something is different
-    if (this.scalarBar.setVisibility(props.showScalarBar)) {
-      needRender++;
-    }
-    if (this.scalarBar.setAxisLabel(props.scalarBarTitle)) {
-      needRender++;
-    }
-    if (this.scalarBar.set(props.scalarBarStyle || {})) {
-      needRender++;
-    }
+    this.scalarBar.setVisibility(props.showScalarBar);
+    this.scalarBar.setAxisLabel(props.scalarBarTitle);
+    this.scalarBar.set(props.scalarBarStyle || {});
 
-    if (this.view && needRender) {
-      this.view.renderView();
-    }
+    // trigger render
+    this.dataChanged();
   }
 
   dataChanged() {

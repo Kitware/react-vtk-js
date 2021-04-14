@@ -123,6 +123,9 @@ export default class VolumeRepresentation extends Component {
         ]);
       }
     }
+
+    // trigger render
+    this.dataChanged();
   }
 
   dataChanged() {
