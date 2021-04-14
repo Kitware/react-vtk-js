@@ -20,10 +20,14 @@ export default class SliceRepresentation extends Component {
   constructor(props) {
     super(props);
 
+    // Guard to prevent rendering if no data
+    this.validData = false;
+    this.currentVisibility = true;
+
     // Create vtk.js objects
     this.lookupTable = vtkColorTransferFunction.newInstance();
     this.piecewiseFunction = vtkPiecewiseFunction.newInstance();
-    this.actor = vtkImageSlice.newInstance();
+    this.actor = vtkImageSlice.newInstance({ visibility: false });
     this.mapper = vtkImageMapper.newInstance();
     this.actor.setMapper(this.mapper);
 
@@ -153,6 +157,25 @@ export default class SliceRepresentation extends Component {
     }
     if (zSlice && (!previous || zSlice !== previous.zSlice)) {
       this.mapper.setZSlice(zSlice);
+    }
+
+    // actor visibility
+    if (actor && actor.visibility !== undefined) {
+      this.currentVisibility = actor.visibility;
+      this.actor.setVisibility(this.currentVisibility && this.validData);
+    }
+
+    // trigger render
+    this.dataChanged();
+  }
+
+  dataAvailable() {
+    if (!this.validData) {
+      this.validData = true;
+      this.actor.setVisibility(this.currentVisibility);
+
+      // trigger render
+      this.dataChanged();
     }
   }
 

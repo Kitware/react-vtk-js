@@ -21,8 +21,12 @@ export default class GeometryRepresentation extends Component {
   constructor(props) {
     super(props);
 
+    // Guard to prevent rendering if no data
+    this.validData = false;
+    this.currentVisibility = true;
+
     // Create vtk.js actor/mapper
-    this.actor = vtkActor.newInstance();
+    this.actor = vtkActor.newInstance({ visibility: false });
     this.lookupTable = vtkColorTransferFunction.newInstance();
     this.mapper = vtkGlyph3DMapper.newInstance({
       lookupTable: this.lookupTable,
@@ -62,7 +66,7 @@ export default class GeometryRepresentation extends Component {
   }
 
   componentWillUnmount() {
-    if (this.view) {
+    if (this.view && this.view.renderer) {
       this.view.renderer.removeActor(this.actor);
     }
 
@@ -106,8 +110,24 @@ export default class GeometryRepresentation extends Component {
       this.lookupTable.updateRange();
     }
 
+    // actor visibility
+    if (actor && actor.visibility !== undefined) {
+      this.currentVisibility = actor.visibility;
+      this.actor.setVisibility(this.currentVisibility && this.validData);
+    }
+
     // trigger render
     this.dataChanged();
+  }
+
+  dataAvailable() {
+    if (!this.validData) {
+      this.validData = true;
+      this.actor.setVisibility(this.currentVisibility);
+
+      // trigger render
+      this.dataChanged();
+    }
   }
 
   dataChanged() {

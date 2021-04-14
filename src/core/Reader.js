@@ -88,7 +88,7 @@ export default class Reader extends Component {
     if (url && (!previous || url !== previous.url)) {
       this.reader.setUrl(url).then(() => {
         if (this.representation) {
-          this.representation.dataChanged();
+          this.representation.dataAvailable();
         }
         if (this.view) {
           if (this.props.resetCameraOnUpdate) {
@@ -104,7 +104,7 @@ export default class Reader extends Component {
     if (parseAsText && (!previous || parseAsText !== previous.parseAsText)) {
       this.reader.parseAsText(parseAsText);
       if (this.representation) {
-        this.representation.dataChanged();
+        this.representation.dataAvailable();
       }
     }
 
@@ -114,7 +114,7 @@ export default class Reader extends Component {
     ) {
       this.reader.parseAsArrayBuffer(Base64.toArrayBuffer(parseAsArrayBuffer));
       if (this.representation) {
-        this.representation.dataChanged();
+        this.representation.dataAvailable();
       }
     }
 

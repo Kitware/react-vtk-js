@@ -51,6 +51,10 @@ export default class Algorithm extends Component {
     );
   }
 
+  componentDidMount() {
+    this.update(this.props);
+  }
+
   componentDidUpdate(prevProps, prevState, snapshot) {
     this.update(this.props, prevProps);
   }
@@ -75,6 +79,12 @@ export default class Algorithm extends Component {
       this.algo.set(state);
       if (this.representation) {
         this.representation.dataChanged();
+      }
+    }
+
+    if (this.algo.getNumberOfInputPorts() === 0) {
+      if (this.representation) {
+        this.representation.dataAvailable();
       }
     }
   }

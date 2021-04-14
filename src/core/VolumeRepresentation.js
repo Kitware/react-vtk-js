@@ -20,10 +20,14 @@ export default class VolumeRepresentation extends Component {
   constructor(props) {
     super(props);
 
+    // Guard to prevent rendering if no data
+    this.validData = false;
+    this.currentVisibility = true;
+
     // Create vtk.js objects
     this.lookupTable = vtkColorTransferFunction.newInstance();
     this.piecewiseFunction = vtkPiecewiseFunction.newInstance();
-    this.volume = vtkVolume.newInstance();
+    this.volume = vtkVolume.newInstance({ visibility: false });
     this.mapper = vtkVolumeMapper.newInstance();
     this.volume.setMapper(this.mapper);
 
@@ -63,7 +67,7 @@ export default class VolumeRepresentation extends Component {
   }
 
   componentWillUnmount() {
-    if (this.view) {
+    if (this.view && this.view.renderer) {
       this.view.renderer.removeVolume(this.volume);
       this.view = null;
     }
@@ -124,8 +128,24 @@ export default class VolumeRepresentation extends Component {
       }
     }
 
+    // actor visibility
+    if (volume && volume.visibility !== undefined) {
+      this.currentVisibility = volume.visibility;
+      this.volume.setVisibility(this.currentVisibility && this.validData);
+    }
+
     // trigger render
     this.dataChanged();
+  }
+
+  dataAvailable() {
+    if (!this.validData) {
+      this.validData = true;
+      this.volume.setVisibility(this.currentVisibility);
+
+      // trigger render
+      this.dataChanged();
+    }
   }
 
   dataChanged() {

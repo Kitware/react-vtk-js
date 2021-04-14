@@ -22,8 +22,15 @@ export default class GeometryRepresentation extends Component {
   constructor(props) {
     super(props);
 
+    // Guard to prevent rendering if no data
+    this.validData = false;
+    this.currentVisibility = true;
+
     // Create vtk.js actor/mapper
-    this.actor = vtkActor.newInstance({ representationId: props.id });
+    this.actor = vtkActor.newInstance({
+      visibility: false,
+      representationId: props.id,
+    });
     this.lookupTable = vtkColorTransferFunction.newInstance();
     this.mapper = vtkMapper.newInstance({
       lookupTable: this.lookupTable,
@@ -174,19 +181,42 @@ export default class GeometryRepresentation extends Component {
     }
 
     if (showCubeAxes !== this.cubeAxes.getVisibility()) {
-      this.cubeAxes.setVisibility(showCubeAxes);
+      this.cubeAxes.setVisibility(showCubeAxes && this.validData);
       this.cubeAxes
         .getActors()
-        .forEach(({ setVisibility }) => setVisibility(showCubeAxes));
+        .forEach(({ setVisibility }) =>
+          setVisibility(showCubeAxes && this.validData)
+        );
     }
 
-    // Only trigger a render if something is different
-    this.scalarBar.setVisibility(props.showScalarBar);
+    // scalar bars
+    this.scalarBar.setVisibility(props.showScalarBar && this.validData);
     this.scalarBar.setAxisLabel(props.scalarBarTitle);
     this.scalarBar.set(props.scalarBarStyle || {});
 
+    // actor visibility
+    if (actor && actor.visibility !== undefined) {
+      this.currentVisibility = actor.visibility;
+      this.actor.setVisibility(this.currentVisibility && this.validData);
+    }
+
     // trigger render
     this.dataChanged();
+  }
+
+  dataAvailable() {
+    if (!this.validData) {
+      this.validData = true;
+      this.actor.setVisibility(this.currentVisibility);
+      this.scalarBar.setVisibility(this.props.showScalarBar);
+      this.cubeAxes.setVisibility(this.props.showCubeAxes);
+      this.cubeAxes
+        .getActors()
+        .forEach(({ setVisibility }) => setVisibility(this.props.showCubeAxes));
+
+      // trigger render
+      this.dataChanged();
+    }
   }
 
   dataChanged() {

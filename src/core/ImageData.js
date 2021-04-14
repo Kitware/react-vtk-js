@@ -55,7 +55,6 @@ export default class ImageData extends Component {
 
   componentDidMount() {
     this.update(this.props);
-    this.downstream.setInputData(this.imageData, this.props.port);
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -79,10 +78,10 @@ export default class ImageData extends Component {
   modified() {
     this.imageData.modified();
 
-    // Let the representation know that data has changed in case auto
-    // rendering configs needs to be triggered with the new data.
-    if (this.representation) {
-      this.representation.dataChanged();
+    // Let the representation know that we have data
+    if (this.representation && this.imageData.getPointData().getScalars()) {
+      this.downstream.setInputData(this.imageData, this.props.port);
+      this.representation.dataAvailable();
     }
   }
 }

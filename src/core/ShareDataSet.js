@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import macro from '@kitware/vtk.js/macro.js';
 
-import { DownstreamContext } from './View';
+import { RepresentationContext, DownstreamContext } from './View';
 
 function vtkTrivialProducer(publicAPI, model) {
   // Set our className
@@ -23,6 +23,7 @@ function extend(publicAPI, model, initialValues = {}) {
   // Inheritance
   macro.obj(publicAPI, model);
   macro.algo(publicAPI, model, 1, 1);
+  macro.event(publicAPI, model, 'DataAvailable');
   vtkTrivialProducer(publicAPI, model);
 }
 
@@ -46,30 +47,64 @@ export default class ShareDataSet extends Component {
   }
 
   render() {
+    this.update();
     return (
-      <DownstreamContext.Consumer>
-        {(downstream) => {
-          if (!this.downstream) {
-            this.downstream = downstream;
-          }
-          return (
-            <DownstreamContext.Provider value={this.getTrivialProducer()}>
-              <div key={this.props.id} id={this.props.id}>
-                {this.props.children}
-              </div>
-            </DownstreamContext.Provider>
-          );
-        }}
-      </DownstreamContext.Consumer>
+      <RepresentationContext.Consumer>
+        {(representation) => (
+          <DownstreamContext.Consumer>
+            {(downstream) => {
+              this.representation = representation;
+              if (!this.downstream) {
+                this.downstream = downstream;
+              }
+              return (
+                <RepresentationContext.Provider value={this}>
+                  <DownstreamContext.Provider value={this.getTrivialProducer()}>
+                    <div key={this.props.id} id={this.props.id}>
+                      {this.props.children}
+                    </div>
+                  </DownstreamContext.Provider>
+                </RepresentationContext.Provider>
+              );
+            }}
+          </DownstreamContext.Consumer>
+        )}
+      </RepresentationContext.Consumer>
     );
   }
 
-  componentDidMount() {
+  update() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+      this.subscription = null;
+    }
+
+    this.subscription = this.getTrivialProducer().onDataAvailable(() => {
+      this.dataAvailable();
+    });
+  }
+
+  dataAvailable() {
     if (this.downstream) {
       this.downstream.setInputConnection(
         this.getTrivialProducer().getOutputPort(),
         this.props.port
       );
+    }
+
+    if (!this.validData) {
+      this.validData = true;
+      this.getTrivialProducer().invokeDataAvailable();
+    }
+
+    if (this.representation) {
+      this.representation.dataAvailable();
+    }
+  }
+
+  dataChanged() {
+    if (this.representation) {
+      this.representation.dataChanged();
     }
   }
 }
