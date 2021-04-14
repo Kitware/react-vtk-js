@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
+import { toTypedArray } from '../utils';
+
 import { DataSetContext, FieldsContext } from './View';
 import vtkDataArray from '@kitware/vtk.js/Common/Core/DataArray.js';
 import { TYPED_ARRAYS } from '@kitware/vtk.js/macro.js';
@@ -76,7 +78,7 @@ export default class DataArray extends Component {
     }
 
     if (values && (changeDetected || !previous || values !== previous.values)) {
-      this.array.setData(klass.from(values), numberOfComponents);
+      this.array.setData(toTypedArray(values, klass), numberOfComponents);
       changeDetected = true;
     }
 
@@ -119,9 +121,20 @@ DataArray.propTypes = {
   name: PropTypes.string,
 
   /**
-   * Actual values to use inside our array
+   * Actual values to use inside our array ([] | TypedArray | { bvals, dtype, shape })
    */
-  values: PropTypes.arrayOf(PropTypes.number),
+  values: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.number),
+    PropTypes.object,
+    PropTypes.instanceOf(Float64Array),
+    PropTypes.instanceOf(Float32Array),
+    PropTypes.instanceOf(Int32Array),
+    PropTypes.instanceOf(Int16Array),
+    PropTypes.instanceOf(Int8Array),
+    PropTypes.instanceOf(Uint32Array),
+    PropTypes.instanceOf(Uint16Array),
+    PropTypes.instanceOf(Uint8Array),
+  ]),
 
   /**
    * Number of components / Tuple size

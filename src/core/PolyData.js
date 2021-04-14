@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
+import { toTypedArray } from '../utils';
+
 import {
   RepresentationContext,
   DownstreamContext,
@@ -71,27 +73,27 @@ export default class PolyData extends Component {
     const typedArray =
       points && points.length > 196608 ? Uint32Array : Uint16Array;
     if (points && (!previous || points !== previous.points)) {
-      this.polydata.getPoints().setData(Float64Array.from(points), 3);
+      this.polydata.getPoints().setData(toTypedArray(points, Float64Array), 3);
       changeDetected = true;
     }
 
     if (verts && (!previous || verts !== previous.verts)) {
-      this.polydata.getVerts().setData(typedArray.from(verts));
+      this.polydata.getVerts().setData(toTypedArray(verts, typedArray));
       changeDetected = true;
     }
 
     if (lines && (!previous || lines !== previous.lines)) {
-      this.polydata.getLines().setData(typedArray.from(lines));
+      this.polydata.getLines().setData(toTypedArray(lines, typedArray));
       changeDetected = true;
     }
 
     if (polys && (!previous || polys !== previous.polys)) {
-      this.polydata.getPolys().setData(typedArray.from(polys));
+      this.polydata.getPolys().setData(toTypedArray(polys, typedArray));
       changeDetected = true;
     }
 
     if (strips && (!previous || strips !== previous.strips)) {
-      this.polydata.getStrips().setData(typedArray.from(strips));
+      this.polydata.getStrips().setData(toTypedArray(strips, typedArray));
       changeDetected = true;
     }
 
@@ -180,29 +182,58 @@ PolyData.propTypes = {
   port: PropTypes.number,
 
   /**
-   * xyz coordinates
+   * xyz coordinates ([] | TypedArray | { bvals, dtype, shape })
    */
-  points: PropTypes.arrayOf(PropTypes.number),
+  points: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.number),
+    PropTypes.object,
+    PropTypes.instanceOf(Float64Array),
+    PropTypes.instanceOf(Float32Array),
+  ]),
 
   /**
    * verts cells
    */
-  verts: PropTypes.arrayOf(PropTypes.number),
+  verts: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.number),
+    PropTypes.object,
+    PropTypes.instanceOf(Uint8Array),
+    PropTypes.instanceOf(Uint16Array),
+    PropTypes.instanceOf(Uint32Array),
+  ]),
 
   /**
    * lines cells
    */
-  lines: PropTypes.arrayOf(PropTypes.number),
+  lines: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.number),
+    PropTypes.object,
+    PropTypes.instanceOf(Uint8Array),
+    PropTypes.instanceOf(Uint16Array),
+    PropTypes.instanceOf(Uint32Array),
+  ]),
 
   /**
    * polys cells
    */
-  polys: PropTypes.arrayOf(PropTypes.number),
+  polys: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.number),
+    PropTypes.object,
+    PropTypes.instanceOf(Uint8Array),
+    PropTypes.instanceOf(Uint16Array),
+    PropTypes.instanceOf(Uint32Array),
+  ]),
 
   /**
    * strips cells
    */
-  strips: PropTypes.arrayOf(PropTypes.number),
+  strips: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.number),
+    PropTypes.object,
+    PropTypes.instanceOf(Uint8Array),
+    PropTypes.instanceOf(Uint16Array),
+    PropTypes.instanceOf(Uint32Array),
+  ]),
 
   /**
    * Type of connectivity `manual` or implicit such as `points`, `triangles`, `strips`
