@@ -70,11 +70,15 @@ export default class PolyData extends Component {
   update(props, previous) {
     const { connectivity, points, verts, lines, polys, strips } = props;
     let changeDetected = false;
-    const typedArray =
-      points && points.length > 196608 ? Uint32Array : Uint16Array;
+    let typedArray = Uint32Array;
+
     if (points && (!previous || points !== previous.points)) {
-      this.polydata.getPoints().setData(toTypedArray(points, Float64Array), 3);
+      const array = toTypedArray(points, Float64Array);
+      this.polydata.getPoints().setData(array, 3);
       changeDetected = true;
+
+      // Adapt cell size
+      typedArray = array.length > 196608 ? Uint32Array : Uint16Array;
     }
 
     if (verts && (!previous || verts !== previous.verts)) {
