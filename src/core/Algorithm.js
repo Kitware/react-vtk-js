@@ -68,7 +68,22 @@ export default class Algorithm extends Component {
     const { vtkClass, state } = props;
 
     if (vtkClass && (!previous || vtkClass !== previous.vtkClass)) {
-      this.algo = vtk({ vtkClass, ...state });
+      if (!this.algo) {
+        this.algo = vtk({ vtkClass, ...state });
+      } else if (this.algo.getClassName() !== vtkClass) {
+        const prevAlgo = this.algo;
+        this.algo = vtk({ vtkClass, ...state });
+        const nbInputs = prevAlgo.getNumberOfInputPorts();
+        for (let i = 0; i < nbInputs; i++) {
+          const connnection = prevAlgo.getInputConnection(i);
+          if (connnection) {
+            this.algo.setInputConnection(connnection, i);
+          } else {
+            this.algo.setInputData(prevAlgo.getInputData(i), i);
+          }
+        }
+      }
+
       this.downstream.setInputConnection(
         this.algo.getOutputPort(),
         this.props.port
