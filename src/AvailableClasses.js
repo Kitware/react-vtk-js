@@ -1,6 +1,10 @@
 // List classes that we want to have available
 // => this is required because of tree shacking
 
+import '@kitware/vtk.js/Rendering/OpenGL/Profiles/Volume';
+import '@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry';
+import '@kitware/vtk.js/Rendering/OpenGL/Profiles/Glyph';
+
 // Data access helper
 import '@kitware/vtk.js/IO/Core/DataAccessHelper/HttpDataAccessHelper';
 import '@kitware/vtk.js/IO/Core/DataAccessHelper/JSZipDataAccessHelper';
