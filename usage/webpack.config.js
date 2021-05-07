@@ -7,6 +7,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const entry = {
   PolyDataViewer: './Geometry/PolyDataViewer.js',
+  TubeExample: './Geometry/TubeExample.js',
   PolyDataWithData: './Geometry/PolyDataWithData.js',
   SourceViewer: './Geometry/SourceViewer.js',
   ProcessingPipeline: './Geometry/ProcessingPipeline.js',
