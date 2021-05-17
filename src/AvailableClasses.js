@@ -20,6 +20,7 @@ import '@kitware/vtk.js/Filters/Sources/PointSource.js';
 import '@kitware/vtk.js/Filters/Sources/SphereSource.js';
 
 // Filters
+import '@kitware/vtk.js/Filters/Core/Cutter.js';
 import '@kitware/vtk.js/Filters/General/WarpScalar.js';
 import '@kitware/vtk.js/Filters/General/TubeFilter.js';
 
