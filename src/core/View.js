@@ -60,7 +60,16 @@ function assignManipulators(style, settings, view) {
   settings.forEach((item) => {
     const klass = manipulatorFactory[item.action];
     if (klass) {
-      const { button, shift, control, alt, scrollEnabled, dragEnabled } = item;
+      const {
+        button,
+        shift,
+        control,
+        alt,
+        scrollEnabled,
+        dragEnabled,
+        useWorldUpVec,
+        worldUpVec,
+      } = item;
       const manipulator = klass.newInstance();
       manipulator.setButton(button);
       manipulator.setShift(!!shift);
@@ -75,6 +84,12 @@ function assignManipulators(style, settings, view) {
       style.addMouseManipulator(manipulator);
       if (manipulator.onBoxSelectChange && view.onBoxSelectChange) {
         manipulator.onBoxSelectChange(view.onBoxSelectChange);
+      }
+      if (useWorldUpVec !== undefined) {
+        manipulator.setUseWorldUpVec(useWorldUpVec);
+      }
+      if (worldUpVec !== undefined) {
+        manipulator.setWorldUpVec(worldUpVec);
       }
     }
   });
