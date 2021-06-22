@@ -69,6 +69,7 @@ function assignManipulators(style, settings, view) {
         dragEnabled,
         useWorldUpVec,
         worldUpVec,
+        useFocalPointAsCenterOfRotation,
       } = item;
       const manipulator = klass.newInstance();
       manipulator.setButton(button);
@@ -90,6 +91,11 @@ function assignManipulators(style, settings, view) {
       }
       if (worldUpVec !== undefined) {
         manipulator.setWorldUpVec(worldUpVec);
+      }
+      if (useFocalPointAsCenterOfRotation !== undefined) {
+        manipulator.setUseFocalPointAsCenterOfRotation(
+          useFocalPointAsCenterOfRotation
+        );
       }
     }
   });
