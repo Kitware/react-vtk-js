@@ -46,6 +46,13 @@ export default class ShareDataSet extends Component {
     return trivialProducer;
   }
 
+  componentWillUnmount() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+      this.subscription = null;
+    }
+  }
+
   render() {
     this.update();
     return (
