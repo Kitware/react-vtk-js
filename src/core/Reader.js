@@ -87,6 +87,9 @@ export default class Reader extends Component {
 
     if (url && (!previous || url !== previous.url)) {
       this.reader.setUrl(url).then(() => {
+        if (!this.reader) {
+          return;
+        }
         if (this.representation) {
           this.representation.dataAvailable();
         }
