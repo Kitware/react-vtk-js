@@ -178,7 +178,7 @@ export default class View extends Component {
       }
       this.cubeAxes.setDataBounds(bbox.getBounds());
     };
-    const debouncedCubeBounds = debounce(this.updateCubeBounds, 50);
+    this.debouncedCubeBounds = debounce(this.updateCubeBounds, 50);
 
     // Internal functions
     this.hasFocus = false;
@@ -219,7 +219,7 @@ export default class View extends Component {
       }
     };
 
-    const hover = debounce(({ x, y }) => {
+    this.hover = debounce(({ x, y }) => {
       if (this.props.pickingModes.indexOf('hover') === -1) {
         return;
       }
@@ -259,7 +259,7 @@ export default class View extends Component {
     };
 
     this.onClick = (e) => click(this.getScreenEventPositionFor(e));
-    this.onMouseMove = (e) => hover(this.getScreenEventPositionFor(e));
+    this.onMouseMove = (e) => this.hover(this.getScreenEventPositionFor(e));
     this.lastSelection = [];
 
     this.onBoxSelectChange = select;
@@ -279,7 +279,7 @@ export default class View extends Component {
     this.subscriptions.push(
       this.renderer.onEvent(({ type, renderer }) => {
         if (renderer && type === 'ComputeVisiblePropBoundsEvent') {
-          debouncedCubeBounds();
+          this.debouncedCubeBounds();
         }
       })
     );
@@ -343,7 +343,7 @@ export default class View extends Component {
     this.resetCamera();
 
     // Give a chance for the first layout to properly reset the camera
-    setTimeout(() => this.resetCamera(), 100);
+    this.firstResetTimeout = setTimeout(() => this.resetCamera(), 100);
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -351,6 +351,12 @@ export default class View extends Component {
   }
 
   componentWillUnmount() {
+    if (this.debouncedCubeBounds) this.debouncedCubeBounds.cancel();
+    if (this.hover) this.hover.cancel();
+    clearTimeout(this.resetCameraTimeout);
+    clearTimeout(this.renderViewTimeout);
+    clearTimeout(this.firstResetTimeout);
+
     while (this.subscriptions.length) {
       this.subscriptions.pop().unsubscribe();
     }
@@ -443,10 +449,10 @@ export default class View extends Component {
 
     // Allow to trigger method call from property change
     if (previous && triggerRender !== previous.triggerRender) {
-      setTimeout(this.renderView, 0);
+      this.renderViewTimeout = setTimeout(this.renderView, 0);
     }
     if (previous && triggerResetCamera !== previous.triggerResetCamera) {
-      setTimeout(this.resetCamera, 0);
+      this.resetCameraTimeout = setTimeout(this.resetCamera, 0);
     }
   }
 
