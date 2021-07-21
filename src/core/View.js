@@ -323,11 +323,11 @@ export default class View extends Component {
   onResize() {
     const container = this.containerRef.current;
     if (container) {
+      const devicePixelRatio = window.devicePixelRatio || 1;
       const { width, height } = container.getBoundingClientRect();
-      this.openglRenderWindow.setSize(
-        Math.max(width, 10),
-        Math.max(height, 10)
-      );
+      const w = Math.floor(width * devicePixelRatio);
+      const h = Math.floor(height * devicePixelRatio);
+      this.openglRenderWindow.setSize(Math.max(w, 10), Math.max(h, 10));
       this.renderWindow.render();
     }
   }
