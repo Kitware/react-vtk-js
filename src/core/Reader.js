@@ -33,8 +33,7 @@ export default class Reader extends Component {
                 <DownstreamContext.Consumer>
                   {(downstream) => {
                     if (!this.reader) {
-                      const { vtkClass } = this.props;
-                      this.reader = vtk({ vtkClass });
+                      this.reader = this.createReader(this.props);
                     }
                     if (!this.downstream) {
                       downstream.setInputConnection(
@@ -74,11 +73,19 @@ export default class Reader extends Component {
     this.reader = null;
   }
 
+  createReader(props) {
+    const { vtkClass, options } = props;
+    return vtk({
+      vtkClass,
+      progressCallback: options.progressCallback,
+    });
+  }
+
   update(props, previous) {
     const { vtkClass, url, parseAsText, parseAsArrayBuffer, options } = props;
 
     if (vtkClass && (!previous || vtkClass !== previous.vtkClass)) {
-      this.reader = vtk({ vtkClass });
+      this.reader = this.createReader(props);
       this.downstream.setInputConnection(
         this.reader.getOutputPort(),
         this.props.port
