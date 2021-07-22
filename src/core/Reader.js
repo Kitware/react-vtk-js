@@ -75,7 +75,7 @@ export default class Reader extends Component {
   }
 
   update(props, previous) {
-    const { vtkClass, url, parseAsText, parseAsArrayBuffer } = props;
+    const { vtkClass, url, parseAsText, parseAsArrayBuffer, options } = props;
 
     if (vtkClass && (!previous || vtkClass !== previous.vtkClass)) {
       this.reader = vtk({ vtkClass });
@@ -86,7 +86,7 @@ export default class Reader extends Component {
     }
 
     if (url && (!previous || url !== previous.url)) {
-      this.reader.setUrl(url).then(() => {
+      this.reader.setUrl(url, options).then(() => {
         if (!this.reader) {
           return;
         }
@@ -137,6 +137,7 @@ Reader.defaultProps = {
   vtkClass: '',
   renderOnUpdate: true,
   resetCameraOnUpdate: true,
+  options: { binary: true },
 };
 
 Reader.propTypes = {
@@ -179,6 +180,11 @@ Reader.propTypes = {
    * Automatically reset camera on data loaded
    */
   resetCameraOnUpdate: PropTypes.bool,
+
+  /**
+   * Reader options
+   */
+  options: PropTypes.object,
 
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
