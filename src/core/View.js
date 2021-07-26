@@ -136,13 +136,15 @@ export default class View extends Component {
     this.openglRenderWindow = vtkOpenGLRenderWindow.newInstance();
     this.renderWindow.addView(this.openglRenderWindow);
 
-    this.interactor = vtkRenderWindowInteractor.newInstance();
-    this.interactor.setView(this.openglRenderWindow);
-    this.interactor.initialize();
+    if (props.interactive) {
+      this.interactor = vtkRenderWindowInteractor.newInstance();
+      this.interactor.setView(this.openglRenderWindow);
+      this.interactor.initialize();
 
-    // Interactor style
-    this.style = vtkInteractorStyleManipulator.newInstance();
-    this.interactor.setInteractorStyle(this.style);
+      // Interactor style
+      this.style = vtkInteractorStyleManipulator.newInstance();
+      this.interactor.setInteractorStyle(this.style);
+    }
 
     // Picking handler
     this.selector = vtkOpenGLHardwareSelector.newInstance({
@@ -335,7 +337,9 @@ export default class View extends Component {
   componentDidMount() {
     const container = this.containerRef.current;
     this.openglRenderWindow.setContainer(container);
-    this.interactor.bindEvents(container);
+    if (this.props.interactive) {
+      this.interactor.bindEvents(container);
+    }
     this.onResize();
     this.resizeObserver.observe(container);
     this.update(this.props);
@@ -367,15 +371,19 @@ export default class View extends Component {
     this.resizeObserver = null;
 
     // Detatch from DOM
-    this.interactor.unbindEvents();
+    if (this.interactor) {
+      this.interactor.unbindEvents();
+    }
     this.openglRenderWindow.setContainer(null);
 
     // Free memory
     this.renderWindow.removeRenderer(this.renderer);
     this.renderWindow.removeView(this.openglRenderWindow);
 
-    this.interactor.delete();
-    this.interactor = null;
+    if (this.interactor) {
+      this.interactor.delete();
+      this.interactor = null;
+    }
 
     this.renderer.delete();
     this.renderer = null;
@@ -391,6 +399,7 @@ export default class View extends Component {
     const {
       background,
       interactorSettings,
+      interactive,
       cameraPosition,
       cameraViewUp,
       cameraParallelProjection,
@@ -403,6 +412,7 @@ export default class View extends Component {
       this.renderer.setBackground(background);
     }
     if (
+      interactive &&
       interactorSettings &&
       (!previous || interactorSettings !== previous.interactorSettings)
     ) {
@@ -458,9 +468,11 @@ export default class View extends Component {
 
   resetCamera() {
     this.renderer.resetCamera();
-    this.style.setCenterOfRotation(
-      this.renderer.getActiveCamera().getFocalPoint()
-    );
+    if (this.props.interactive) {
+      this.style.setCenterOfRotation(
+        this.renderer.getActiveCamera().getFocalPoint()
+      );
+    }
     this.renderWindow.render();
   }
 
@@ -584,6 +596,7 @@ View.defaultProps = {
       shift: true,
     },
   ],
+  interactive: true,
   pickingModes: [],
   showCubeAxes: false,
 };
@@ -614,6 +627,11 @@ View.propTypes = {
    * Configure the interactions
    */
   interactorSettings: PropTypes.array,
+
+  /**
+   * Enable/Disable interaction
+   */
+  interactive: PropTypes.bool,
 
   /**
    * Initial camera position from an object in [0,0,0]
