@@ -493,7 +493,7 @@ export default class View extends Component {
         const representationIds = [];
         this.selections.forEach((v) => {
           const { prop } = v.getProperties();
-          const { representationId } = prop.get('representationId');
+          const representationId = prop?.get('representationId').representationId;
           if (representationId) {
             representationIds.push(representationId);
           }
@@ -511,6 +511,9 @@ export default class View extends Component {
       return this.selections.map((v) => {
         const { prop, compositeID, displayPosition } = v.getProperties();
 
+        // Return false to mark this item for removal
+        if (prop == null) return false;
+
         return {
           worldPosition: Array.from(
             this.openglRenderWindow.displayToWorld(
@@ -525,7 +528,7 @@ export default class View extends Component {
           ...prop.get('representationId'),
           ray,
         };
-      });
+      }).filter(Boolean);
     }
     return [];
   }
