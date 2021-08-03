@@ -209,7 +209,14 @@ export default class View extends Component {
       if (this.props.pickingModes.indexOf('click') === -1) {
         return;
       }
-      const selection = this.pick(x, y, x, y);
+      const tolerance = this.getPointerSizeTolerance();
+      const selection = this.pick(
+        Math.floor(x - tolerance),
+        Math.floor(y - tolerance),
+        Math.ceil(x + tolerance),
+        Math.ceil(y + tolerance),
+        false
+      );
 
       // Share the selection with the rest of the world
       if (this.props.onClick) {
@@ -225,7 +232,15 @@ export default class View extends Component {
       if (this.props.pickingModes.indexOf('hover') === -1) {
         return;
       }
-      const selection = this.pick(x, y, x, y);
+
+      const tolerance = this.getPointerSizeTolerance();
+      const selection = this.pick(
+        Math.floor(x - tolerance),
+        Math.floor(y - tolerance),
+        Math.ceil(x + tolerance),
+        Math.ceil(y + tolerance),
+        false
+      );
 
       // Guard against trigger of empty selection
       if (this.lastSelection.length === 0 && selection.length === 0) {
@@ -248,7 +263,7 @@ export default class View extends Component {
         return;
       }
       const [x1, x2, y1, y2] = selection;
-      const pickResult = this.pick(x1, y1, x2, y2);
+      const pickResult = this.pick(x1, y1, x2, y2, true);
 
       // Share the selection with the rest of the world
       if (this.props.onSelect) {
@@ -285,6 +300,10 @@ export default class View extends Component {
         }
       })
     );
+  }
+
+  getPointerSizeTolerance() {
+    return this.props.pointerSize / 2;
   }
 
   getScreenEventPositionFor(source) {
@@ -476,12 +495,12 @@ export default class View extends Component {
     this.renderWindow.render();
   }
 
-  pick(x1, y1, x2, y2) {
+  pick(x1, y1, x2, y2, useFrustrum = false) {
     this.selector.setArea(x1, y1, x2, y2);
     this.previousSelectedData = null;
     if (this.selector.captureBuffers()) {
       this.selections = this.selector.generateSelection(x1, y1, x2, y2) || [];
-      if (x1 !== x2 || y1 !== y2) {
+      if (useFrustrum) {
         const frustrum = [
           Array.from(
             this.openglRenderWindow.displayToWorld(x1, y1, 0, this.renderer)
@@ -511,7 +530,8 @@ export default class View extends Component {
         const representationIds = [];
         this.selections.forEach((v) => {
           const { prop } = v.getProperties();
-          const representationId = prop?.get('representationId').representationId;
+          const representationId =
+            prop?.get('representationId').representationId;
           if (representationId) {
             representationIds.push(representationId);
           }
@@ -520,33 +540,45 @@ export default class View extends Component {
       }
       const ray = [
         Array.from(
-          this.openglRenderWindow.displayToWorld(x1, y1, 0, this.renderer)
+          this.openglRenderWindow.displayToWorld(
+            Math.round((x1 + x2) / 2),
+            Math.round((y1 + y2) / 2),
+            0,
+            this.renderer
+          )
         ),
         Array.from(
-          this.openglRenderWindow.displayToWorld(x1, y1, 1, this.renderer)
+          this.openglRenderWindow.displayToWorld(
+            Math.round((x1 + x2) / 2),
+            Math.round((y1 + y2) / 2),
+            1,
+            this.renderer
+          )
         ),
       ];
-      return this.selections.map((v) => {
-        const { prop, compositeID, displayPosition } = v.getProperties();
+      return this.selections
+        .map((v) => {
+          const { prop, compositeID, displayPosition } = v.getProperties();
 
-        // Return false to mark this item for removal
-        if (prop == null) return false;
+          // Return false to mark this item for removal
+          if (prop == null) return false;
 
-        return {
-          worldPosition: Array.from(
-            this.openglRenderWindow.displayToWorld(
-              displayPosition[0],
-              displayPosition[1],
-              displayPosition[2],
-              this.renderer
-            )
-          ),
-          displayPosition,
-          compositeID, // Not yet useful unless GlyphRepresentation
-          ...prop.get('representationId'),
-          ray,
-        };
-      }).filter(Boolean);
+          return {
+            worldPosition: Array.from(
+              this.openglRenderWindow.displayToWorld(
+                displayPosition[0],
+                displayPosition[1],
+                displayPosition[2],
+                this.renderer
+              )
+            ),
+            displayPosition,
+            compositeID, // Not yet useful unless GlyphRepresentation
+            ...prop.get('representationId'),
+            ray,
+          };
+        })
+        .filter(Boolean);
     }
     return [];
   }
@@ -602,6 +634,7 @@ View.defaultProps = {
   interactive: true,
   pickingModes: [],
   showCubeAxes: false,
+  pointerSize: 0,
 };
 
 View.propTypes = {
@@ -709,6 +742,11 @@ View.propTypes = {
    * the picking info describing the object being select along with the frustrum.
    */
   selectInfo: PropTypes.object,
+
+  /**
+   * Defines the tolerance of the click and hover selection.
+   */
+  pointerSize: PropTypes.number,
 
   /**
    * Show/Hide Cube Axes for the given representation
