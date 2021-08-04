@@ -9,8 +9,7 @@
   "module": "dist/esm/index.js",
   "source": "src/index.js",
   "dependencies": {
-    "@babel/runtime": "^7.12.5",
-    "@kitware/vtk.js": "^18.7.0"
+    "@babel/runtime": "^7.12.5"
   },
   "scripts": {
     "prebuild": "npm run fix",
@@ -28,7 +27,8 @@
     "semantic-release": "semantic-release"
   },
   "peerDependencies": {
-    "react": "^16.0.0"
+    "react": "^16.0.0",
+    "@kitware/vtk.js": "^19.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
