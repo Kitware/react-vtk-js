@@ -205,8 +205,8 @@ export default class View extends Component {
     };
 
     // Handle picking
-    const click = ({ x, y }) => {
-      if (this.props.pickingModes.indexOf('click') === -1) {
+    const handlePicking = (callback, pickingMode, { x, y }) => {
+      if (this.props.pickingModes.indexOf(pickingMode) === -1) {
         return;
       }
       const tolerance = this.getPointerSizeTolerance();
@@ -219,12 +219,12 @@ export default class View extends Component {
       );
 
       // Share the selection with the rest of the world
-      if (this.props.onClick) {
-        this.props.onClick(selection[0]);
+      if (callback) {
+        callback(selection[0]);
       }
 
       if ('setProps' in this.props) {
-        this.props.setProps({ clickInfo: selection[0] });
+        this.props.setProps({ [`${pickingMode}Info`]: selection[0] });
       }
     };
 
@@ -275,7 +275,24 @@ export default class View extends Component {
       }
     };
 
-    this.onClick = (e) => click(this.getScreenEventPositionFor(e));
+    this.onClick = (e) =>
+      handlePicking(
+        this.props.onClick,
+        'click',
+        this.getScreenEventPositionFor(e)
+      );
+    this.onMouseDown = (e) =>
+      handlePicking(
+        this.props.onMouseDown,
+        'mouseDown',
+        this.getScreenEventPositionFor(e)
+      );
+    this.onMouseUp = (e) =>
+      handlePicking(
+        this.props.onMouseUp,
+        'mouseUp',
+        this.getScreenEventPositionFor(e)
+      );
     this.onMouseMove = (e) => this.hover(this.getScreenEventPositionFor(e));
     this.lastSelection = [];
 
@@ -331,6 +348,7 @@ export default class View extends Component {
         onMouseEnter={this.onEnter}
         onMouseLeave={this.onLeave}
         onClick={this.onClick}
+        onMouseUp={this.onMouseUp}
         onMouseMove={this.onMouseMove}
       >
         <div style={RENDERER_STYLE} ref={this.containerRef} />
@@ -483,6 +501,11 @@ export default class View extends Component {
     if (previous && triggerResetCamera !== previous.triggerResetCamera) {
       this.resetCameraTimeout = setTimeout(this.resetCamera, 0);
     }
+
+    // Assign the mouseDown event, we can't use the React event system
+    // because the mouseDown event is swallowed by other logic
+    const canvas = this.openglRenderWindow.getCanvas();
+    canvas.addEventListener('mousedown', this.onMouseDown);
   }
 
   resetCamera() {
@@ -703,9 +726,15 @@ View.propTypes = {
   ]),
 
   /**
-   * List of picking listeners to bind. The supported values are `click`, `hover` and `select`. By default it is disabled (empty array).
+   * List of picking listeners to bind. By default it is disabled (empty array).
    */
-  pickingModes: PropTypes.arrayOf(PropTypes.string),
+  pickingModes: PropTypes.oneOf([
+    'click',
+    'hover',
+    'select',
+    'mouseDown',
+    'mouseUp',
+  ]),
 
   /**
    * User callback function for click
@@ -718,6 +747,30 @@ View.propTypes = {
    * the picking info describing the object being clicked on.
    */
   clickInfo: PropTypes.object,
+
+  /**
+   * User callback function for mouse down
+   */
+  onMouseDown: PropTypes.func,
+
+  /**
+   * Read-only prop. To use this, make sure that `pickingModes` contains `mouseDown`.
+   * This prop is updated when a mouse down event is fired on an element in the map. This contains
+   * the picking info describing the object interested by the event.
+   */
+  mouseDownInfo: PropTypes.object,
+
+  /**
+   * User callback function for mouse up
+   */
+  onMouseUp: PropTypes.func,
+
+  /**
+   * Read-only prop. To use this, make sure that `pickingModes` contains `mouseUp`.
+   * This prop is updated when a mouse up event is fired on an element in the map. This contains
+   * the picking info describing the object interested by the event.
+   */
+  mouseUpInfo: PropTypes.object,
 
   /**
    * User callback function for hover
