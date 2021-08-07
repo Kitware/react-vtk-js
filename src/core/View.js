@@ -728,13 +728,9 @@ View.propTypes = {
   /**
    * List of picking listeners to bind. By default it is disabled (empty array).
    */
-  pickingModes: PropTypes.oneOf([
-    'click',
-    'hover',
-    'select',
-    'mouseDown',
-    'mouseUp',
-  ]),
+  pickingModes: PropTypes.arrayOf(
+    PropTypes.oneOf(['click', 'hover', 'select', 'mouseDown', 'mouseUp'])
+  ),
 
   /**
    * User callback function for click
