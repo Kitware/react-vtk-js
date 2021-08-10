@@ -166,6 +166,10 @@ export default class View extends Component {
     this.resetCamera = this.resetCamera.bind(this);
     const bbox = vtkBoundingBox.newInstance({ bounds: [0, 0, 0, 0, 0, 0] });
     this.updateCubeBounds = () => {
+      if (!this.props.showCubeAxes) {
+        return;
+      }
+
       bbox.reset();
       const { props } = this.renderer.get('props');
       for (let i = 0; i < props.length; i++) {
@@ -556,8 +560,8 @@ export default class View extends Component {
         const representationIds = [];
         this.selections.forEach((v) => {
           const { prop } = v.getProperties();
-          const representationId =
-            prop?.get('representationId').representationId;
+          const representationId = prop?.get('representationId')
+            .representationId;
           if (representationId) {
             representationIds.push(representationId);
           }
