@@ -25,7 +25,10 @@ export default {
         format: 'cjs',
       },
     ],
-    external: ['react', 'prop-types'],
+    external: (id) => (
+      ['react', 'prop-types'].indexOf(id) > 0 ||
+      /^@kitware\/vtk\.js/.test(id)
+    ),
     plugins: [
       nodeResolve({
         // include: 'node_modules/**',
