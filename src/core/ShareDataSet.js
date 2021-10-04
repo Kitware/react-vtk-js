@@ -45,7 +45,7 @@ export default class ShareDataSet extends Component {
     }
     return trivialProducer;
   }
-  
+
   componentDidMount() {
     const dataset = this.getTrivialProducer().getOutputData();
     if (dataset && !dataset.isDeleted()) {

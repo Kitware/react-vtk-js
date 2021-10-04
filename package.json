@@ -27,7 +27,7 @@
     "semantic-release": "semantic-release"
   },
   "peerDependencies": {
-    "@kitware/vtk.js": "^19.0.0",
+    "@kitware/vtk.js": "^19.7.1",
     "react": "^16.0.0"
   },
   "devDependencies": {
