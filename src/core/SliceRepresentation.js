@@ -139,23 +139,23 @@ export default class SliceRepresentation extends Component {
     }
 
     // ijk
-    if (iSlice && (!previous || iSlice !== previous.iSlice)) {
+    if (iSlice != null && (!previous || iSlice !== previous.iSlice)) {
       this.mapper.setISlice(iSlice);
     }
-    if (jSlice && (!previous || jSlice !== previous.jSlice)) {
+    if (jSlice != null && (!previous || jSlice !== previous.jSlice)) {
       this.mapper.setJSlice(jSlice);
     }
-    if (kSlice && (!previous || kSlice !== previous.kSlice)) {
+    if (kSlice != null && (!previous || kSlice !== previous.kSlice)) {
       this.mapper.setKSlice(kSlice);
     }
     // xyz
-    if (xSlice && (!previous || xSlice !== previous.xSlice)) {
+    if (xSlice != null && (!previous || xSlice !== previous.xSlice)) {
       this.mapper.setXSlice(xSlice);
     }
-    if (ySlice && (!previous || ySlice !== previous.ySlice)) {
+    if (ySlice != null && (!previous || ySlice !== previous.ySlice)) {
       this.mapper.setYSlice(ySlice);
     }
-    if (zSlice && (!previous || zSlice !== previous.zSlice)) {
+    if (zSlice != null && (!previous || zSlice !== previous.zSlice)) {
       this.mapper.setZSlice(zSlice);
     }
 
