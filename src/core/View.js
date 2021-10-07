@@ -70,6 +70,7 @@ function assignManipulators(style, settings, view) {
         useWorldUpVec,
         worldUpVec,
         useFocalPointAsCenterOfRotation,
+        zoomScale,
       } = item;
       const manipulator = klass.newInstance();
       manipulator.setButton(button);
@@ -96,6 +97,9 @@ function assignManipulators(style, settings, view) {
         manipulator.setUseFocalPointAsCenterOfRotation(
           useFocalPointAsCenterOfRotation
         );
+      }
+      if (zoomScale !== undefined) {
+        manipulator.setZoomScale(zoomScale);
       }
     }
   });
@@ -560,8 +564,8 @@ export default class View extends Component {
         const representationIds = [];
         this.selections.forEach((v) => {
           const { prop } = v.getProperties();
-          const representationId = prop?.get('representationId')
-            .representationId;
+          const representationId =
+            prop?.get('representationId').representationId;
           if (representationId) {
             representationIds.push(representationId);
           }
