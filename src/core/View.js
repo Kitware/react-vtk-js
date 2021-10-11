@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 // vtk.js Rendering stack
 // ----------------------------------------------------------------------------
 
-import { debounce } from '@kitware/vtk.js/macro.js';
+import { debounce } from '@kitware/vtk.js/macros.js';
 
 import vtkOpenGLRenderWindow from '@kitware/vtk.js/Rendering/OpenGL/RenderWindow.js';
 import vtkRenderWindow from '@kitware/vtk.js/Rendering/Core/RenderWindow.js';
