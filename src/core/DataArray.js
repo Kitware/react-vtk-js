@@ -5,7 +5,7 @@ import { toTypedArray } from '../utils';
 
 import { DataSetContext, FieldsContext } from './View';
 import vtkDataArray from '@kitware/vtk.js/Common/Core/DataArray.js';
-import { TYPED_ARRAYS } from '@kitware/vtk.js/macro.js';
+import { TYPED_ARRAYS } from '@kitware/vtk.js/macros.js';
 
 /**
  * DataArray is creating a vtkDataArray for the container fields
