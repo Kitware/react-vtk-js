@@ -13,7 +13,7 @@
   },
   "scripts": {
     "prebuild": "npm run fix",
-    "build": "rollup ./src/index.js -c",
+    "build": "rm -rf dist && rollup ./src/index.js -c",
     "prepare": "npm run build",
     "test": "npm run test:lint && npm run test:build",
     "test:build": "npm run build",
