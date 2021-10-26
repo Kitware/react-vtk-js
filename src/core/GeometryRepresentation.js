@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext, DownstreamContext } from './View';
+import { vec2Equals } from '../utils';
 
 import vtkActor from '@kitware/vtk.js/Rendering/Core/Actor.js';
 import vtkMapper from '@kitware/vtk.js/Rendering/Core/Mapper.js';
@@ -50,7 +51,7 @@ export default class GeometryRepresentation extends Component {
     }
   }
 
-  initCubeAxes = () => {
+  initCubeAxes() {
     this.cubeAxes = vtkCubeAxesActor.newInstance({
       visibility: false,
       dataBounds: [-1, 1, -1, 1, -1, 1],
@@ -81,7 +82,7 @@ export default class GeometryRepresentation extends Component {
     };
 
     this.subscriptions.push(this.mapper.onModified(updateCubeAxes));
-  };
+  }
 
   render() {
     return (
@@ -158,20 +159,23 @@ export default class GeometryRepresentation extends Component {
       colorMapPreset,
       colorDataRange,
     } = props;
+    let changed = false;
+
     if (actor && (!previous || actor !== previous.actor)) {
-      this.actor.set(actor);
+      changed = this.actor.set(actor) || changed;
     }
     if (mapper && (!previous || mapper !== previous.mapper)) {
-      this.mapper.set(mapper);
+      changed = this.mapper.set(mapper) || changed;
     }
     if (property && (!previous || property !== previous.property)) {
-      this.actor.getProperty().set(property);
+      changed = this.actor.getProperty().set(property) || changed;
     }
 
     if (
       colorMapPreset &&
       (!previous || colorMapPreset !== previous.colorMapPreset)
     ) {
+      changed = true;
       const preset = vtkColorMaps.getPresetByName(colorMapPreset);
       this.lookupTable.applyColorMap(preset);
       this.lookupTable.setMappingRange(...colorDataRange);
@@ -180,13 +184,15 @@ export default class GeometryRepresentation extends Component {
 
     if (
       colorDataRange &&
-      (!previous || colorDataRange !== previous.colorDataRange)
+      (!previous || !vec2Equals(colorDataRange, previous.colorDataRange))
     ) {
+      changed = true;
       this.lookupTable.setMappingRange(...colorDataRange);
       this.lookupTable.updateRange();
     }
 
     if (showCubeAxes && this.cubeAxes == null) {
+      changed = true;
       this.initCubeAxes();
 
       if (
@@ -201,6 +207,7 @@ export default class GeometryRepresentation extends Component {
       this.cubeAxes != null &&
       showCubeAxes !== this.cubeAxes.getVisibility()
     ) {
+      changed = true;
       this.cubeAxes.setVisibility(showCubeAxes && this.validData);
       this.cubeAxes
         .getActors()
@@ -210,18 +217,24 @@ export default class GeometryRepresentation extends Component {
     }
 
     // scalar bars
-    this.scalarBar.setVisibility(props.showScalarBar && this.validData);
-    this.scalarBar.setAxisLabel(props.scalarBarTitle);
-    this.scalarBar.set(props.scalarBarStyle || {});
+    changed =
+      this.scalarBar.setVisibility(props.showScalarBar && this.validData) ||
+      changed;
+    changed = this.scalarBar.setAxisLabel(props.scalarBarTitle) || changed;
+    changed = this.scalarBar.set(props.scalarBarStyle || {}) || changed;
 
     // actor visibility
     if (actor && actor.visibility !== undefined) {
       this.currentVisibility = actor.visibility;
-      this.actor.setVisibility(this.currentVisibility && this.validData);
+      changed =
+        this.actor.setVisibility(this.currentVisibility && this.validData) ||
+        changed;
     }
 
-    // trigger render
-    this.dataChanged();
+    if (changed) {
+      // trigger render
+      this.dataChanged();
+    }
   }
 
   dataAvailable() {

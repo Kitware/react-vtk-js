@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext, DownstreamContext } from './View';
+import { smartEqualsShallow } from '../utils';
 
 import vtkActor from '@kitware/vtk.js/Rendering/Core/Actor.js';
 import vtkGlyph3DMapper from '@kitware/vtk.js/Rendering/Core/Glyph3DMapper.js';
@@ -82,20 +83,23 @@ export default class GeometryRepresentation extends Component {
 
   update(props, previous) {
     const { actor, mapper, property, colorMapPreset, colorDataRange } = props;
+    let changed = false;
+
     if (actor && (!previous || actor !== previous.actor)) {
-      this.actor.set(actor);
+      changed = this.actor.set(actor) || changed;
     }
     if (mapper && (!previous || mapper !== previous.mapper)) {
-      this.mapper.set(mapper);
+      changed = this.mapper.set(mapper) || changed;
     }
     if (property && (!previous || property !== previous.property)) {
-      this.actor.getProperty().set(property);
+      changed = this.actor.getProperty().set(property) || changed;
     }
 
     if (
       colorMapPreset &&
       (!previous || colorMapPreset !== previous.colorMapPreset)
     ) {
+      changed = true;
       const preset = vtkColorMaps.getPresetByName(colorMapPreset);
       this.lookupTable.applyColorMap(preset);
       this.lookupTable.setMappingRange(...colorDataRange);
@@ -104,8 +108,10 @@ export default class GeometryRepresentation extends Component {
 
     if (
       colorDataRange &&
-      (!previous || colorDataRange !== previous.colorDataRange)
+      (!previous ||
+        !smartEqualsShallow(colorDataRange, previous.colorDataRange))
     ) {
+      changed = true;
       this.lookupTable.setMappingRange(...colorDataRange);
       this.lookupTable.updateRange();
     }
@@ -113,11 +119,15 @@ export default class GeometryRepresentation extends Component {
     // actor visibility
     if (actor && actor.visibility !== undefined) {
       this.currentVisibility = actor.visibility;
-      this.actor.setVisibility(this.currentVisibility && this.validData);
+      changed =
+        this.actor.setVisibility(this.currentVisibility && this.validData) ||
+        changed;
     }
 
     // trigger render
-    this.dataChanged();
+    if (changed) {
+      this.dataChanged();
+    }
   }
 
   dataAvailable() {

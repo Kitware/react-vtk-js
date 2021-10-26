@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext, DownstreamContext } from './View';
+import { smartEqualsShallow } from '../utils';
 
 import vtkImageSlice from '@kitware/vtk.js/Rendering/Core/ImageSlice.js';
 import vtkImageMapper from '@kitware/vtk.js/Rendering/Core/ImageMapper.js';
@@ -92,19 +93,22 @@ export default class SliceRepresentation extends Component {
       ySlice,
       zSlice,
     } = props;
+    let changed = false;
+
     if (actor && (!previous || actor !== previous.actor)) {
-      this.actor.set(actor);
+      changed = this.actor.set(actor) || changed;
     }
     if (property && (!previous || property !== previous.property)) {
-      this.actor.getProperty().set(property);
+      changed = this.actor.getProperty().set(property) || changed;
     }
     if (mapper && (!previous || mapper !== previous.mapper)) {
-      this.mapper.set(mapper);
+      changed = this.mapper.set(mapper) || changed;
     }
     if (
       colorMapPreset &&
       (!previous || colorMapPreset !== previous.colorMapPreset)
     ) {
+      changed = true;
       const preset = vtkColorMaps.getPresetByName(colorMapPreset);
       this.lookupTable.applyColorMap(preset);
       this.lookupTable.setMappingRange(...colorDataRange);
@@ -113,8 +117,10 @@ export default class SliceRepresentation extends Component {
 
     if (
       colorDataRange &&
-      (!previous || colorDataRange !== previous.colorDataRange)
+      (!previous ||
+        !smartEqualsShallow(colorDataRange, previous.colorDataRange))
     ) {
+      changed = true;
       if (typeof colorDataRange === 'string') {
         if (previous) {
           this.dataChanged();
@@ -140,33 +146,37 @@ export default class SliceRepresentation extends Component {
 
     // ijk
     if (iSlice != null && (!previous || iSlice !== previous.iSlice)) {
-      this.mapper.setISlice(iSlice);
+      changed = this.mapper.setISlice(iSlice) || changed;
     }
     if (jSlice != null && (!previous || jSlice !== previous.jSlice)) {
-      this.mapper.setJSlice(jSlice);
+      changed = this.mapper.setJSlice(jSlice) || changed;
     }
     if (kSlice != null && (!previous || kSlice !== previous.kSlice)) {
-      this.mapper.setKSlice(kSlice);
+      changed = this.mapper.setKSlice(kSlice) || changed;
     }
     // xyz
     if (xSlice != null && (!previous || xSlice !== previous.xSlice)) {
-      this.mapper.setXSlice(xSlice);
+      changed = this.mapper.setXSlice(xSlice) || changed;
     }
     if (ySlice != null && (!previous || ySlice !== previous.ySlice)) {
-      this.mapper.setYSlice(ySlice);
+      changed = this.mapper.setYSlice(ySlice) || changed;
     }
     if (zSlice != null && (!previous || zSlice !== previous.zSlice)) {
-      this.mapper.setZSlice(zSlice);
+      changed = this.mapper.setZSlice(zSlice) || changed;
     }
 
     // actor visibility
     if (actor && actor.visibility !== undefined) {
       this.currentVisibility = actor.visibility;
-      this.actor.setVisibility(this.currentVisibility && this.validData);
+      changed =
+        this.actor.setVisibility(this.currentVisibility && this.validData) ||
+        changed;
     }
 
     // trigger render
-    this.dataChanged();
+    if (changed) {
+      this.dataChanged();
+    }
   }
 
   dataAvailable() {

@@ -28,3 +28,57 @@ export function toTypedArray(values, TypedArray) {
 
   return values;
 }
+
+export function vec2Equals(v1, v2) {
+  if (!v1 || v1.length !== 2 || !v2 || v2.length !== 2) {
+    return false;
+  }
+  return v1[0] === v2[0] && v1[1] === v2[1];
+}
+
+// assumes two not null objects
+function objSubsetEquals(a, b) {
+  for (const k in a) {
+    if (!(k in b) || a[k] !== b[k]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// assumes two array-like objects
+export function arrayEquals(a, b) {
+  if (a.length !== b.length) {
+    return false;
+  }
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// array-like: Arrays or TypedArrays
+export function isArrayLike(a) {
+  return (
+    Array.isArray(a) || (ArrayBuffer.isView(a) && !(a instanceof DataView))
+  );
+}
+
+// performs shallow equality checks for arrays and objects.
+// regular equality check otherwise.
+export function smartEqualsShallow(a, b) {
+  if (typeof a !== typeof b) {
+    return false;
+  }
+  // handle arrays
+  if (isArrayLike(a) && isArrayLike(b)) {
+    return arrayEquals(a, b);
+  }
+  // handle objects
+  if (typeof a === 'object' && a && b) {
+    return objSubsetEquals(a, b) && objSubsetEquals(b, a);
+  }
+  return a === b;
+}
