@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import { toTypedArray } from '../utils';
+import { toTypedArray, smartEqualsShallow } from '../utils';
 
 import {
   RepresentationContext,
@@ -72,7 +72,7 @@ export default class PolyData extends Component {
     let changeDetected = false;
     let typedArray = Uint32Array;
 
-    if (points && (!previous || points !== previous.points)) {
+    if (points && (!previous || !smartEqualsShallow(points, previous.points))) {
       const array = toTypedArray(points, Float64Array);
       this.polydata.getPoints().setData(array, 3);
       changeDetected = true;
@@ -81,22 +81,22 @@ export default class PolyData extends Component {
       typedArray = array.length > 196608 ? Uint32Array : Uint16Array;
     }
 
-    if (verts && (!previous || verts !== previous.verts)) {
+    if (verts && (!previous || !smartEqualsShallow(verts, previous.verts))) {
       this.polydata.getVerts().setData(toTypedArray(verts, typedArray));
       changeDetected = true;
     }
 
-    if (lines && (!previous || lines !== previous.lines)) {
+    if (lines && (!previous || !smartEqualsShallow(lines, previous.lines))) {
       this.polydata.getLines().setData(toTypedArray(lines, typedArray));
       changeDetected = true;
     }
 
-    if (polys && (!previous || polys !== previous.polys)) {
+    if (polys && (!previous || !smartEqualsShallow(polys, previous.polys))) {
       this.polydata.getPolys().setData(toTypedArray(polys, typedArray));
       changeDetected = true;
     }
 
-    if (strips && (!previous || strips !== previous.strips)) {
+    if (strips && (!previous || !smartEqualsShallow(strips, previous.strips))) {
       this.polydata.getStrips().setData(toTypedArray(strips, typedArray));
       changeDetected = true;
     }
