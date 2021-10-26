@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { RepresentationContext, DownstreamContext } from './View';
+import { smartEqualsShallow } from '../utils';
 
 import vtk from '@kitware/vtk.js/vtk.js';
 
@@ -90,7 +91,7 @@ export default class Algorithm extends Component {
       );
     }
 
-    if (state && (!previous || state !== previous.state)) {
+    if (state && (!previous || !smartEqualsShallow(state, previous.state))) {
       this.algo.set(state);
       if (this.representation) {
         this.representation.dataChanged();
