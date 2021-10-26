@@ -50,7 +50,7 @@ export default class GeometryRepresentation extends Component {
     }
   }
 
-  initCubeAxes = () => {
+  initCubeAxes() {
     this.cubeAxes = vtkCubeAxesActor.newInstance({
       visibility: false,
       dataBounds: [-1, 1, -1, 1, -1, 1],
@@ -81,7 +81,7 @@ export default class GeometryRepresentation extends Component {
     };
 
     this.subscriptions.push(this.mapper.onModified(updateCubeAxes));
-  };
+  }
 
   render() {
     return (
