@@ -78,6 +78,8 @@ export default class PolyData extends Component {
       changeDetected = true;
 
       // Adapt cell size
+      // Max cell size for uint16 is 655356*3=196608.
+      // switch to uint32array if this is the case.
       typedArray = array.length > 196608 ? Uint32Array : Uint16Array;
     }
 
@@ -103,7 +105,9 @@ export default class PolyData extends Component {
 
     if (
       connectivity &&
-      (connectivity || !previous || connectivity !== previous.connectivity)
+      (!previous ||
+        points?.length !== previous.points?.length ||
+        connectivity !== previous.connectivity)
     ) {
       const nbPoints = points.length / 3;
       switch (connectivity) {
