@@ -164,6 +164,7 @@ export default class PolyData extends Component {
     // Let the representation know that we have data
     if (this.representation && this.polydata.getPoints().getData().length) {
       this.representation.dataAvailable();
+      this.representation.dataChanged();
     }
   }
 }

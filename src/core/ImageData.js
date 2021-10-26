@@ -82,6 +82,7 @@ export default class ImageData extends Component {
     if (this.representation && this.imageData.getPointData().getScalars()) {
       this.downstream.setInputData(this.imageData, this.props.port);
       this.representation.dataAvailable();
+      this.representation.dataChanged();
     }
   }
 }
