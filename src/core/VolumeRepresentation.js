@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext, DownstreamContext } from './View';
+import { smartEqualsShallow } from '../utils';
 
 import vtkVolume from '@kitware/vtk.js/Rendering/Core/Volume.js';
 import vtkVolumeMapper from '@kitware/vtk.js/Rendering/Core/VolumeMapper.js';
@@ -81,19 +82,22 @@ export default class VolumeRepresentation extends Component {
 
   update(props, previous) {
     const { volume, property, mapper, colorMapPreset, colorDataRange } = props;
+    let changed = false;
+
     if (volume && (!previous || volume !== previous.volume)) {
-      this.volume.set(volume);
+      changed = this.volume.set(volume) || changed;
     }
     if (property && (!previous || property !== previous.property)) {
-      this.volume.getProperty().set(property);
+      changed = this.volume.getProperty().set(property) || changed;
     }
     if (mapper && (!previous || mapper !== previous.mapper)) {
-      this.mapper.set(mapper);
+      changed = this.mapper.set(mapper) || changed;
     }
     if (
       colorMapPreset &&
       (!previous || colorMapPreset !== previous.colorMapPreset)
     ) {
+      changed = true;
       const preset = vtkColorMaps.getPresetByName(colorMapPreset);
       this.lookupTable.applyColorMap(preset);
       this.lookupTable.setMappingRange(...colorDataRange);
@@ -102,11 +106,12 @@ export default class VolumeRepresentation extends Component {
 
     if (
       colorDataRange &&
-      (!previous || colorDataRange !== previous.colorDataRange)
+      (!previous ||
+        !smartEqualsShallow(colorDataRange, previous.colorDataRange))
     ) {
+      changed = true;
       if (typeof colorDataRange === 'string') {
         if (previous) {
-          console.log('from update');
           this.dataChanged();
         } else {
           this.lookupTable.setMappingRange(0, 1);
@@ -131,11 +136,15 @@ export default class VolumeRepresentation extends Component {
     // actor visibility
     if (volume && volume.visibility !== undefined) {
       this.currentVisibility = volume.visibility;
-      this.volume.setVisibility(this.currentVisibility && this.validData);
+      changed =
+        this.volume.setVisibility(this.currentVisibility && this.validData) ||
+        changed;
     }
 
     // trigger render
-    this.dataChanged();
+    if (changed) {
+      this.dataChanged();
+    }
   }
 
   dataAvailable() {
