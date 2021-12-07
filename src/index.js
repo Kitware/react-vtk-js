@@ -23,6 +23,7 @@ export const Reader = Core.Reader;
 export const ShareDataSet = Core.ShareDataSet;
 export const View = Core.View;
 export const GeometryRepresentation = Core.GeometryRepresentation;
+export const Geometry2DRepresentation = Core.Geometry2DRepresentation;
 export const GlyphRepresentation = Core.GlyphRepresentation;
 export const ImageData = Core.ImageData;
 export const DataArray = Core.DataArray;
