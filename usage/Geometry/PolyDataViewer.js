@@ -16,16 +16,16 @@ import { Coordinate } from '@kitware/vtk.js/Rendering/Core/Coordinate/Constants'
 function Example(props) {
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
-      <View id='0' background={[0.1, 0.5, 0.9]}>
+      <View id="0" background={[0.1, 0.5, 0.9]}>
         <GeometryRepresentation
-          id='1'
+          id="1"
           property={{
             opacity: 0.1,
             color: [0.7, 0, 0],
           }}
         >
           <PolyData
-            id='2'
+            id="2"
             points={[
               0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0,
               1, 1,
@@ -42,7 +42,7 @@ function Example(props) {
           />
         </GeometryRepresentation>
         <Geometry2DRepresentation
-          id='3'
+          id="3"
           property={{
             opacity: 1.0,
             pointSize: 4.0,
@@ -55,7 +55,7 @@ function Example(props) {
           }}
         >
           <PolyData
-            id='4'
+            id="4"
             points={[
               0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0,
               1, 1,
@@ -65,7 +65,7 @@ function Example(props) {
           />
         </Geometry2DRepresentation>
         <Geometry2DRepresentation
-          id='5'
+          id="5"
           property={{
             opacity: 0.8,
             pointSize: 15,
@@ -78,7 +78,7 @@ function Example(props) {
           }}
         >
           <PolyData
-            id='6'
+            id="6"
             points={[
               0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0,
               1, 1,
