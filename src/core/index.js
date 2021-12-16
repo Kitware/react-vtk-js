@@ -7,6 +7,7 @@ import vtkReader from './Reader';
 import vtkShareDataSet from './ShareDataSet';
 import vtkView from './View';
 import vtkGeometryRepresentation from './GeometryRepresentation';
+import vtkGeometry2DRepresentation from './Geometry2DRepresentation';
 import vtkGlyphRepresentation from './GlyphRepresentation';
 import vtkImageData from './ImageData';
 import vtkDataArray from './DataArray';
@@ -24,6 +25,7 @@ export const Reader = vtkReader;
 export const ShareDataSet = vtkShareDataSet;
 export const View = vtkView;
 export const GeometryRepresentation = vtkGeometryRepresentation;
+export const Geometry2DRepresentation = vtkGeometry2DRepresentation;
 export const GlyphRepresentation = vtkGlyphRepresentation;
 export const ImageData = vtkImageData;
 export const DataArray = vtkDataArray;
@@ -42,6 +44,7 @@ export default {
   ShareDataSet: vtkShareDataSet,
   View: vtkView,
   GeometryRepresentation: vtkGeometryRepresentation,
+  Geometry2DRepresentation: vtkGeometry2DRepresentation,
   GlyphRepresentation: vtkGlyphRepresentation,
   ImageData: vtkImageData,
   DataArray: vtkDataArray,
