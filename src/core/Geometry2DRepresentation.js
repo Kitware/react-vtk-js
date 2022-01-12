@@ -34,7 +34,8 @@ export default class Geometry2DRepresentation extends Component {
     });
     this.lookupTable = vtkColorTransferFunction.newInstance();
     this.transformCoordinate = vtkCoordinate.newInstance({
-      coordinateSystem: Coordinate.DISPLAY,
+      coordinateSystem:
+        this.props.transformCoordinate?.coordinateSystem ?? Coordinate.DISPLAY,
     });
     this.mapper = vtkMapper2D.newInstance({
       lookupTable: this.lookupTable,
