@@ -214,12 +214,10 @@ export default class View extends Component {
         return;
       }
       const tolerance = this.getPointerSizeTolerance();
-      const selection = this.pick(
-        Math.floor(x - tolerance),
-        Math.floor(y - tolerance),
-        Math.ceil(x + tolerance),
-        Math.ceil(y + tolerance),
-        false
+      const selection = this.pickClosest(
+        Math.floor(x),
+        Math.floor(y),
+        tolerance
       );
 
       // Share the selection with the rest of the world
@@ -238,12 +236,10 @@ export default class View extends Component {
       }
 
       const tolerance = this.getPointerSizeTolerance();
-      const selection = this.pick(
-        Math.floor(x - tolerance),
-        Math.floor(y - tolerance),
-        Math.ceil(x + tolerance),
-        Math.ceil(y + tolerance),
-        false
+      const selection = this.pickClosest(
+        Math.floor(x),
+        Math.floor(y),
+        tolerance
       );
 
       // Guard against trigger of empty selection
@@ -523,6 +519,70 @@ export default class View extends Component {
       );
     }
     this.renderWindow.render();
+  }
+
+  pickClosest(xp, yp, tolerance) {
+    const x1 = Math.floor(xp - tolerance);
+    const y1 = Math.floor(yp - tolerance);
+    const x2 = Math.ceil(xp + tolerance);
+    const y2 = Math.ceil(yp + tolerance);
+
+    this.selector.setArea(x1, y1, x2, y2);
+    this.previousSelectedData = null;
+
+    if (this.selector.captureBuffers()) {
+      const pos = [xp, yp];
+      const outSelectedPosition = [0, 0];
+      const info = this.selector.getPixelInformation(
+        pos,
+        tolerance,
+        outSelectedPosition
+      );
+
+      if (info == null || info.prop == null) return [];
+
+      const startPoint = this.openglRenderWindow.displayToWorld(
+        Math.round((x1 + x2) / 2),
+        Math.round((y1 + y2) / 2),
+        0,
+        this.renderer
+      );
+
+      const endPoint = this.openglRenderWindow.displayToWorld(
+        Math.round((x1 + x2) / 2),
+        Math.round((y1 + y2) / 2),
+        1,
+        this.renderer
+      );
+
+      const ray = [Array.from(startPoint), Array.from(endPoint)];
+
+      const worldPosition = Array.from(
+        this.openglRenderWindow.displayToWorld(
+          info.displayPosition[0],
+          info.displayPosition[1],
+          info.zValue,
+          this.renderer
+        )
+      );
+
+      const displayPosition = [
+        info.displayPosition[0],
+        info.displayPosition[1],
+        info.zValue,
+      ];
+
+      const selection = [];
+      selection[0] = {
+        worldPosition,
+        displayPosition,
+        compositeID: info.compositeID,
+        ...info.prop.get('representationId'),
+        ray,
+      };
+      return selection;
+    }
+    return [];
   }
 
   pick(x1, y1, x2, y2, useFrustrum = false) {
