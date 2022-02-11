@@ -16,6 +16,9 @@ import vtkInteractorStyleManipulator from '@kitware/vtk.js/Interaction/Style/Int
 import vtkBoundingBox from '@kitware/vtk.js/Common/DataModel/BoundingBox.js';
 import vtkCubeAxesActor from '@kitware/vtk.js/Rendering/Core/CubeAxesActor.js';
 
+import vtkAxesActor from '@kitware/vtk.js/Rendering/Core/AxesActor';
+import vtkOrientationMarkerWidget from '@kitware/vtk.js/Interaction/Widgets/OrientationMarkerWidget';
+
 // Style modes
 import vtkMouseCameraTrackballMultiRotateManipulator from '@kitware/vtk.js/Interaction/Manipulators/MouseCameraTrackballMultiRotateManipulator.js';
 import vtkMouseCameraTrackballPanManipulator from '@kitware/vtk.js/Interaction/Manipulators/MouseCameraTrackballPanManipulator.js';
@@ -121,6 +124,7 @@ const RENDERER_STYLE = {
  *   - `cameraPosition`: [0, 0, 1]
  *   - `cameraViewUp`: [0, 1, 0]
  *   - `cameraParallelProjection`: false
+ *   - `showOrientationAxes`: true
  */
 export default class View extends Component {
   constructor(props) {
@@ -145,6 +149,20 @@ export default class View extends Component {
       this.style = vtkInteractorStyleManipulator.newInstance();
       this.interactor.setInteractorStyle(this.style);
     }
+
+    // Create orientation widget
+    this.axesActor = vtkAxesActor.newInstance();
+    this.orientationWidget = vtkOrientationMarkerWidget.newInstance({
+      actor: this.axesActor,
+      interactor: this.interactor,
+    });
+    this.orientationWidget.setEnabled(true);
+    this.orientationWidget.setViewportCorner(
+      vtkOrientationMarkerWidget.Corners.BOTTOM_LEFT
+    );
+    this.orientationWidget.setViewportSize(0.15);
+    this.orientationWidget.setMinPixelSize(100);
+    this.orientationWidget.setMaxPixelSize(300);
 
     // Picking handler
     this.selector = vtkOpenGLHardwareSelector.newInstance({
@@ -447,6 +465,7 @@ export default class View extends Component {
       triggerResetCamera,
       showCubeAxes,
       cubeAxesStyle,
+      showOrientationAxes,
     } = props;
     if (background && (!previous || background !== previous.background)) {
       this.renderer.setBackground(background);
@@ -495,6 +514,10 @@ export default class View extends Component {
 
     if (this.cubeAxes.set(cubeAxesStyle || {})) {
       this.renderView();
+    }
+
+    if (showOrientationAxes !== this.orientationWidget.getEnabled()) {
+      this.orientationWidget.setEnabled(showOrientationAxes);
     }
 
     // Allow to trigger method call from property change
@@ -725,6 +748,7 @@ View.defaultProps = {
   pickingModes: [],
   showCubeAxes: false,
   pointerSize: 0,
+  showOrientationAxes: true,
 };
 
 View.propTypes = {
@@ -874,4 +898,9 @@ View.propTypes = {
    * https://github.com/Kitware/vtk-js/blob/HEAD/Sources/Rendering/Core/CubeAxesActor/index.js#L703-L719
    */
   cubeAxesStyle: PropTypes.object,
+
+  /**
+   * Show/Hide orientation axes.
+   */
+  showOrientationAxes: PropTypes.bool,
 };
