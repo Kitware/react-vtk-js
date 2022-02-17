@@ -748,7 +748,7 @@ View.defaultProps = {
   pickingModes: [],
   showCubeAxes: false,
   pointerSize: 0,
-  showOrientationAxes: true,
+  showOrientationAxes: false,
 };
 
 View.propTypes = {
