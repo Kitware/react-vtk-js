@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 
 import {
   View,
@@ -20,8 +19,8 @@ function Example(props) {
           }}
         >
           <ShareDataSet>
-            <Algorithm 
-              vtkClass='vtkSphereSource' 
+            <Algorithm
+              vtkClass='vtkSphereSource'
               state={{
                 phiResolution: 10,
                 thetaResolution: 20,
@@ -35,7 +34,7 @@ function Example(props) {
               height: 0.25,
               radius: 0.08,
             }}
-            port='1'
+            port={1}
           />
         </GlyphRepresentation>
         <GeometryRepresentation>
@@ -46,5 +45,4 @@ function Example(props) {
   );
 }
 
-// Render React object
-ReactDOM.render(<Example />, document.querySelector('.root'));
+export default Example;

@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 
 import { newInstance as newVtkPlaneInstance } from '@kitware/vtk.js/Common/DataModel/Plane.js';
 
@@ -31,5 +30,4 @@ function Example(props) {
   );
 }
 
-// Render React object
-ReactDOM.render(<Example />, document.querySelector('.root'));
+export default Example;

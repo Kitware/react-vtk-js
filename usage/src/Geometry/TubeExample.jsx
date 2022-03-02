@@ -1,5 +1,4 @@
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react';
 import {
   View,
   GeometryRepresentation,
@@ -11,7 +10,7 @@ function Example(props) {
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <View background={[0.0, 0.0, 0.0]}>
-      <GeometryRepresentation
+        <GeometryRepresentation
           property={{
             color: [0.7, 0, 0],
           }}
@@ -25,12 +24,8 @@ function Example(props) {
           >
             <PolyData
               points={[
-                0, 0, 0,
-                0, -5, 0,
-                0.25, -6, 0,
-                1, -7, 0,
-                1.75, -7.5, 0,
-                6, -7.5, 0,
+                0, 0, 0, 0, -5, 0, 0.25, -6, 0, 1, -7, 0, 1.75, -7.5, 0, 6,
+                -7.5, 0,
               ]}
               lines={[2, 0, 1, 2, 1, 2, 2, 2, 3, 2, 3, 4, 2, 4, 5]}
             />
@@ -41,22 +36,17 @@ function Example(props) {
             color: [0, 1, 0],
           }}
         >
-            <PolyData
-              points={[
-                0, 0, 0,
-                0, -5, 0,
-                0.25, -6, 0,
-                1, -7, 0,
-                1.75, -7.5, 0,
-                6, -7.5, 0,
-              ]}
-              lines={[6, 0, 1, 2, 3, 4, 5]}
-            />
+          <PolyData
+            points={[
+              0, 0, 0, 0, -5, 0, 0.25, -6, 0, 1, -7, 0, 1.75, -7.5, 0, 6, -7.5,
+              0,
+            ]}
+            lines={[6, 0, 1, 2, 3, 4, 5]}
+          />
         </GeometryRepresentation>
       </View>
     </div>
   );
 }
 
-// Render React object
-ReactDOM.render(<Example />, document.querySelector('.root'));
+export default Example;
