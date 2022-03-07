@@ -22,9 +22,10 @@
     "fix:eslint": "eslint --fix src",
     "fix": "npm run fix:prettier && npm run fix:eslint",
     "predeploy": "cd usage && npm install && npm run build",
-    "deploy": "gh-pages -d usage/www -f -r $GIT_PUBLISH_URL",
+    "deploy": "gh-pages -d usage/dist -f -r $GIT_PUBLISH_URL",
     "commit": "git cz",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "dev": "rollup ./src/index.js -c --watch"
   },
   "peerDependencies": {
     "@kitware/vtk.js": "^21.3.0",

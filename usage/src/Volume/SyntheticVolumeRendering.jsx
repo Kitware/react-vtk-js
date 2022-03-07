@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 
 import { View, VolumeDataRepresentation } from 'react-vtk-js';
 
@@ -9,12 +8,12 @@ function Example(props) {
     array.push(Math.random());
   }
   return (
-    <div style={{width: '100vw', height: '100vh'}}>
-      <View id="0">
+    <div style={{ width: '100vw', height: '100vh' }}>
+      <View id='0'>
         <VolumeDataRepresentation
-          spacing={[1,1,1]}
-          dimensions={[10,10,10]}
-          origin={[0,0,0]}
+          spacing={[1, 1, 1]}
+          dimensions={[10, 10, 10]}
+          origin={[0, 0, 0]}
           scalars={array}
           rescaleColorMap={false}
         />
@@ -23,5 +22,4 @@ function Example(props) {
   );
 }
 
-// Render React object
-ReactDOM.render(<Example />, document.querySelector('.root'));
+export default Example;

@@ -1,5 +1,4 @@
 import React, { useState, useContext } from 'react';
-import ReactDOM from 'react-dom';
 
 import {
   Contexts,
@@ -25,7 +24,7 @@ function generateRandomVolumeField(iMax, jMax, kMax) {
   return array;
 }
 
-function generateComponentVolumeField(iMax, jMax, kMax, component=0) {
+function generateComponentVolumeField(iMax, jMax, kMax, component = 0) {
   const array = [];
   for (let k = 0; k < kMax; k++) {
     for (let j = 0; j < jMax; j++) {
@@ -47,16 +46,16 @@ const FIELDS = [
 
 function Slider(props) {
   const view = useContext(Contexts.ViewContext);
-  function onChange(e) {
+  const onChange = (e) => {
     const value = Number(e.currentTarget.value);
     props.setValue(value);
     setTimeout(view.renderView, 0);
-  }
+  };
   return (
     <input
-      type="range"
-      min="0"
-      step="1"
+      type='range'
+      min='0'
+      step='1'
       max={props.max}
       value={props.value}
       onChange={onChange}
@@ -72,17 +71,21 @@ function Slider(props) {
 }
 
 function Example(props) {
-  const [fieldIdx, setFieldIdx] =  useState(0);
+  const [fieldIdx, setFieldIdx] = useState(0);
   const colorWindow = fieldIdx ? 10 : 1;
   const colorLevel = fieldIdx ? 5 : 0.5;
 
   return (
-    <div style={{width: '100vw', height: '100vh'}}>
-      <View id="0">
-        <Slider max={FIELDS.length - 1} value={fieldIdx} setValue={setFieldIdx} />
-        <VolumeRepresentation>
+    <div style={{ width: '100vw', height: '100vh' }}>
+      <View id='0'>
+        <Slider
+          max={FIELDS.length - 1}
+          value={fieldIdx}
+          setValue={setFieldIdx}
+        />
+        <VolumeRepresentation key={fieldIdx}>
           <VolumeController rescaleColorMap={false} />
-          <ShareDataSet>
+          <ShareDataSet name={fieldIdx}>
             <ImageData
               spacing={[1, 1, 1]}
               dimensions={[10, 10, 10]}
@@ -90,7 +93,7 @@ function Example(props) {
             >
               <PointData>
                 <DataArray
-                  registration="setScalars"
+                  registration='setScalars'
                   type='Float32Array'
                   values={FIELDS[fieldIdx]}
                 />
@@ -99,10 +102,21 @@ function Example(props) {
           </ShareDataSet>
         </VolumeRepresentation>
       </View>
-      <div style={{ position: 'absolute', width: '20%', height: '20%', bottom: 0, right: 0 }}>
-        <View background={[1,1,1]} triggerRender={fieldIdx}>
-          <SliceRepresentation kSlice="5" property={{ colorWindow, colorLevel }}>
-            <ShareDataSet />
+      <div
+        style={{
+          position: 'absolute',
+          width: '20%',
+          height: '20%',
+          bottom: 0,
+          right: 0,
+        }}
+      >
+        <View background={[1, 1, 1]} triggerRender={fieldIdx}>
+          <SliceRepresentation
+            kSlice='5'
+            property={{ colorWindow, colorLevel }}
+          >
+            <ShareDataSet name={fieldIdx} />
           </SliceRepresentation>
         </View>
       </div>
@@ -110,5 +124,4 @@ function Example(props) {
   );
 }
 
-// Render React object
-ReactDOM.render(<Example />, document.querySelector('.root'));
+export default Example;
