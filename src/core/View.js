@@ -324,9 +324,9 @@ export default class View extends Component {
       visibility: false,
       dataBounds: [-1, 1, -1, 1, -1, 1],
     });
-    this.cubeAxes
-      .getActors()
-      .forEach(({ setVisibility }) => setVisibility(false));
+    Array.from(this.cubeAxes.getActors()).forEach(({ setVisibility }) =>
+      setVisibility(false)
+    );
     this.cubeAxes.setCamera(this.camera);
     this.renderer.addActor(this.cubeAxes);
 
@@ -506,9 +506,9 @@ export default class View extends Component {
     }
 
     if (this.cubeAxes.setVisibility(showCubeAxes)) {
-      this.cubeAxes
-        .getActors()
-        .forEach(({ setVisibility }) => setVisibility(showCubeAxes));
+      Array.from(this.cubeAxes.getActors()).forEach(({ setVisibility }) =>
+        setVisibility(showCubeAxes)
+      );
       this.renderView();
     }
 

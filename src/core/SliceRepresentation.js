@@ -27,14 +27,18 @@ export default class SliceRepresentation extends Component {
 
     // Create vtk.js objects
     this.lookupTable = vtkColorTransferFunction.newInstance();
+    const preset = vtkColorMaps.getPresetByName(
+      this.props.colorMapPreset ?? 'Grayscale'
+    );
+    this.lookupTable.applyColorMap(preset);
     this.piecewiseFunction = vtkPiecewiseFunction.newInstance();
     this.actor = vtkImageSlice.newInstance({ visibility: false });
     this.mapper = vtkImageMapper.newInstance();
     this.actor.setMapper(this.mapper);
 
-    // this.actor.getProperty().setRGBTransferFunction(0, this.lookupTable);
+    this.actor.getProperty().setRGBTransferFunction(0, this.lookupTable);
     // this.actor.getProperty().setScalarOpacity(0, this.piecewiseFunction);
-    // this.actor.getProperty().setInterpolationTypeToLinear();
+    this.actor.getProperty().setInterpolationTypeToLinear();
   }
 
   render() {
@@ -111,8 +115,6 @@ export default class SliceRepresentation extends Component {
       changed = true;
       const preset = vtkColorMaps.getPresetByName(colorMapPreset);
       this.lookupTable.applyColorMap(preset);
-      this.lookupTable.setMappingRange(...colorDataRange);
-      this.lookupTable.updateRange();
     }
 
     if (
@@ -212,7 +214,7 @@ export default class SliceRepresentation extends Component {
 }
 
 SliceRepresentation.defaultProps = {
-  colorMapPreset: 'erdc_rainbow_bright',
+  colorMapPreset: 'Grayscale',
   colorDataRange: 'auto',
 };
 
