@@ -195,7 +195,7 @@ export default class SliceRepresentation extends Component {
     if (this.props.colorDataRange === 'auto') {
       this.mapper.update();
       const input = this.mapper.getInputData();
-      const array = input && input.getPointData().getScalars();
+      const array = input && input.getPointData()?.getScalars();
       const dataRange = array && array.getRange();
       if (dataRange) {
         this.lookupTable.setMappingRange(...dataRange);
