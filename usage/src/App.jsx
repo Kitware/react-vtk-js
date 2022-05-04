@@ -17,6 +17,7 @@ const SyntheticVolumeRendering = lazy(() =>
 );
 const VolumeRendering = lazy(() => import('./Volume/VolumeRendering'));
 const DynamicUpdate = lazy(() => import('./Volume/DynamicUpdate'));
+const MultiView = lazy(() => import('./MultiView'));
 
 const demos = [
   'Geometry/Picking',
@@ -32,6 +33,7 @@ const demos = [
   'Volume/SyntheticVolumeRendering',
   'Volume/VolumeRendering',
   'Volume/DynamicUpdate',
+  'MultiView',
 ];
 
 function App() {
@@ -93,6 +95,7 @@ function App() {
           )}
           {example === 'Volume/VolumeRendering' && <VolumeRendering />}
           {example === 'Volume/DynamicUpdate' && <DynamicUpdate />}
+          {example === 'Multi' && <MultiView />}
         </Suspense>
       </div>
     </>
