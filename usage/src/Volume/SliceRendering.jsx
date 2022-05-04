@@ -116,8 +116,8 @@ function Example(props) {
   const [useLookupTableScalarRange, setUseLookupTableScalarRange] =
     useState(false);
   return (
-    <div style={{ width: '100vw', height: '100vh' }}>
-      <div style={{ width: '50vw', height: '100vh', display: 'inline-block' }}>
+    <div style={{ width: '100%', height: '100%' }}>
+      <div style={{ width: '50vw', height: '100%', display: 'inline-block' }}>
         <View
           id='0'
           cameraPosition={[1, 0, 0]}
@@ -213,7 +213,7 @@ function Example(props) {
           </SliceRepresentation>
         </View>
       </div>
-      <div style={{ width: '50vw', height: '100vh', display: 'inline-block' }}>
+      <div style={{ width: '50vw', height: '100%', display: 'inline-block' }}>
         <View
           id='0'
           background={[0, 0, 0]}

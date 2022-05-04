@@ -76,7 +76,7 @@ function Example(props) {
   const colorLevel = fieldIdx ? 5 : 0.5;
 
   return (
-    <div style={{ width: '100vw', height: '100vh' }}>
+    <div style={{ width: '100%', height: '100%' }}>
       <View id='0'>
         <Slider
           max={FIELDS.length - 1}
@@ -113,7 +113,7 @@ function Example(props) {
       >
         <View background={[1, 1, 1]} triggerRender={fieldIdx}>
           <SliceRepresentation
-            kSlice='5'
+            kSlice={5}
             property={{ colorWindow, colorLevel }}
           >
             <ShareDataSet />

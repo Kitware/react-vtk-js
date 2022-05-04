@@ -8,7 +8,7 @@ function Example(props) {
     array.push(Math.random());
   }
   return (
-    <div style={{ width: '100vw', height: '100vh' }}>
+    <div style={{ width: '100%', height: '100%' }}>
       <View id='0'>
         <VolumeDataRepresentation
           spacing={[1, 1, 1]}
