@@ -5,7 +5,7 @@ import vtkPointData from './PointData';
 import vtkPolyData from './PolyData';
 import vtkReader from './Reader';
 import vtkShareDataSet from './ShareDataSet';
-import vtkView from './View';
+import vtkView from './ViewContainer';
 import vtkGeometryRepresentation from './GeometryRepresentation';
 import vtkGeometry2DRepresentation from './Geometry2DRepresentation';
 import vtkGlyphRepresentation from './GlyphRepresentation';
@@ -15,6 +15,7 @@ import vtkFieldData from './FieldData';
 import vtkAlgorithm from './Algorithm';
 import vtkCalculator from './Calculator';
 import vtkCellData from './CellData';
+import vtkMultiViewRoot from './MultiViewRoot';
 
 export const VolumeRepresentation = vtkVolumeRepresentation;
 export const SliceRepresentation = vtkSliceRepresentation;
@@ -33,6 +34,7 @@ export const FieldData = vtkFieldData;
 export const Algorithm = vtkAlgorithm;
 export const Calculator = vtkCalculator;
 export const CellData = vtkCellData;
+export const MultiViewRoot = vtkMultiViewRoot;
 
 export default {
   VolumeRepresentation: vtkVolumeRepresentation,
@@ -52,4 +54,5 @@ export default {
   Algorithm: vtkAlgorithm,
   Calculator: vtkCalculator,
   CellData: vtkCellData,
+  MultiViewRoot: vtkMultiViewRoot,
 };

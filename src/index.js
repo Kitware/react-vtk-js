@@ -31,6 +31,7 @@ export const FieldData = Core.FieldData;
 export const Algorithm = Core.Algorithm;
 export const Calculator = Core.Calculator;
 export const CellData = Core.CellData;
+export const MultiViewRoot = Core.MultiViewRoot;
 
 // Representations
 export const PointCloudRepresentation =
