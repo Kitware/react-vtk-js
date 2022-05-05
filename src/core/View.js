@@ -215,7 +215,6 @@ export default class View extends Component {
     };
     this.onEnter = () => {
       this.hasFocus = true;
-      this.interactor.setCurrentRenderer(this.renderer);
     };
     this.onLeave = () => {
       this.hasFocus = false;

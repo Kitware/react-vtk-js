@@ -122,6 +122,7 @@ class ViewController extends Component {
     const container = view?.containerRef.current;
     if (this.props.root && container) {
       this.bindInteractorEvents(container);
+      this.interactor.setCurrentRenderer(this.renderer);
       this.interactor.setInteractorStyle(view.style);
     }
   }
