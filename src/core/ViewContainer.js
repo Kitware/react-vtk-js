@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import vtkOpenGLRenderWindow from '@kitware/vtk.js/Rendering/OpenGL/RenderWindow.js';
 import vtkRenderWindow from '@kitware/vtk.js/Rendering/Core/RenderWindow.js';
 import vtkRenderWindowInteractor from '@kitware/vtk.js/Rendering/Core/RenderWindowInteractor.js';
-import vtkInteractorStyleManipulator from '@kitware/vtk.js/Interaction/Style/InteractorStyleManipulator.js';
 import vtkRenderer from '@kitware/vtk.js/Rendering/Core/Renderer.js';
 
 import View from './View';
@@ -13,9 +12,8 @@ class ViewController extends Component {
   constructor(props) {
     super(props);
 
-    this.interactorStyle = vtkInteractorStyleManipulator.newInstance();
     this.renderer = vtkRenderer.newInstance();
-    this.containerRef = React.createRef();
+    this.viewRef = React.createRef();
 
     if (props.root) {
       this.renderWindow = props.root.renderWindow;
@@ -41,7 +39,8 @@ class ViewController extends Component {
   }
 
   componentDidMount() {
-    const container = this.containerRef.current;
+    const view = this.viewRef.current;
+    const container = view.containerRef.current;
     container.addEventListener('pointerenter', this.onEnter);
 
     if (!this.props.root) {
@@ -49,12 +48,13 @@ class ViewController extends Component {
       if (this.props.interactive) {
         this.interactor.bindEvents(container);
       }
-      this.interactor.setInteractorStyle(this.interactorStyle);
+      this.interactor.setInteractorStyle(view.style);
     }
   }
 
   componentWillUnmount() {
-    const container = this.containerRef.current;
+    const view = this.viewRef.current;
+    const container = view.containerRef.current;
     container.removeEventListener('pointerenter', this.onEnter);
 
     // MultiViewRoot parent may delete the render window first in WillUnmount.
@@ -80,10 +80,8 @@ class ViewController extends Component {
       this.openglRenderWindow.delete();
     }
 
-    this.interactorStyle.delete();
     this.renderer.delete();
 
-    this.interactorStyle = null;
     this.interactor = null;
     this.renderWindow = null;
     this.openglRenderWindow = null;
@@ -99,8 +97,7 @@ class ViewController extends Component {
         renderWindowView={this.openglRenderWindow}
         renderer={this.renderer}
         interactor={this.interactor}
-        interactorStyle={this.interactorStyle}
-        ref={this.containerRef}
+        ref={this.viewRef}
         onResize={this.onResize}
         {...filteredProps}
       />
@@ -120,15 +117,16 @@ class ViewController extends Component {
   }
 
   onEnter() {
-    const container = this.containerRef.current;
+    const view = this.viewRef.current;
+    const container = view?.containerRef.current;
     if (this.props.root && container) {
       this.bindInteractorEvents(container);
-      this.interactor.setInteractorStyle(this.interactorStyle);
+      this.interactor.setInteractorStyle(view.style);
     }
   }
 
   onResize() {
-    const container = this.containerRef.current;
+    const container = this.viewRef.current?.containerRef.current;
     if (container) {
       if (this.props.root) {
         const containerBox = container.getBoundingClientRect();

@@ -12,6 +12,7 @@ import vtkCubeAxesActor from '@kitware/vtk.js/Rendering/Core/CubeAxesActor.js';
 
 import vtkAxesActor from '@kitware/vtk.js/Rendering/Core/AxesActor';
 import vtkOrientationMarkerWidget from '@kitware/vtk.js/Interaction/Widgets/OrientationMarkerWidget';
+import vtkInteractorStyleManipulator from '@kitware/vtk.js/Interaction/Style/InteractorStyleManipulator.js';
 
 // Style modes
 import vtkMouseCameraTrackballMultiRotateManipulator from '@kitware/vtk.js/Interaction/Manipulators/MouseCameraTrackballMultiRotateManipulator.js';
@@ -120,7 +121,7 @@ const RENDERER_STYLE = {
  *   - `cameraParallelProjection`: false
  *   - `showOrientationAxes`: true
  */
-class View extends Component {
+export default class View extends Component {
   constructor(props) {
     super(props);
     this.containerRef = React.createRef();
@@ -134,7 +135,7 @@ class View extends Component {
 
     if (props.interactive) {
       this.interactor = props.interactor;
-      this.style = props.interactorStyle;
+      this.style = vtkInteractorStyleManipulator.newInstance();
     }
 
     // Create orientation widget
@@ -364,14 +365,14 @@ class View extends Component {
         onMouseUp={this.onMouseUp}
         onMouseMove={this.onMouseMove}
       >
-        <div style={RENDERER_STYLE} ref={this.props.containerRef} />
+        <div style={RENDERER_STYLE} ref={this.containerRef} />
         <ViewContext.Provider value={this}>{children}</ViewContext.Provider>
       </div>
     );
   }
 
   componentDidMount() {
-    const container = this.props.containerRef.current;
+    const container = this.containerRef.current;
     this.onResize();
     this.resizeObserver.observe(container);
     document.addEventListener('keyup', this.handleKey);
@@ -402,7 +403,7 @@ class View extends Component {
       this.subscriptions.pop().unsubscribe();
     }
 
-    const container = this.props.containerRef.current;
+    const container = this.containerRef.current;
     container.removeEventListener('mousedown', this.onMouseDown);
 
     document.removeEventListener('keyup', this.handleKey);
@@ -864,12 +865,3 @@ View.propTypes = {
    */
   showOrientationAxes: PropTypes.bool,
 };
-
-const ForwardedView = React.forwardRef((props, ref) => (
-  <View {...props} containerRef={ref} />
-));
-
-ForwardedView.defaultProps = View.defaultProps;
-ForwardedView.propTypes = View.propTypes;
-
-export default ForwardedView;

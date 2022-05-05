@@ -95,7 +95,7 @@ function App() {
           )}
           {example === 'Volume/VolumeRendering' && <VolumeRendering />}
           {example === 'Volume/DynamicUpdate' && <DynamicUpdate />}
-          {example === 'Multi' && <MultiView />}
+          {example === 'MultiView' && <MultiView />}
         </Suspense>
       </div>
     </>
