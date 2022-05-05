@@ -152,7 +152,7 @@ export default class MultiViewRoot extends Component {
 
 MultiViewRoot.defaultProps = {
   triggerRender: 0,
-  disableRoot: false,
+  disabled: false,
 };
 
 export const propTypes = {
@@ -169,7 +169,7 @@ export const propTypes = {
   /**
    * Disables or enables the multi-renderer root.
    */
-  disableRoot: PropTypes.bool,
+  disabled: PropTypes.bool,
 
   /**
    * List of representation to show
