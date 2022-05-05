@@ -1,0 +1,1 @@
+import"./vendor.6bdb1e91.js";import{V as r,l as i}from"./index.b36608c5.js";import{a as e}from"./index.6fba4bcd.js";function l(s){const a=[];for(;a.length<1e3;)a.push(Math.random());return e("div",{style:{width:"100%",height:"100%"},children:e(r,{id:"0",children:e(i,{spacing:[1,1,1],dimensions:[10,10,10],origin:[0,0,0],scalars:a,rescaleColorMap:!1})})})}export{l as default};
