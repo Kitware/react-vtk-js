@@ -133,11 +133,9 @@ export default class View extends Component {
 
     this.openglRenderWindow = props.renderWindowView;
 
-    if (props.interactive) {
-      this.interactor = props.interactor;
-      this.defaultStyle = vtkInteractorStyleManipulator.newInstance();
-      this.style = this.defaultStyle;
-    }
+    this.interactor = props.interactor;
+    this.defaultStyle = vtkInteractorStyleManipulator.newInstance();
+    this.style = props.interactive ? this.defaultStyle : null;
 
     // Create orientation widget
     this.axesActor = vtkAxesActor.newInstance();
@@ -194,8 +192,10 @@ export default class View extends Component {
     this.debouncedCubeBounds = debounce(this.updateCubeBounds, 50);
 
     this.setInteractorStyle = (style) => {
-      this.style = style;
-      this.interactor.setInteractorStyle(style);
+      if (this.props.interactive) {
+        this.style = style;
+        this.interactor.setInteractorStyle(style);
+      }
     };
 
     // Internal functions
