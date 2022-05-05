@@ -22,6 +22,7 @@ class ViewController extends Component {
     } else {
       this.renderWindow = vtkRenderWindow.newInstance();
       this.openglRenderWindow = vtkOpenGLRenderWindow.newInstance();
+      this.interactor = vtkRenderWindowInteractor.newInstance();
     }
 
     this.onEnter = this.onEnter.bind(this);
@@ -32,7 +33,6 @@ class ViewController extends Component {
     if (!this.props.root) {
       this.renderWindow.addView(this.openglRenderWindow);
 
-      this.interactor = vtkRenderWindowInteractor.newInstance();
       if (this.props.interactive) {
         this.interactor.setView(this.openglRenderWindow);
         this.interactor.initialize();
