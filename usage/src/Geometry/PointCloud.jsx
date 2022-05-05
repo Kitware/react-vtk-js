@@ -14,7 +14,7 @@ for (let i = 0; i < 1000; i++) {
 // React complains about unique key prop but I don't see why
 function Example(props) {
   return (
-    <div style={{ width: '100vw', height: '100vh' }}>
+    <div style={{ width: '100%', height: '100%' }}>
       <View>
         <PointCloudRepresentation
           property={{ pointSize: 10 }}

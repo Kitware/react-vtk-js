@@ -7,17 +7,12 @@ import PropTypes from 'prop-types';
 
 import { debounce } from '@kitware/vtk.js/macros.js';
 
-import vtkOpenGLRenderWindow from '@kitware/vtk.js/Rendering/OpenGL/RenderWindow.js';
-import vtkRenderWindow from '@kitware/vtk.js/Rendering/Core/RenderWindow.js';
-import vtkRenderWindowInteractor from '@kitware/vtk.js/Rendering/Core/RenderWindowInteractor.js';
-import vtkRenderer from '@kitware/vtk.js/Rendering/Core/Renderer.js';
-import vtkInteractorStyleManipulator from '@kitware/vtk.js/Interaction/Style/InteractorStyleManipulator.js';
-
 import vtkBoundingBox from '@kitware/vtk.js/Common/DataModel/BoundingBox.js';
 import vtkCubeAxesActor from '@kitware/vtk.js/Rendering/Core/CubeAxesActor.js';
 
 import vtkAxesActor from '@kitware/vtk.js/Rendering/Core/AxesActor';
 import vtkOrientationMarkerWidget from '@kitware/vtk.js/Interaction/Widgets/OrientationMarkerWidget';
+import vtkInteractorStyleManipulator from '@kitware/vtk.js/Interaction/Style/InteractorStyleManipulator.js';
 
 // Style modes
 import vtkMouseCameraTrackballMultiRotateManipulator from '@kitware/vtk.js/Interaction/Manipulators/MouseCameraTrackballMultiRotateManipulator.js';
@@ -132,22 +127,16 @@ export default class View extends Component {
     this.containerRef = React.createRef();
 
     // Create vtk.js view
-    this.renderWindow = vtkRenderWindow.newInstance();
-    this.renderer = vtkRenderer.newInstance();
-    this.renderWindow.addRenderer(this.renderer);
+    this.renderWindow = props.renderWindow;
+    this.renderer = props.renderer;
     this.camera = this.renderer.getActiveCamera();
 
-    this.openglRenderWindow = vtkOpenGLRenderWindow.newInstance();
-    this.renderWindow.addView(this.openglRenderWindow);
+    this.openglRenderWindow = props.renderWindowView;
 
     if (props.interactive) {
-      this.interactor = vtkRenderWindowInteractor.newInstance();
-      this.interactor.setView(this.openglRenderWindow);
-      this.interactor.initialize();
-
-      // Interactor style
-      this.style = vtkInteractorStyleManipulator.newInstance();
-      this.interactor.setInteractorStyle(this.style);
+      this.interactor = props.interactor;
+      this.defaultStyle = vtkInteractorStyleManipulator.newInstance();
+      this.style = this.defaultStyle;
     }
 
     // Create orientation widget
@@ -155,8 +144,8 @@ export default class View extends Component {
     this.orientationWidget = vtkOrientationMarkerWidget.newInstance({
       actor: this.axesActor,
       interactor: this.interactor,
+      parentRenderer: this.renderer,
     });
-    this.orientationWidget.setEnabled(true);
     this.orientationWidget.setViewportCorner(
       vtkOrientationMarkerWidget.Corners.BOTTOM_LEFT
     );
@@ -203,6 +192,11 @@ export default class View extends Component {
       this.cubeAxes.setDataBounds(bbox.getBounds());
     };
     this.debouncedCubeBounds = debounce(this.updateCubeBounds, 50);
+
+    this.setInteractorStyle = (style) => {
+      this.style = style;
+      this.interactor.setInteractorStyle(style);
+    };
 
     // Internal functions
     this.hasFocus = false;
@@ -345,7 +339,7 @@ export default class View extends Component {
   }
 
   getScreenEventPositionFor(source) {
-    const bounds = this.containerRef.current.getBoundingClientRect();
+    const bounds = this.openglRenderWindow.getCanvas().getBoundingClientRect();
     const [canvasWidth, canvasHeight] = this.openglRenderWindow.getSize();
     const scaleX = canvasWidth / bounds.width;
     const scaleY = canvasHeight / bounds.height;
@@ -355,6 +349,10 @@ export default class View extends Component {
       z: 0,
     };
     return position;
+  }
+
+  onResize() {
+    this.props.onResize();
   }
 
   render() {
@@ -373,35 +371,22 @@ export default class View extends Component {
         onMouseMove={this.onMouseMove}
       >
         <div style={RENDERER_STYLE} ref={this.containerRef} />
-        <div>
-          <ViewContext.Provider value={this}>{children}</ViewContext.Provider>
-        </div>
+        <ViewContext.Provider value={this}>{children}</ViewContext.Provider>
       </div>
     );
   }
 
-  onResize() {
-    const container = this.containerRef.current;
-    if (container) {
-      const devicePixelRatio = window.devicePixelRatio || 1;
-      const { width, height } = container.getBoundingClientRect();
-      const w = Math.floor(width * devicePixelRatio);
-      const h = Math.floor(height * devicePixelRatio);
-      this.openglRenderWindow.setSize(Math.max(w, 10), Math.max(h, 10));
-      this.renderWindow.render();
-    }
-  }
-
   componentDidMount() {
     const container = this.containerRef.current;
-    this.openglRenderWindow.setContainer(container);
-    if (this.props.interactive) {
-      this.interactor.bindEvents(container);
-    }
     this.onResize();
     this.resizeObserver.observe(container);
-    this.update(this.props);
     document.addEventListener('keyup', this.handleKey);
+
+    // Assign the mouseDown event, we can't use the React event system
+    // because the mouseDown event is swallowed by other logic
+    container.addEventListener('mousedown', this.onMouseDown);
+
+    this.update(this.props);
     this.resetCamera();
 
     // Give a chance for the first layout to properly reset the camera
@@ -423,34 +408,23 @@ export default class View extends Component {
       this.subscriptions.pop().unsubscribe();
     }
 
+    const container = this.containerRef.current;
+    container.removeEventListener('mousedown', this.onMouseDown);
+
     document.removeEventListener('keyup', this.handleKey);
     // Stop size listening
     this.resizeObserver.disconnect();
     this.resizeObserver = null;
 
-    // Detatch from DOM
-    if (this.interactor) {
-      this.interactor.unbindEvents();
-    }
-    this.openglRenderWindow.setContainer(null);
+    this.selector.delete();
+    this.orientationWidget.delete();
+    this.defaultStyle.delete();
 
-    // Free memory
-    this.renderWindow.removeRenderer(this.renderer);
-    this.renderWindow.removeView(this.openglRenderWindow);
-
-    if (this.interactor) {
-      this.interactor.delete();
-      this.interactor = null;
-    }
-
-    this.renderer.delete();
+    this.defaultStyle = null;
+    this.style = null;
     this.renderer = null;
-
-    this.renderWindow.delete();
-    this.renderWindow = null;
-
-    this.openglRenderWindow.delete();
-    this.openglRenderWindow = null;
+    this.selector = null;
+    this.orientationWidget = null;
   }
 
   update(props, previous) {
@@ -527,11 +501,6 @@ export default class View extends Component {
     if (previous && triggerResetCamera !== previous.triggerResetCamera) {
       this.resetCameraTimeout = setTimeout(this.resetCamera, 0);
     }
-
-    // Assign the mouseDown event, we can't use the React event system
-    // because the mouseDown event is swallowed by other logic
-    const canvas = this.openglRenderWindow.getCanvas();
-    canvas.addEventListener('mousedown', this.onMouseDown);
   }
 
   resetCamera() {

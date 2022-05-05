@@ -31,7 +31,7 @@ function Slider(props) {
 function Example(props) {
   const [scaleFactor, setScaleFactor] = useState(0);
   return (
-    <div style={{ width: '100vw', height: '100vh' }}>
+    <div style={{ width: '100%', height: '100%' }}>
       <View showCubeAxes>
         <Slider value={scaleFactor} setValue={setScaleFactor} />
         <GeometryRepresentation
