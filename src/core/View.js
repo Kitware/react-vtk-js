@@ -135,7 +135,8 @@ export default class View extends Component {
 
     if (props.interactive) {
       this.interactor = props.interactor;
-      this.style = vtkInteractorStyleManipulator.newInstance();
+      this.defaultStyle = vtkInteractorStyleManipulator.newInstance();
+      this.style = this.defaultStyle;
     }
 
     // Create orientation widget
@@ -191,6 +192,11 @@ export default class View extends Component {
       this.cubeAxes.setDataBounds(bbox.getBounds());
     };
     this.debouncedCubeBounds = debounce(this.updateCubeBounds, 50);
+
+    this.setInteractorStyle = (style) => {
+      this.style = style;
+      this.interactor.setInteractorStyle(style);
+    };
 
     // Internal functions
     this.hasFocus = false;
@@ -413,7 +419,10 @@ export default class View extends Component {
 
     this.selector.delete();
     this.orientationWidget.delete();
+    this.defaultStyle.delete();
 
+    this.defaultStyle = null;
+    this.style = null;
     this.renderer = null;
     this.selector = null;
     this.orientationWidget = null;
