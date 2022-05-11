@@ -14,6 +14,7 @@ class ViewController extends Component {
 
     this.renderer = vtkRenderer.newInstance();
     this.viewRef = React.createRef();
+    this.resizeObserver = new ResizeObserver(() => this.onResize());
 
     if (props.root) {
       this.renderWindow = props.root.renderWindow;
@@ -41,15 +42,21 @@ class ViewController extends Component {
     this.renderWindow.addRenderer(this.renderer);
 
     const view = this.viewRef.current;
-    const container = view.containerRef.current;
-    container.addEventListener('pointerenter', this.onEnter);
-
-    if (!this.props.root) {
-      this.openglRenderWindow.setContainer(container);
-      if (this.props.interactive) {
-        this.interactor.bindEvents(container);
+    const container = view?.containerRef.current;
+    if (view && container) {
+      container.addEventListener('pointerenter', this.onEnter);
+      if (this.props.root) {
+        this.props.root.observeRendererResize(container, this.renderer);
+      } else {
+        this.resizeObserver.observe(container);
+        this.openglRenderWindow.setContainer(container);
+        if (this.props.interactive) {
+          this.interactor.bindEvents(container);
+        }
+        this.interactor.setInteractorStyle(view.style);
+        // initial resize
+        this.onResize();
       }
-      this.interactor.setInteractorStyle(view.style);
     }
   }
 
@@ -57,6 +64,11 @@ class ViewController extends Component {
     const view = this.viewRef.current;
     const container = view.containerRef.current;
     container.removeEventListener('pointerenter', this.onEnter);
+
+    this.resizeObserver.disconnect();
+    if (this.props.root) {
+      this.props.root.unobserveRendererResize(container);
+    }
 
     // MultiViewRoot parent may delete the render window first in WillUnmount.
     if (!this.renderWindow.isDeleted()) {
@@ -99,7 +111,6 @@ class ViewController extends Component {
         renderer={this.renderer}
         interactor={this.interactor}
         ref={this.viewRef}
-        onResize={this.onResize}
         {...filteredProps}
       />
     );
@@ -129,31 +140,13 @@ class ViewController extends Component {
 
   onResize() {
     const container = this.viewRef.current?.containerRef.current;
-    if (container) {
-      if (this.props.root) {
-        const containerBox = container.getBoundingClientRect();
-        const canvasBox = this.openglRenderWindow
-          .getCanvas()
-          .getBoundingClientRect();
-
-        // relative to canvas
-        const top = containerBox.top - canvasBox.top;
-        const left = containerBox.left - canvasBox.left;
-
-        const xmin = left / canvasBox.width;
-        const xmax = (left + containerBox.width) / canvasBox.width;
-        const ymin = 1 - (top + containerBox.height) / canvasBox.height;
-        const ymax = 1 - top / canvasBox.height;
-
-        this.renderer.setViewport(xmin, ymin, xmax, ymax);
-      } else {
-        const devicePixelRatio = window.devicePixelRatio || 1;
-        const { width, height } = container.getBoundingClientRect();
-        const w = Math.floor(width * devicePixelRatio);
-        const h = Math.floor(height * devicePixelRatio);
-        this.openglRenderWindow.setSize(Math.max(w, 10), Math.max(h, 10));
-        this.renderWindow.render();
-      }
+    if (container && !this.props.root) {
+      const devicePixelRatio = window.devicePixelRatio || 1;
+      const { width, height } = container.getBoundingClientRect();
+      const w = Math.floor(width * devicePixelRatio);
+      const h = Math.floor(height * devicePixelRatio);
+      this.openglRenderWindow.setSize(Math.max(w, 10), Math.max(h, 10));
+      this.renderWindow.render();
     }
   }
 }
