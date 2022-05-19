@@ -36,6 +36,7 @@ export default class MultiViewRoot extends Component {
   constructor(props) {
     super(props);
     this.containerRef = React.createRef();
+    this.containerToRenderer = new Map();
 
     // Create vtk.js view
     this.renderWindow = vtkRenderWindow.newInstance();
@@ -45,7 +46,7 @@ export default class MultiViewRoot extends Component {
     this.renderWindow.addView(this.renderWindowView);
 
     this.resizeObserver = new ResizeObserver((entries) => {
-      this.onResize();
+      this.onResize(entries);
     });
 
     this.interactor = vtkRenderWindowInteractor.newInstance();
@@ -65,7 +66,7 @@ export default class MultiViewRoot extends Component {
       this.interactor.initialize();
 
       this.resizeObserver.observe(container);
-      this.onResize();
+      this.resizeRootContainer();
 
       this.initialized = true;
 
@@ -129,16 +130,56 @@ export default class MultiViewRoot extends Component {
     }
   }
 
-  onResize() {
-    const container = this.containerRef.current;
-    if (container) {
+  observeRendererResize(container, renderer) {
+    if (!this.containerToRenderer.has(container)) {
+      this.containerToRenderer.set(container, renderer);
+      this.resizeObserver.observe(container);
+    }
+  }
+
+  unobserveRendererResize(container) {
+    this.containerToRenderer.delete(container);
+    this.resizeObserver.unobserve(container);
+  }
+
+  resizeRootContainer() {
+    const rootContainer = this.containerRef.current;
+    // resize the render window
+    if (rootContainer) {
       const devicePixelRatio = window.devicePixelRatio || 1;
-      const { width, height } = container.getBoundingClientRect();
+      const { width, height } = rootContainer.getBoundingClientRect();
       const w = Math.floor(width * devicePixelRatio);
       const h = Math.floor(height * devicePixelRatio);
       this.renderWindowView.setSize(Math.max(w, 10), Math.max(h, 10));
-      this.renderWindow.render();
     }
+  }
+
+  onResize(entries) {
+    entries.forEach((entry) => {
+      const rootContainer = this.containerRef.current;
+      if (entry.target === rootContainer) {
+        this.resizeRootContainer();
+      } else if (this.containerToRenderer.has(entry.target)) {
+        // update that renderer's viewport
+        const renderer = this.containerToRenderer.get(entry.target);
+        const containerBox = entry.target.getBoundingClientRect();
+        const canvasBox = this.renderWindowView
+          .getCanvas()
+          .getBoundingClientRect();
+
+        // relative to canvas
+        const top = containerBox.top - canvasBox.top;
+        const left = containerBox.left - canvasBox.left;
+
+        const xmin = left / canvasBox.width;
+        const xmax = (left + containerBox.width) / canvasBox.width;
+        const ymin = 1 - (top + containerBox.height) / canvasBox.height;
+        const ymax = 1 - top / canvasBox.height;
+
+        renderer.setViewport(xmin, ymin, xmax, ymax);
+      }
+    });
+    this.renderWindow.render();
   }
 
   update(props, previous) {

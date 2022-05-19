@@ -160,9 +160,6 @@ export default class View extends Component {
     );
     this.selector.attach(this.openglRenderWindow, this.renderer);
 
-    // Resize handling
-    this.resizeObserver = new ResizeObserver(() => this.onResize());
-
     // expose helper methods
     this.renderView = () => {
       this.updateCubeBounds();
@@ -351,10 +348,6 @@ export default class View extends Component {
     return position;
   }
 
-  onResize() {
-    this.props.onResize();
-  }
-
   render() {
     const { id, children, style, className } = this.props;
 
@@ -378,8 +371,6 @@ export default class View extends Component {
 
   componentDidMount() {
     const container = this.containerRef.current;
-    this.onResize();
-    this.resizeObserver.observe(container);
     document.addEventListener('keyup', this.handleKey);
 
     // Assign the mouseDown event, we can't use the React event system
@@ -412,9 +403,6 @@ export default class View extends Component {
     container.removeEventListener('mousedown', this.onMouseDown);
 
     document.removeEventListener('keyup', this.handleKey);
-    // Stop size listening
-    this.resizeObserver.disconnect();
-    this.resizeObserver = null;
 
     this.selector.delete();
     this.orientationWidget.delete();
