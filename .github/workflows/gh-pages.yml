@@ -21,6 +21,8 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
+      - name: Build Docs
+        run: cd ./usage && npm ci && npm run build
       - name: Publish docs
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.ref == 'refs/heads/master' }}
