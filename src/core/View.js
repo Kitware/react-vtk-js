@@ -422,7 +422,9 @@ export default class View extends Component {
       interactive,
       cameraPosition,
       cameraViewUp,
+      cameraFocalPoint,
       cameraParallelProjection,
+      autoResetCamera,
       triggerRender,
       triggerResetCamera,
       showCubeAxes,
@@ -446,23 +448,31 @@ export default class View extends Component {
     ) {
       const camera = this.renderer.getActiveCamera();
       camera.setParallelProjection(cameraParallelProjection);
-      if (previous) {
+      if (previous && autoResetCamera) {
         this.resetCamera();
       }
     }
     if (
-      cameraPosition &&
-      (!previous ||
-        JSON.stringify(cameraPosition) !==
-          JSON.stringify(previous.cameraPosition))
+      (cameraPosition &&
+        (!previous ||
+          JSON.stringify(cameraPosition) !==
+            JSON.stringify(previous.cameraPosition))) ||
+      (cameraViewUp &&
+        (!previous ||
+          JSON.stringify(cameraViewUp) !==
+            JSON.stringify(previous.cameraViewUp))) ||
+      (cameraFocalPoint &&
+        (!previous ||
+          JSON.stringify(cameraFocalPoint) !==
+            JSON.stringify(previous.cameraFocalPoint)))
     ) {
       const camera = this.renderer.getActiveCamera();
       camera.set({
         position: cameraPosition,
         viewUp: cameraViewUp,
-        focalPoint: [0, 0, 0],
+        focalPoint: cameraFocalPoint,
       });
-      if (previous) {
+      if (previous && autoResetCamera) {
         this.resetCamera();
       }
     }
@@ -662,6 +672,8 @@ View.defaultProps = {
   background: [0.2, 0.3, 0.4],
   cameraPosition: [0, 0, 1],
   cameraViewUp: [0, 1, 0],
+  cameraFocalPoint: [0, 0, 0],
+  autoResetCamera: true,
   cameraParallelProjection: false,
   triggerRender: 0,
   triggerResetCamera: 0,
@@ -746,6 +758,11 @@ View.propTypes = {
   cameraPosition: PropTypes.array,
 
   /**
+   * Initial camera focal point from an object in [0,0,0]
+   */
+  cameraFocalPoint: PropTypes.array,
+
+  /**
    * Initial camera position from an object in [0,0,0]
    */
   cameraViewUp: PropTypes.array,
@@ -754,6 +771,15 @@ View.propTypes = {
    * Use parallel projection (default: false)
    */
   cameraParallelProjection: PropTypes.bool,
+
+  /**
+   * Whether to automatically call resetCamera() (default: true)
+   *
+   * When set to false, the user must explicitly provide camera
+   * properties. Note that the initial resetCamera() call will
+   * still occur upon component mount.
+   */
+  autoResetCamera: PropTypes.bool,
 
   /**
    * Property use to trigger a render when changing.
