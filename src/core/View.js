@@ -375,7 +375,7 @@ export default class View extends Component {
 
     // Assign the mouseDown event, we can't use the React event system
     // because the mouseDown event is swallowed by other logic
-    container.addEventListener('mousedown', this.onMouseDown, true);
+    container.addEventListener('mousedown', this.onMouseDown);
 
     this.update(this.props);
     this.resetCamera();
