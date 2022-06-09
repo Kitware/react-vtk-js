@@ -28,7 +28,7 @@
     "dev": "rollup ./src/index.js -c --watch"
   },
   "peerDependencies": {
-    "@kitware/vtk.js": "^24.7.1",
+    "@kitware/vtk.js": "^24.17.0",
     "react": "^16.0.0"
   },
   "devDependencies": {
@@ -36,7 +36,7 @@
     "@babel/plugin-transform-runtime": "^7.12.10",
     "@babel/preset-env": "^7.12.11",
     "@babel/preset-react": "^7.12.10",
-    "@kitware/vtk.js": "^24.7.1",
+    "@kitware/vtk.js": "^24.17.0",
     "@rollup/plugin-babel": "^5.2.2",
     "@rollup/plugin-commonjs": "17.0.0",
     "@rollup/plugin-eslint": "^8.0.1",
