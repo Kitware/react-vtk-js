@@ -184,7 +184,9 @@ export default class View extends Component {
           bbox.addBounds(...prop.getBounds());
         }
       }
-      this.cubeAxes.setDataBounds(bbox.getBounds());
+      if (this.cubeAxes) {
+        this.cubeAxes.setDataBounds(bbox.getBounds());
+      }
     };
     this.debouncedCubeBounds = debounce(this.updateCubeBounds, 50);
 
