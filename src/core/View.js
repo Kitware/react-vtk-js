@@ -184,7 +184,9 @@ export default class View extends Component {
           bbox.addBounds(...prop.getBounds());
         }
       }
-      this.cubeAxes.setDataBounds(bbox.getBounds());
+      if (this.cubeAxes) {
+        this.cubeAxes.setDataBounds(bbox.getBounds());
+      }
     };
     this.debouncedCubeBounds = debounce(this.updateCubeBounds, 50);
 
@@ -311,15 +313,9 @@ export default class View extends Component {
     this.onBoxSelectChange = select;
 
     // Cube Axes
-    this.cubeAxes = vtkCubeAxesActor.newInstance({
-      visibility: false,
-      dataBounds: [-1, 1, -1, 1, -1, 1],
-    });
-    Array.from(this.cubeAxes.getActors()).forEach(({ setVisibility }) =>
-      setVisibility(false)
-    );
-    this.cubeAxes.setCamera(this.camera);
-    this.renderer.addActor(this.cubeAxes);
+    if (this.props.showCubeAxes) {
+      this.initCubeAxes();
+    }
 
     this.subscriptions = [];
     this.subscriptions.push(
@@ -329,6 +325,18 @@ export default class View extends Component {
         }
       })
     );
+  }
+
+  initCubeAxes() {
+    this.cubeAxes = vtkCubeAxesActor.newInstance({
+      visibility: false,
+      dataBounds: [-1, 1, -1, 1, -1, 1],
+    });
+    Array.from(this.cubeAxes.getActors()).forEach(({ setVisibility }) =>
+      setVisibility(false)
+    );
+    this.cubeAxes.setCamera(this.camera);
+    this.renderer.addActor(this.cubeAxes);
   }
 
   getPointerSizeTolerance() {
@@ -467,15 +475,21 @@ export default class View extends Component {
       }
     }
 
-    if (this.cubeAxes.setVisibility(showCubeAxes)) {
-      Array.from(this.cubeAxes.getActors()).forEach(({ setVisibility }) =>
-        setVisibility(showCubeAxes)
-      );
-      this.renderView();
-    }
+    if (this.props.showCubeAxes) {
+      if (this.cubeAxes == null) {
+        this.initCubeAxes();
+      }
 
-    if (this.cubeAxes.set(cubeAxesStyle || {})) {
-      this.renderView();
+      if (this.cubeAxes.setVisibility(showCubeAxes)) {
+        Array.from(this.cubeAxes.getActors()).forEach(({ setVisibility }) =>
+          setVisibility(showCubeAxes)
+        );
+        this.renderView();
+      }
+
+      if (this.cubeAxes.set(cubeAxesStyle || {})) {
+        this.renderView();
+      }
     }
 
     if (showOrientationAxes !== this.orientationWidget.getEnabled()) {
