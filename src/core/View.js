@@ -392,11 +392,6 @@ export default class View extends Component {
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     this.update(this.props, prevProps);
-
-    // Cube Axes
-    if (this.props.showCubeAxes && this.cubeAxes == null) {
-      this.initCubeAxes();
-    }
   }
 
   componentWillUnmount() {
@@ -479,6 +474,10 @@ export default class View extends Component {
     }
 
     if (this.props.showCubeAxes) {
+      if (this.cubeAxes == null) {
+        this.initCubeAxes();
+      }
+
       if (this.cubeAxes.setVisibility(showCubeAxes)) {
         Array.from(this.cubeAxes.getActors()).forEach(({ setVisibility }) =>
           setVisibility(showCubeAxes)
