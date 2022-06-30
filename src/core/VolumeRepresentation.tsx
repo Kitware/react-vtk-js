@@ -1,23 +1,50 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext, DownstreamContext } from './View';
 import { smartEqualsShallow } from '../utils';
 
-import vtkImageSlice from '@kitware/vtk.js/Rendering/Core/ImageSlice.js';
-import vtkImageMapper from '@kitware/vtk.js/Rendering/Core/ImageMapper.js';
+import vtkVolume from '@kitware/vtk.js/Rendering/Core/Volume.js';
+import vtkVolumeMapper from '@kitware/vtk.js/Rendering/Core/VolumeMapper.js';
 import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps.js';
 import vtkColorTransferFunction from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction.js';
 import vtkPiecewiseFunction from '@kitware/vtk.js/Common/DataModel/PiecewiseFunction.js';
 
+interface VolumeRepresentationProps {
+  /**
+   * The ID used to identify this component.
+   */
+  id?: string;
+  /**
+   * Properties to set to the mapper
+   */
+  mapper?: object;
+  /**
+   * Properties to set to the volume
+   */
+  volume?: object;
+  /**
+   * Properties to set to the volume.property
+   */
+  property?: object;
+  /**
+   * Preset name for the lookup table color map
+   */
+  colorMapPreset?: string;
+  /**
+   * Data range use for the colorMap
+   */
+  colorDataRange?: number[] | string;
+  children?: React.ReactNode[] | React.ReactNode;
+}
+
 /**
- * SliceRepresentation is responsible to convert a vtkPolyData into rendering
+ * VolumeRepresentation is responsible to convert a vtkPolyData into rendering
  * It takes the following set of properties:
  *   - colorBy: ['POINTS', ''],
  *   - pointSize: 1,
  *   - color: [1,1,1],
  */
-export default class SliceRepresentation extends Component {
+export default class VolumeRepresentation extends Component<VolumeRepresentationProps> {
   constructor(props) {
     super(props);
 
@@ -27,18 +54,14 @@ export default class SliceRepresentation extends Component {
 
     // Create vtk.js objects
     this.lookupTable = vtkColorTransferFunction.newInstance();
-    const preset = vtkColorMaps.getPresetByName(
-      this.props.colorMapPreset ?? 'Grayscale'
-    );
-    this.lookupTable.applyColorMap(preset);
     this.piecewiseFunction = vtkPiecewiseFunction.newInstance();
-    this.actor = vtkImageSlice.newInstance({ visibility: false });
-    this.mapper = vtkImageMapper.newInstance();
-    this.actor.setMapper(this.mapper);
+    this.volume = vtkVolume.newInstance({ visibility: false });
+    this.mapper = vtkVolumeMapper.newInstance();
+    this.volume.setMapper(this.mapper);
 
-    this.actor.getProperty().setRGBTransferFunction(0, this.lookupTable);
-    // this.actor.getProperty().setScalarOpacity(0, this.piecewiseFunction);
-    this.actor.getProperty().setInterpolationTypeToLinear();
+    this.volume.getProperty().setRGBTransferFunction(0, this.lookupTable);
+    this.volume.getProperty().setScalarOpacity(0, this.piecewiseFunction);
+    this.volume.getProperty().setInterpolationTypeToLinear();
   }
 
   render() {
@@ -46,7 +69,7 @@ export default class SliceRepresentation extends Component {
       <ViewContext.Consumer>
         {(view) => {
           if (!this.view) {
-            view.renderer.addActor(this.actor);
+            view.renderer.addVolume(this.volume);
             this.view = view;
           }
           return (
@@ -73,37 +96,26 @@ export default class SliceRepresentation extends Component {
 
   componentWillUnmount() {
     if (this.view && this.view.renderer) {
-      this.view.renderer.removeActor(this.actor);
+      this.view.renderer.removeVolume(this.volume);
+      this.view = null;
     }
 
-    this.actor.delete();
-    this.actor = null;
+    this.volume.delete();
+    this.volume = null;
 
     this.mapper.delete();
     this.mapper = null;
   }
 
   update(props, previous) {
-    const {
-      actor,
-      property,
-      mapper,
-      colorMapPreset,
-      colorDataRange,
-      iSlice,
-      jSlice,
-      kSlice,
-      xSlice,
-      ySlice,
-      zSlice,
-    } = props;
+    const { volume, property, mapper, colorMapPreset, colorDataRange } = props;
     let changed = false;
 
-    if (actor && (!previous || actor !== previous.actor)) {
-      changed = this.actor.set(actor) || changed;
+    if (volume && (!previous || volume !== previous.volume)) {
+      changed = this.volume.set(volume) || changed;
     }
     if (property && (!previous || property !== previous.property)) {
-      changed = this.actor.getProperty().set(property) || changed;
+      changed = this.volume.getProperty().set(property) || changed;
     }
     if (mapper && (!previous || mapper !== previous.mapper)) {
       changed = this.mapper.set(mapper) || changed;
@@ -115,6 +127,8 @@ export default class SliceRepresentation extends Component {
       changed = true;
       const preset = vtkColorMaps.getPresetByName(colorMapPreset);
       this.lookupTable.applyColorMap(preset);
+      this.lookupTable.setMappingRange(...colorDataRange);
+      this.lookupTable.updateRange();
     }
 
     if (
@@ -146,32 +160,11 @@ export default class SliceRepresentation extends Component {
       }
     }
 
-    // ijk
-    if (iSlice != null && (!previous || iSlice !== previous.iSlice)) {
-      changed = this.mapper.setISlice(iSlice) || changed;
-    }
-    if (jSlice != null && (!previous || jSlice !== previous.jSlice)) {
-      changed = this.mapper.setJSlice(jSlice) || changed;
-    }
-    if (kSlice != null && (!previous || kSlice !== previous.kSlice)) {
-      changed = this.mapper.setKSlice(kSlice) || changed;
-    }
-    // xyz
-    if (xSlice != null && (!previous || xSlice !== previous.xSlice)) {
-      changed = this.mapper.setXSlice(xSlice) || changed;
-    }
-    if (ySlice != null && (!previous || ySlice !== previous.ySlice)) {
-      changed = this.mapper.setYSlice(ySlice) || changed;
-    }
-    if (zSlice != null && (!previous || zSlice !== previous.zSlice)) {
-      changed = this.mapper.setZSlice(zSlice) || changed;
-    }
-
     // actor visibility
-    if (actor && actor.visibility !== undefined) {
-      this.currentVisibility = actor.visibility;
+    if (volume && volume.visibility !== undefined) {
+      this.currentVisibility = volume.visibility;
       changed =
-        this.actor.setVisibility(this.currentVisibility && this.validData) ||
+        this.volume.setVisibility(this.currentVisibility && this.validData) ||
         changed;
     }
 
@@ -184,7 +177,7 @@ export default class SliceRepresentation extends Component {
   dataAvailable() {
     if (!this.validData) {
       this.validData = true;
-      this.actor.setVisibility(this.currentVisibility);
+      this.volume.setVisibility(this.currentVisibility);
 
       // trigger render
       this.dataChanged();
@@ -195,7 +188,7 @@ export default class SliceRepresentation extends Component {
     if (this.props.colorDataRange === 'auto') {
       this.mapper.update();
       const input = this.mapper.getInputData();
-      const array = input && input.getPointData()?.getScalars();
+      const array = input && input.getPointData().getScalars();
       const dataRange = array && array.getRange();
       if (dataRange) {
         this.lookupTable.setMappingRange(...dataRange);
@@ -213,77 +206,7 @@ export default class SliceRepresentation extends Component {
   }
 }
 
-SliceRepresentation.defaultProps = {
-  colorMapPreset: 'Grayscale',
+VolumeRepresentation.defaultProps = {
+  colorMapPreset: 'erdc_rainbow_bright',
   colorDataRange: 'auto',
-};
-
-SliceRepresentation.propTypes = {
-  /**
-   * The ID used to identify this component.
-   */
-  id: PropTypes.string,
-
-  /**
-   * Properties to set to the mapper
-   */
-  mapper: PropTypes.object,
-
-  /**
-   * Properties to set to the slice/actor
-   */
-  actor: PropTypes.object,
-
-  /**
-   * Properties to set to the volume.property
-   */
-  property: PropTypes.object,
-
-  /**
-   * Preset name for the lookup table color map
-   */
-  colorMapPreset: PropTypes.string,
-
-  /**
-   * Data range use for the colorMap
-   */
-  colorDataRange: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.number),
-    PropTypes.string,
-  ]),
-
-  /**
-   * index of the slice along i
-   */
-  iSlice: PropTypes.number,
-
-  /**
-   * index of the slice along j
-   */
-  jSlice: PropTypes.number,
-
-  /**
-   * index of the slice along k
-   */
-  kSlice: PropTypes.number,
-
-  /**
-   * index of the slice along x
-   */
-  xSlice: PropTypes.number,
-
-  /**
-   * index of the slice along y
-   */
-  ySlice: PropTypes.number,
-
-  /**
-   * index of the slice along z
-   */
-  zSlice: PropTypes.number,
-
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
 };

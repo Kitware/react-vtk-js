@@ -1,14 +1,28 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext } from './View';
 
 import vtkVolumeController from '@kitware/vtk.js/Interaction/UI/VolumeController.js';
 
+interface VolumeControllerProps {
+  /**
+   * The ID used to identify this component.
+   */
+  id?: string;
+  /**
+   * Controller size in pixels
+   */
+  size?: number[];
+  /**
+   * Use opacity range to rescale color map
+   */
+  rescaleColorMap?: boolean;
+}
+
 /**
  * VolumeController is a GUI to control the piecewise function
  */
-export default class VolumeController extends Component {
+export default class VolumeController extends Component<VolumeControllerProps> {
   constructor(props) {
     super(props);
     this.subscriptions = [];
@@ -92,21 +106,4 @@ export default class VolumeController extends Component {
 VolumeController.defaultProps = {
   size: [400, 150],
   rescaleColorMap: true,
-};
-
-VolumeController.propTypes = {
-  /**
-   * The ID used to identify this component.
-   */
-  id: PropTypes.string,
-
-  /**
-   * Controller size in pixels
-   */
-  size: PropTypes.arrayOf(PropTypes.number),
-
-  /**
-   * Use opacity range to rescale color map
-   */
-  rescaleColorMap: PropTypes.bool,
 };

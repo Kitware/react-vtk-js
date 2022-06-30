@@ -1,23 +1,74 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext, DownstreamContext } from './View';
 import { smartEqualsShallow } from '../utils';
 
-import vtkVolume from '@kitware/vtk.js/Rendering/Core/Volume.js';
-import vtkVolumeMapper from '@kitware/vtk.js/Rendering/Core/VolumeMapper.js';
+import vtkImageSlice from '@kitware/vtk.js/Rendering/Core/ImageSlice.js';
+import vtkImageMapper from '@kitware/vtk.js/Rendering/Core/ImageMapper.js';
 import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps.js';
 import vtkColorTransferFunction from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction.js';
 import vtkPiecewiseFunction from '@kitware/vtk.js/Common/DataModel/PiecewiseFunction.js';
 
+interface SliceRepresentationProps {
+  /**
+   * The ID used to identify this component.
+   */
+  id?: string;
+  /**
+   * Properties to set to the mapper
+   */
+  mapper?: object;
+  /**
+   * Properties to set to the slice/actor
+   */
+  actor?: object;
+  /**
+   * Properties to set to the volume.property
+   */
+  property?: object;
+  /**
+   * Preset name for the lookup table color map
+   */
+  colorMapPreset?: string;
+  /**
+   * Data range use for the colorMap
+   */
+  colorDataRange?: number[] | string;
+  /**
+   * index of the slice along i
+   */
+  iSlice?: number;
+  /**
+   * index of the slice along j
+   */
+  jSlice?: number;
+  /**
+   * index of the slice along k
+   */
+  kSlice?: number;
+  /**
+   * index of the slice along x
+   */
+  xSlice?: number;
+  /**
+   * index of the slice along y
+   */
+  ySlice?: number;
+  /**
+   * index of the slice along z
+   */
+  zSlice?: number;
+  children?: React.ReactNode[] | React.ReactNode;
+}
+
 /**
- * VolumeRepresentation is responsible to convert a vtkPolyData into rendering
+ * SliceRepresentation is responsible to convert a vtkPolyData into rendering
  * It takes the following set of properties:
  *   - colorBy: ['POINTS', ''],
  *   - pointSize: 1,
  *   - color: [1,1,1],
  */
-export default class VolumeRepresentation extends Component {
+export default class SliceRepresentation extends Component<SliceRepresentationProps> {
   constructor(props) {
     super(props);
 
@@ -27,14 +78,18 @@ export default class VolumeRepresentation extends Component {
 
     // Create vtk.js objects
     this.lookupTable = vtkColorTransferFunction.newInstance();
+    const preset = vtkColorMaps.getPresetByName(
+      this.props.colorMapPreset ?? 'Grayscale'
+    );
+    this.lookupTable.applyColorMap(preset);
     this.piecewiseFunction = vtkPiecewiseFunction.newInstance();
-    this.volume = vtkVolume.newInstance({ visibility: false });
-    this.mapper = vtkVolumeMapper.newInstance();
-    this.volume.setMapper(this.mapper);
+    this.actor = vtkImageSlice.newInstance({ visibility: false });
+    this.mapper = vtkImageMapper.newInstance();
+    this.actor.setMapper(this.mapper);
 
-    this.volume.getProperty().setRGBTransferFunction(0, this.lookupTable);
-    this.volume.getProperty().setScalarOpacity(0, this.piecewiseFunction);
-    this.volume.getProperty().setInterpolationTypeToLinear();
+    this.actor.getProperty().setRGBTransferFunction(0, this.lookupTable);
+    // this.actor.getProperty().setScalarOpacity(0, this.piecewiseFunction);
+    this.actor.getProperty().setInterpolationTypeToLinear();
   }
 
   render() {
@@ -42,7 +97,7 @@ export default class VolumeRepresentation extends Component {
       <ViewContext.Consumer>
         {(view) => {
           if (!this.view) {
-            view.renderer.addVolume(this.volume);
+            view.renderer.addActor(this.actor);
             this.view = view;
           }
           return (
@@ -69,26 +124,37 @@ export default class VolumeRepresentation extends Component {
 
   componentWillUnmount() {
     if (this.view && this.view.renderer) {
-      this.view.renderer.removeVolume(this.volume);
-      this.view = null;
+      this.view.renderer.removeActor(this.actor);
     }
 
-    this.volume.delete();
-    this.volume = null;
+    this.actor.delete();
+    this.actor = null;
 
     this.mapper.delete();
     this.mapper = null;
   }
 
   update(props, previous) {
-    const { volume, property, mapper, colorMapPreset, colorDataRange } = props;
+    const {
+      actor,
+      property,
+      mapper,
+      colorMapPreset,
+      colorDataRange,
+      iSlice,
+      jSlice,
+      kSlice,
+      xSlice,
+      ySlice,
+      zSlice,
+    } = props;
     let changed = false;
 
-    if (volume && (!previous || volume !== previous.volume)) {
-      changed = this.volume.set(volume) || changed;
+    if (actor && (!previous || actor !== previous.actor)) {
+      changed = this.actor.set(actor) || changed;
     }
     if (property && (!previous || property !== previous.property)) {
-      changed = this.volume.getProperty().set(property) || changed;
+      changed = this.actor.getProperty().set(property) || changed;
     }
     if (mapper && (!previous || mapper !== previous.mapper)) {
       changed = this.mapper.set(mapper) || changed;
@@ -100,8 +166,6 @@ export default class VolumeRepresentation extends Component {
       changed = true;
       const preset = vtkColorMaps.getPresetByName(colorMapPreset);
       this.lookupTable.applyColorMap(preset);
-      this.lookupTable.setMappingRange(...colorDataRange);
-      this.lookupTable.updateRange();
     }
 
     if (
@@ -133,11 +197,32 @@ export default class VolumeRepresentation extends Component {
       }
     }
 
+    // ijk
+    if (iSlice != null && (!previous || iSlice !== previous.iSlice)) {
+      changed = this.mapper.setISlice(iSlice) || changed;
+    }
+    if (jSlice != null && (!previous || jSlice !== previous.jSlice)) {
+      changed = this.mapper.setJSlice(jSlice) || changed;
+    }
+    if (kSlice != null && (!previous || kSlice !== previous.kSlice)) {
+      changed = this.mapper.setKSlice(kSlice) || changed;
+    }
+    // xyz
+    if (xSlice != null && (!previous || xSlice !== previous.xSlice)) {
+      changed = this.mapper.setXSlice(xSlice) || changed;
+    }
+    if (ySlice != null && (!previous || ySlice !== previous.ySlice)) {
+      changed = this.mapper.setYSlice(ySlice) || changed;
+    }
+    if (zSlice != null && (!previous || zSlice !== previous.zSlice)) {
+      changed = this.mapper.setZSlice(zSlice) || changed;
+    }
+
     // actor visibility
-    if (volume && volume.visibility !== undefined) {
-      this.currentVisibility = volume.visibility;
+    if (actor && actor.visibility !== undefined) {
+      this.currentVisibility = actor.visibility;
       changed =
-        this.volume.setVisibility(this.currentVisibility && this.validData) ||
+        this.actor.setVisibility(this.currentVisibility && this.validData) ||
         changed;
     }
 
@@ -150,7 +235,7 @@ export default class VolumeRepresentation extends Component {
   dataAvailable() {
     if (!this.validData) {
       this.validData = true;
-      this.volume.setVisibility(this.currentVisibility);
+      this.actor.setVisibility(this.currentVisibility);
 
       // trigger render
       this.dataChanged();
@@ -161,7 +246,7 @@ export default class VolumeRepresentation extends Component {
     if (this.props.colorDataRange === 'auto') {
       this.mapper.update();
       const input = this.mapper.getInputData();
-      const array = input && input.getPointData().getScalars();
+      const array = input && input.getPointData()?.getScalars();
       const dataRange = array && array.getRange();
       if (dataRange) {
         this.lookupTable.setMappingRange(...dataRange);
@@ -179,47 +264,7 @@ export default class VolumeRepresentation extends Component {
   }
 }
 
-VolumeRepresentation.defaultProps = {
-  colorMapPreset: 'erdc_rainbow_bright',
+SliceRepresentation.defaultProps = {
+  colorMapPreset: 'Grayscale',
   colorDataRange: 'auto',
-};
-
-VolumeRepresentation.propTypes = {
-  /**
-   * The ID used to identify this component.
-   */
-  id: PropTypes.string,
-
-  /**
-   * Properties to set to the mapper
-   */
-  mapper: PropTypes.object,
-
-  /**
-   * Properties to set to the volume
-   */
-  volume: PropTypes.object,
-
-  /**
-   * Properties to set to the volume.property
-   */
-  property: PropTypes.object,
-
-  /**
-   * Preset name for the lookup table color map
-   */
-  colorMapPreset: PropTypes.string,
-
-  /**
-   * Data range use for the colorMap
-   */
-  colorDataRange: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.number),
-    PropTypes.string,
-  ]),
-
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
 };

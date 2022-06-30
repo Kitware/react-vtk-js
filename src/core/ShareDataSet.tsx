@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 
 import macro from '@kitware/vtk.js/macros.js';
 
@@ -33,10 +32,26 @@ const newInstance = macro.newInstance(extend, 'vtkTrivialProducer');
 
 const SHARED_INSTANCES = {};
 
+interface ShareDataSetProps {
+  /**
+   * The ID used to identify this component.
+   */
+  id?: string;
+  /**
+   * downstream connection port
+   */
+  port?: number;
+  /**
+   * Unique dataset name to cross reference
+   */
+  name?: string;
+  children?: React.ReactNode[] | React.ReactNode;
+}
+
 /**
 
  */
-export default class ShareDataSet extends Component {
+export default class ShareDataSet extends Component<ShareDataSetProps> {
   getTrivialProducer() {
     let trivialProducer = SHARED_INSTANCES[this.props.name];
     if (!trivialProducer) {
@@ -126,26 +141,4 @@ export default class ShareDataSet extends Component {
 ShareDataSet.defaultProps = {
   port: 0,
   name: 'shared',
-};
-
-ShareDataSet.propTypes = {
-  /**
-   * The ID used to identify this component.
-   */
-  id: PropTypes.string,
-
-  /**
-   * downstream connection port
-   */
-  port: PropTypes.number,
-
-  /**
-   * Unique dataset name to cross reference
-   */
-  name: PropTypes.string,
-
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
 };

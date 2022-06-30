@@ -220,5 +220,3 @@ export const propTypes = {
     PropTypes.node,
   ]),
 };
-
-MultiViewRoot.propTypes = propTypes;

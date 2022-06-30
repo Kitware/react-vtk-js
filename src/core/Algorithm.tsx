@@ -1,10 +1,29 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 
 import { RepresentationContext, DownstreamContext } from './View';
 import { smartEqualsShallow } from '../utils';
 
 import vtk from '@kitware/vtk.js/vtk.js';
+
+interface AlgorithmProps {
+  /**
+   * The ID used to identify this component.
+   */
+  id?: string;
+  /**
+   * downstream connection port
+   */
+  port?: number;
+  /**
+   * vtkClass name
+   */
+  vtkClass?: string;
+  /**
+   * set of property values for vtkClass
+   */
+  state?: object;
+  children?: React.ReactNode[] | React.ReactNode;
+}
 
 /**
  * Algorithm is exposing a source or filter to a downstream filter
@@ -12,8 +31,18 @@ import vtk from '@kitware/vtk.js/vtk.js';
  *   - vtkClass: vtkClassName
  *   - state: {}
  */
-export default class Algorithm extends Component {
-  constructor(props) {
+export default class Algorithm extends Component<AlgorithmProps> {
+  algo: IvtkObject | null;
+  downstream: IvtkObject | undefined;
+  representation: IvtkObject | undefined;
+
+  static defaultProps = {
+    port: 0,
+    vtkClass: 'vtkConeSource',
+    state: {},
+  };
+
+  constructor(props: AlgorithmProps) {
     super(props);
 
     // Create vtk.js algorithm
@@ -26,12 +55,14 @@ export default class Algorithm extends Component {
         {(representation) => (
           <DownstreamContext.Consumer>
             {(downstream) => {
+              if (representation == null) return null;
+
               this.representation = representation;
               if (!this.algo) {
                 const { vtkClass, state } = this.props;
                 this.algo = vtk({ vtkClass, ...state });
               }
-              if (!this.downstream) {
+              if (!this.downstream && downstream != null) {
                 downstream.setInputConnection(
                   this.algo.getOutputPort(),
                   this.props.port
@@ -56,7 +87,7 @@ export default class Algorithm extends Component {
     this.update(this.props);
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate(prevProps: AlgorithmProps) {
     this.update(this.props, prevProps);
   }
 
@@ -65,7 +96,7 @@ export default class Algorithm extends Component {
     this.algo = null;
   }
 
-  update(props, previous) {
+  update(props: AlgorithmProps, previous: AlgorithmProps | void) {
     const { vtkClass, state } = props;
 
     if (vtkClass && (!previous || vtkClass !== previous.vtkClass)) {
@@ -105,36 +136,3 @@ export default class Algorithm extends Component {
     }
   }
 }
-
-Algorithm.defaultProps = {
-  port: 0,
-  vtkClass: 'vtkConeSource',
-  state: {},
-};
-
-Algorithm.propTypes = {
-  /**
-   * The ID used to identify this component.
-   */
-  id: PropTypes.string,
-
-  /**
-   * downstream connection port
-   */
-  port: PropTypes.number,
-
-  /**
-   * vtkClass name
-   */
-  vtkClass: PropTypes.string,
-
-  /**
-   * set of property values for vtkClass
-   */
-  state: PropTypes.object,
-
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
-};

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext, DownstreamContext } from './View';
 import { vec2Equals } from '../utils';
@@ -12,6 +11,56 @@ import vtkColorTransferFunction from '@kitware/vtk.js/Rendering/Core/ColorTransf
 import vtkCubeAxesActor from '@kitware/vtk.js/Rendering/Core/CubeAxesActor.js';
 import vtkScalarBarActor from '@kitware/vtk.js/Rendering/Core/ScalarBarActor.js';
 
+interface GeometryRepresentationProps {
+  /**
+   * The ID used to identify this component.
+   */
+  id?: string;
+  /**
+   * Properties to set to the actor
+   */
+  actor?: object;
+  /**
+   * Properties to set to the actor
+   */
+  mapper?: object;
+  /**
+   * Properties to set to the actor.property
+   */
+  property?: object;
+  /**
+   * Preset name for the lookup table color map
+   */
+  colorMapPreset?: string;
+  /**
+   * Data range use for the colorMap
+   */
+  colorDataRange?: number[];
+  /**
+   * Show/Hide Cube Axes for the given representation
+   */
+  showCubeAxes?: boolean;
+  /**
+   * Configure cube Axes style by overriding the set of properties defined
+   * https://github.com/Kitware/vtk-js/blob/HEAD/Sources/Rendering/Core/CubeAxesActor/index.js#L703-L719
+   */
+  cubeAxesStyle?: object;
+  /**
+   * Show hide scalar bar for that representation
+   */
+  showScalarBar?: boolean;
+  /**
+   * Use given string as title for scalar bar. By default it is empty (no title).
+   */
+  scalarBarTitle?: string;
+  /**
+   * Configure scalar bar style by overriding the set of properties defined
+   * https://github.com/Kitware/vtk-js/blob/master/Sources/Rendering/Core/ScalarBarActor/index.js#L776-L796
+   */
+  scalarBarStyle?: object;
+  children?: React.ReactNode[] | React.ReactNode;
+}
+
 /**
  * GeometryRepresentation is responsible to convert a vtkPolyData into rendering
  * It takes the following set of properties:
@@ -19,7 +68,7 @@ import vtkScalarBarActor from '@kitware/vtk.js/Rendering/Core/ScalarBarActor.js'
  *   - pointSize: 1,
  *   - color: [1,1,1],
  */
-export default class GeometryRepresentation extends Component {
+export default class GeometryRepresentation extends Component<GeometryRepresentationProps> {
   constructor(props) {
     super(props);
 
@@ -268,68 +317,4 @@ GeometryRepresentation.defaultProps = {
   showCubeAxes: false,
   showScalarBar: false,
   scalarBarTitle: '',
-};
-
-GeometryRepresentation.propTypes = {
-  /**
-   * The ID used to identify this component.
-   */
-  id: PropTypes.string,
-
-  /**
-   * Properties to set to the actor
-   */
-  actor: PropTypes.object,
-
-  /**
-   * Properties to set to the actor
-   */
-  mapper: PropTypes.object,
-
-  /**
-   * Properties to set to the actor.property
-   */
-  property: PropTypes.object,
-
-  /**
-   * Preset name for the lookup table color map
-   */
-  colorMapPreset: PropTypes.string,
-
-  /**
-   * Data range use for the colorMap
-   */
-  colorDataRange: PropTypes.arrayOf(PropTypes.number),
-
-  /**
-   * Show/Hide Cube Axes for the given representation
-   */
-  showCubeAxes: PropTypes.bool,
-
-  /**
-   * Configure cube Axes style by overriding the set of properties defined
-   * https://github.com/Kitware/vtk-js/blob/HEAD/Sources/Rendering/Core/CubeAxesActor/index.js#L703-L719
-   */
-  cubeAxesStyle: PropTypes.object,
-
-  /**
-   * Show hide scalar bar for that representation
-   */
-  showScalarBar: PropTypes.bool,
-
-  /**
-   * Use given string as title for scalar bar. By default it is empty (no title).
-   */
-  scalarBarTitle: PropTypes.string,
-
-  /**
-   * Configure scalar bar style by overriding the set of properties defined
-   * https://github.com/Kitware/vtk-js/blob/master/Sources/Rendering/Core/ScalarBarActor/index.js#L776-L796
-   */
-  scalarBarStyle: PropTypes.object,
-
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
 };

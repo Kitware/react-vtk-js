@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "noEmitOnError": true,
+    "lib": ["es2017"],
+    "strict": true,
+    "esModuleInterop": false,
+    "outDir": "dist",
+    "rootDir": "./",
+    "jsx": "react",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["./src/**/*.ts", "src/core/Algorithm.tsx"]
+}

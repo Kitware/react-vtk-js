@@ -1,11 +1,47 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 
 import { toTypedArray } from '../utils';
 
 import { DataSetContext, FieldsContext } from './View';
 import vtkDataArray from '@kitware/vtk.js/Common/Core/DataArray.js';
 import { TYPED_ARRAYS } from '@kitware/vtk.js/macros.js';
+
+interface DataArrayProps {
+  /**
+   * The ID used to identify this component.
+   */
+  id?: string;
+  /**
+   * Typed array name
+   */
+  type?: string;
+  /**
+   * Field name
+   */
+  name?: string;
+  /**
+   * Actual values to use inside our array ([] | TypedArray | { bvals, dtype, shape })
+   */
+  values?:
+    | number[]
+    | object
+    | Float64Array
+    | Float32Array
+    | Int32Array
+    | Int16Array
+    | Int8Array
+    | Uint32Array
+    | Uint16Array
+    | Uint8Array;
+  /**
+   * Number of components / Tuple size
+   */
+  numberOfComponents?: number;
+  /**
+   * Name of the method to call on the fieldData (addArray, setScalars, setVectors...)
+   */
+  registration?: string;
+}
 
 /**
  * DataArray is creating a vtkDataArray for the container fields
@@ -15,7 +51,7 @@ import { TYPED_ARRAYS } from '@kitware/vtk.js/macros.js';
  *   - numberOfComponents: 1,
  *   - registration: 'addArray', 'setScalars', ...
  */
-export default class DataArray extends Component {
+export default class DataArray extends Component<DataArrayProps> {
   constructor(props) {
     super(props);
 
@@ -102,47 +138,4 @@ DataArray.defaultProps = {
   values: [],
   numberOfComponents: 1,
   registration: 'addArray',
-};
-
-DataArray.propTypes = {
-  /**
-   * The ID used to identify this component.
-   */
-  id: PropTypes.string,
-
-  /**
-   * Typed array name
-   */
-  type: PropTypes.string,
-
-  /**
-   * Field name
-   */
-  name: PropTypes.string,
-
-  /**
-   * Actual values to use inside our array ([] | TypedArray | { bvals, dtype, shape })
-   */
-  values: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.number),
-    PropTypes.object,
-    PropTypes.instanceOf(Float64Array),
-    PropTypes.instanceOf(Float32Array),
-    PropTypes.instanceOf(Int32Array),
-    PropTypes.instanceOf(Int16Array),
-    PropTypes.instanceOf(Int8Array),
-    PropTypes.instanceOf(Uint32Array),
-    PropTypes.instanceOf(Uint16Array),
-    PropTypes.instanceOf(Uint8Array),
-  ]),
-
-  /**
-   * Number of components / Tuple size
-   */
-  numberOfComponents: PropTypes.number,
-
-  /**
-   * Name of the method to call on the fieldData (addArray, setScalars, setVectors...)
-   */
-  registration: PropTypes.string,
 };

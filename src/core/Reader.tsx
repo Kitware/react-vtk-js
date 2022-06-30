@@ -1,10 +1,49 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext, DownstreamContext } from './View';
 
 import vtk from '@kitware/vtk.js/vtk.js';
 import Base64 from '@kitware/vtk.js/Common/Core/Base64.js';
+
+interface ReaderProps {
+  /**
+   * The ID used to identify this component.
+   */
+  id?: string;
+  /**
+   * downstream connection port
+   */
+  port?: number;
+  /**
+   * vtkClass name
+   */
+  vtkClass?: string;
+  /**
+   * set of url to fetch data from
+   */
+  url?: string;
+  /**
+   * set text data to process
+   */
+  parseAsText?: string;
+  /**
+   * set binary data to process from base64 string
+   */
+  parseAsArrayBuffer?: string;
+  /**
+   * Automatically render on data loaded
+   */
+  renderOnUpdate?: boolean;
+  /**
+   * Automatically reset camera on data loaded
+   */
+  resetCameraOnUpdate?: boolean;
+  /**
+   * Reader options
+   */
+  options?: object;
+  children?: React.ReactNode[] | React.ReactNode;
+}
 
 /**
  * Reader is exposing a reader to a downstream filter
@@ -14,7 +53,7 @@ import Base64 from '@kitware/vtk.js/Common/Core/Base64.js';
  *   - parseAsText: string
  *   - parseAsArrayBuffer: base64String
  */
-export default class Reader extends Component {
+export default class Reader extends Component<ReaderProps> {
   constructor(props) {
     super(props);
 
@@ -145,56 +184,4 @@ Reader.defaultProps = {
   renderOnUpdate: true,
   resetCameraOnUpdate: true,
   options: { binary: true },
-};
-
-Reader.propTypes = {
-  /**
-   * The ID used to identify this component.
-   */
-  id: PropTypes.string,
-
-  /**
-   * downstream connection port
-   */
-  port: PropTypes.number,
-
-  /**
-   * vtkClass name
-   */
-  vtkClass: PropTypes.string,
-
-  /**
-   * set of url to fetch data from
-   */
-  url: PropTypes.string,
-
-  /**
-   * set text data to process
-   */
-  parseAsText: PropTypes.string,
-
-  /**
-   * set binary data to process from base64 string
-   */
-  parseAsArrayBuffer: PropTypes.string,
-
-  /**
-   * Automatically render on data loaded
-   */
-  renderOnUpdate: PropTypes.bool,
-
-  /**
-   * Automatically reset camera on data loaded
-   */
-  resetCameraOnUpdate: PropTypes.bool,
-
-  /**
-   * Reader options
-   */
-  options: PropTypes.object,
-
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
 };

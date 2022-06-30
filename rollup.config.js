@@ -4,11 +4,13 @@ import eslint from '@rollup/plugin-eslint';
 import { terser } from 'rollup-plugin-terser';
 import analyze from 'rollup-plugin-analyzer';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
+import typescript from '@rollup/plugin-typescript';
 
 const plugins = [
+  typescript(),
   !process.env.NOLINT &&
     eslint({
-      include: 'src/**/*.js',
+      include: 'src/**/*.tsx?',
       exclude: 'node_modules/**',
     }),
   babel({

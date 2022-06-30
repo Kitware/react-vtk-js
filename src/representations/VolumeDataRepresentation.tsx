@@ -1,11 +1,77 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import VolumeRepresentation from '../core/VolumeRepresentation';
 import ImageData from '../core/ImageData';
 import PointData from '../core/PointData';
 import DataArray from '../core/DataArray';
 import VolumeController from '../core/VolumeController';
+
+interface VolumneDataRepresentationProps {
+  /**
+   * The ID used to identify this component.
+   */
+  id?: string;
+  /**
+   * Number of points along x, y, z
+   */
+  dimensions?: number[];
+  /**
+   * Spacing along x, y, z between points in world coordinates
+   */
+  spacing?: number[];
+  /**
+   * World coordinate of the lower left corner of your vtkImageData (i=0, j=0, k=0).
+   */
+  origin?: number[];
+  /**
+   * Use RGB values to attach to the points/vertex
+   */
+  rgb?: number[];
+  /**
+   * Use RGBA values to attach to the points/vertex
+   */
+  rgba?: number[];
+  /**
+   * Field values to attach to the points
+   */
+  scalars?: number[];
+  /**
+   * Types of numbers provided in scalars
+   */
+  scalarsType?: string;
+  /**
+   * Properties to set to the mapper
+   */
+  mapper?: object;
+  /**
+   * Properties to set to the volume
+   */
+  volume?: object;
+  /**
+   * Properties to set to the volume.property
+   */
+  property?: object;
+  /**
+   * Preset name for the lookup table color map
+   */
+  colorMapPreset?: string;
+  /**
+   * Show volumeController
+   */
+  volumeController?: boolean;
+  /**
+   * Controller size in pixels
+   */
+  controllerSize?: number[];
+  /**
+   * Use opacity range to rescale color map
+   */
+  rescaleColorMap?: boolean;
+  /**
+   * Data range use for the colorMap
+   */
+  colorDataRange?: number[] | string;
+}
 
 /**
  * VolumneDataRepresentation expect the following set of properties
@@ -17,7 +83,9 @@ import VolumeController from '../core/VolumeController';
  *   - scalars: [...]
  *   - scalarsType: Float32Array
  */
-export default function VolumneDataRepresentation(props) {
+export default function VolumneDataRepresentation(
+  props: VolumneDataRepresentationProps
+) {
   let nbComponents = 0;
   let values = null;
   let type = null;
@@ -76,87 +144,4 @@ VolumneDataRepresentation.defaultProps = {
   volumeController: true,
   rescaleColorMap: true,
   controllerSize: [400, 150],
-};
-
-VolumneDataRepresentation.propTypes = {
-  /**
-   * The ID used to identify this component.
-   */
-  id: PropTypes.string,
-  /**
-   * Number of points along x, y, z
-   */
-  dimensions: PropTypes.arrayOf(PropTypes.number),
-
-  /**
-   * Spacing along x, y, z between points in world coordinates
-   */
-  spacing: PropTypes.arrayOf(PropTypes.number),
-
-  /**
-   * World coordinate of the lower left corner of your vtkImageData (i=0, j=0, k=0).
-   */
-  origin: PropTypes.arrayOf(PropTypes.number),
-
-  /**
-   * Use RGB values to attach to the points/vertex
-   */
-  rgb: PropTypes.arrayOf(PropTypes.number),
-  /**
-   * Use RGBA values to attach to the points/vertex
-   */
-  rgba: PropTypes.arrayOf(PropTypes.number),
-
-  /**
-   * Field values to attach to the points
-   */
-  scalars: PropTypes.arrayOf(PropTypes.number),
-
-  /**
-   * Types of numbers provided in scalars
-   */
-  scalarsType: PropTypes.string,
-
-  /**
-   * Properties to set to the mapper
-   */
-  mapper: PropTypes.object,
-
-  /**
-   * Properties to set to the volume
-   */
-  volume: PropTypes.object,
-
-  /**
-   * Properties to set to the volume.property
-   */
-  property: PropTypes.object,
-
-  /**
-   * Preset name for the lookup table color map
-   */
-  colorMapPreset: PropTypes.string,
-
-  /**
-   * Show volumeController
-   */
-  volumeController: PropTypes.bool,
-
-  /**
-   * Controller size in pixels
-   */
-  controllerSize: PropTypes.arrayOf(PropTypes.number),
-
-  /**
-   * Use opacity range to rescale color map
-   */
-  rescaleColorMap: PropTypes.bool,
-
-  /**
-   * Data range use for the colorMap
-   */
-  colorDataRange: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.number),
-    PropTypes.string,
-  ]),
 };

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 
 // ----------------------------------------------------------------------------
 // vtk.js Rendering stack
@@ -32,11 +31,11 @@ import { FieldAssociations } from '@kitware/vtk.js/Common/DataModel/DataSet/Cons
 // Context to pass parent variables to children
 // ----------------------------------------------------------------------------
 
-export const ViewContext = React.createContext(null);
-export const RepresentationContext = React.createContext(null);
-export const DataSetContext = React.createContext(null);
-export const FieldsContext = React.createContext(null);
-export const DownstreamContext = React.createContext(null);
+export const ViewContext = React.createContext<IvtkObject | null>(null);
+export const RepresentationContext = React.createContext<IvtkObject | null>(null);
+export const DataSetContext = React.createContext<IvtkObject | null>(null);
+export const FieldsContext = React.createContext<IvtkObject | null>(null);
+export const DownstreamContext = React.createContext<IvtkObject | null>(null);
 
 // ----------------------------------------------------------------------------
 // Helper constants
@@ -112,6 +111,130 @@ const RENDERER_STYLE = {
   height: '100%',
   overflow: 'hidden',
 };
+
+interface ViewProps {
+  /**
+   * The ID used to identify this component.
+   */
+  id?: string;
+  /**
+   * Allow user to override the default View style { width: '100%', height: '100%' }
+   */
+  style?: object;
+  /**
+   * Allow user to provide custom className associated to root element
+   */
+  className?: string;
+  /**
+   * The color of the view background using 3 floating numbers
+   * between 0-1 of Red, Green, Blue component.
+   */
+  background?: unknown[];
+  /**
+   * Configure the interactions
+   */
+  interactorSettings?: unknown[];
+  /**
+   * Enable/Disable interaction
+   */
+  interactive?: boolean;
+  /**
+   * Initial camera position from an object in [0,0,0]
+   */
+  cameraPosition?: unknown[];
+  /**
+   * Initial camera position from an object in [0,0,0]
+   */
+  cameraViewUp?: unknown[];
+  /**
+   * Use parallel projection (default: false)
+   */
+  cameraParallelProjection?: boolean;
+  /**
+   * Property use to trigger a render when changing.
+   */
+  triggerRender?: number;
+  /**
+   * Property use to trigger a resetCamera when changing.
+   */
+  triggerResetCamera?: number;
+  /**
+   * List of representation to show
+   */
+  children?: React.ReactNode[] | React.ReactNode;
+  /**
+   * List of picking listeners to bind. By default it is disabled (empty array).
+   */
+  pickingModes?: 'click' | 'hover' | 'select' | 'mouseDown' | 'mouseUp'[];
+  /**
+   * User callback function for click
+   */
+  onClick?(...args: unknown[]): unknown;
+  /**
+   * Read-only prop. To use this, make sure that `pickingModes` contains `click`.
+   * This prop is updated when an element in the map is clicked. This contains
+   * the picking info describing the object being clicked on.
+   */
+  clickInfo?: object;
+  /**
+   * User callback function for mouse down
+   */
+  onMouseDown?(...args: unknown[]): unknown;
+  /**
+   * Read-only prop. To use this, make sure that `pickingModes` contains `mouseDown`.
+   * This prop is updated when a mouse down event is fired on an element in the map. This contains
+   * the picking info describing the object interested by the event.
+   */
+  mouseDownInfo?: object;
+  /**
+   * User callback function for mouse up
+   */
+  onMouseUp?(...args: unknown[]): unknown;
+  /**
+   * Read-only prop. To use this, make sure that `pickingModes` contains `mouseUp`.
+   * This prop is updated when a mouse up event is fired on an element in the map. This contains
+   * the picking info describing the object interested by the event.
+   */
+  mouseUpInfo?: object;
+  /**
+   * User callback function for hover
+   */
+  onHover?(...args: unknown[]): unknown;
+  /**
+   * Read-only prop. To use this, make sure that `pickingModes` contains `hover`.
+   * This prop is updated when an element in the map is hovered. This contains
+   * the picking info describing the object being hovered.
+   */
+  hoverInfo?: object;
+  /**
+   * User callback function for box select
+   */
+  onSelect?(...args: unknown[]): unknown;
+  /**
+   * Read-only prop. To use this, make sure that `pickingModes` contains `select`.
+   * This prop is updated when an element in the view is select. This contains
+   * the picking info describing the object being select along with the frustrum.
+   */
+  selectInfo?: object;
+  /**
+   * Defines the tolerance of the click and hover selection.
+   */
+  pointerSize?: number;
+  /**
+   * Show/Hide Cube Axes for the given representation
+   */
+  showCubeAxes?: boolean;
+  /**
+   * Configure cube Axes style by overriding the set of properties defined
+   * https://github.com/Kitware/vtk-js/blob/HEAD/Sources/Rendering/Core/CubeAxesActor/index.js#L703-L719
+   */
+  cubeAxesStyle?: object;
+  /**
+   * Show/Hide orientation axes.
+   */
+  showOrientationAxes?: boolean;
+}
+
 /**
  * View is responsible to render vtk.js data.
  * It takes the following set of properties:
@@ -121,7 +244,7 @@ const RENDERER_STYLE = {
  *   - `cameraParallelProjection`: false
  *   - `showOrientationAxes`: true
  */
-export default class View extends Component {
+export default class View extends Component<ViewProps> {
   constructor(props) {
     super(props);
     this.containerRef = React.createRef();
@@ -720,158 +843,4 @@ View.defaultProps = {
   showCubeAxes: false,
   pointerSize: 0,
   showOrientationAxes: false,
-};
-
-View.propTypes = {
-  /**
-   * The ID used to identify this component.
-   */
-  id: PropTypes.string,
-
-  /**
-   * Allow user to override the default View style { width: '100%', height: '100%' }
-   */
-  style: PropTypes.object,
-
-  /**
-   * Allow user to provide custom className associated to root element
-   */
-  className: PropTypes.string,
-
-  /**
-   * The color of the view background using 3 floating numbers
-   * between 0-1 of Red, Green, Blue component.
-   */
-  background: PropTypes.array,
-
-  /**
-   * Configure the interactions
-   */
-  interactorSettings: PropTypes.array,
-
-  /**
-   * Enable/Disable interaction
-   */
-  interactive: PropTypes.bool,
-
-  /**
-   * Initial camera position from an object in [0,0,0]
-   */
-  cameraPosition: PropTypes.array,
-
-  /**
-   * Initial camera position from an object in [0,0,0]
-   */
-  cameraViewUp: PropTypes.array,
-
-  /**
-   * Use parallel projection (default: false)
-   */
-  cameraParallelProjection: PropTypes.bool,
-
-  /**
-   * Property use to trigger a render when changing.
-   */
-  triggerRender: PropTypes.number,
-
-  /**
-   * Property use to trigger a resetCamera when changing.
-   */
-  triggerResetCamera: PropTypes.number,
-
-  /**
-   * List of representation to show
-   */
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
-
-  /**
-   * List of picking listeners to bind. By default it is disabled (empty array).
-   */
-  pickingModes: PropTypes.arrayOf(
-    PropTypes.oneOf(['click', 'hover', 'select', 'mouseDown', 'mouseUp'])
-  ),
-
-  /**
-   * User callback function for click
-   */
-  onClick: PropTypes.func,
-
-  /**
-   * Read-only prop. To use this, make sure that `pickingModes` contains `click`.
-   * This prop is updated when an element in the map is clicked. This contains
-   * the picking info describing the object being clicked on.
-   */
-  clickInfo: PropTypes.object,
-
-  /**
-   * User callback function for mouse down
-   */
-  onMouseDown: PropTypes.func,
-
-  /**
-   * Read-only prop. To use this, make sure that `pickingModes` contains `mouseDown`.
-   * This prop is updated when a mouse down event is fired on an element in the map. This contains
-   * the picking info describing the object interested by the event.
-   */
-  mouseDownInfo: PropTypes.object,
-
-  /**
-   * User callback function for mouse up
-   */
-  onMouseUp: PropTypes.func,
-
-  /**
-   * Read-only prop. To use this, make sure that `pickingModes` contains `mouseUp`.
-   * This prop is updated when a mouse up event is fired on an element in the map. This contains
-   * the picking info describing the object interested by the event.
-   */
-  mouseUpInfo: PropTypes.object,
-
-  /**
-   * User callback function for hover
-   */
-  onHover: PropTypes.func,
-
-  /**
-   * Read-only prop. To use this, make sure that `pickingModes` contains `hover`.
-   * This prop is updated when an element in the map is hovered. This contains
-   * the picking info describing the object being hovered.
-   */
-  hoverInfo: PropTypes.object,
-
-  /**
-   * User callback function for box select
-   */
-  onSelect: PropTypes.func,
-
-  /**
-   * Read-only prop. To use this, make sure that `pickingModes` contains `select`.
-   * This prop is updated when an element in the view is select. This contains
-   * the picking info describing the object being select along with the frustrum.
-   */
-  selectInfo: PropTypes.object,
-
-  /**
-   * Defines the tolerance of the click and hover selection.
-   */
-  pointerSize: PropTypes.number,
-
-  /**
-   * Show/Hide Cube Axes for the given representation
-   */
-  showCubeAxes: PropTypes.bool,
-
-  /**
-   * Configure cube Axes style by overriding the set of properties defined
-   * https://github.com/Kitware/vtk-js/blob/HEAD/Sources/Rendering/Core/CubeAxesActor/index.js#L703-L719
-   */
-  cubeAxesStyle: PropTypes.object,
-
-  /**
-   * Show/Hide orientation axes.
-   */
-  showOrientationAxes: PropTypes.bool,
 };

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 
 import { DownstreamContext } from './View';
 
@@ -7,6 +6,34 @@ import vtkCalculator from '@kitware/vtk.js/Filters/General/Calculator.js';
 import vtkDataSet from '@kitware/vtk.js/Common/DataModel/DataSet.js';
 
 const { FieldDataTypes } = vtkDataSet;
+
+interface CalculatorProps {
+  /**
+   * The ID used to identify this component.
+   */
+  id?: string;
+  /**
+   * downstream connection port
+   */
+  port?: number;
+  /**
+   * Field name
+   */
+  name?: string;
+  /**
+   * Field location [POINT, CELL, COORDINATE, SCALARS, ]
+   */
+  location?: string;
+  /**
+   * List of fields you want available for your formula
+   */
+  arrays?: string[];
+  /**
+   * Field formula
+   */
+  formula?(...args: unknown[]): unknown;
+  children?: React.ReactNode[] | React.ReactNode;
+}
 
 /**
  * Calculator is exposing a source or filter to a downstream filter
@@ -16,7 +43,7 @@ const { FieldDataTypes } = vtkDataSet;
  *   - arrays: []         // Name of array to have access in formula
  *   - formula: fn
  */
-export default class Calculator extends Component {
+export default class Calculator extends Component<CalculatorProps> {
   constructor(props) {
     super(props);
 
@@ -66,41 +93,4 @@ Calculator.defaultProps = {
   location: 'POINT',
   arrays: [],
   formula: (xyz) => xyz[0],
-};
-
-Calculator.propTypes = {
-  /**
-   * The ID used to identify this component.
-   */
-  id: PropTypes.string,
-
-  /**
-   * downstream connection port
-   */
-  port: PropTypes.number,
-
-  /**
-   * Field name
-   */
-  name: PropTypes.string,
-
-  /**
-   * Field location [POINT, CELL, COORDINATE, SCALARS, ]
-   */
-  location: PropTypes.string,
-
-  /**
-   * List of fields you want available for your formula
-   */
-  arrays: PropTypes.arrayOf(PropTypes.string),
-
-  /**
-   * Field formula
-   */
-  formula: PropTypes.func,
-
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
 };

@@ -1,25 +1,51 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext, DownstreamContext } from './View';
-import { vec2Equals } from '../utils';
+import { smartEqualsShallow } from '../utils';
 
-import vtkActor2D from '@kitware/vtk.js/Rendering/Core/Actor2D.js';
-import vtkMapper2D from '@kitware/vtk.js/Rendering/Core/Mapper2D.js';
+import vtkActor from '@kitware/vtk.js/Rendering/Core/Actor.js';
+import vtkGlyph3DMapper from '@kitware/vtk.js/Rendering/Core/Glyph3DMapper.js';
 import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps.js';
 import vtkColorTransferFunction from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction.js';
-import vtkCoordinate from '@kitware/vtk.js/Rendering/Core/Coordinate.js';
-import { Coordinate } from '@kitware/vtk.js/Rendering/Core/Coordinate/Constants.js';
+
+interface GeometryRepresentationProps {
+  /**
+   * The ID used to identify this component.
+   */
+  id?: string;
+  /**
+   * Properties to set to the actor
+   */
+  actor?: object;
+  /**
+   * Properties to set to the vtkGlyph3DMapper
+   */
+  mapper?: object;
+  /**
+   * Properties to set to the actor.property
+   */
+  property?: object;
+  /**
+   * Preset name for the lookup table color map
+   */
+  colorMapPreset?: string;
+  /**
+   * Data range use for the colorMap
+   */
+  colorDataRange?: number[];
+  children?: React.ReactNode[] | React.ReactNode;
+}
 
 /**
- * Geometry2DRepresentation is useful for rendering polydata in 2D screen space.
+ * GlyphRepresentation using a source on port=1 as Glyph and the points of the source on port=0 to position the given glyphs
  * It takes the following set of properties:
- *   - representation: ['POINTS', 'WIREFRAME', 'SURFACE'],
- *   - pointSize: 1,
- *   - color: [1,1,1],
- *   - opacity: 1,
+ *    - actor: Properties to assign to the vtkActor
+ *    - mapper: Properties to assign to the vtkGlyph3DMapper
+ *    - property: Properties to assign to the vtkProperty (actor.getProperty())
+ *    - colorMapPreset: Name of the preset to use for controlling the color mapping
+ *    - colorDataRange: Range to use for the color scale
  */
-export default class Geometry2DRepresentation extends Component {
+export default class GeometryRepresentation extends Component<GeometryRepresentationProps> {
   constructor(props) {
     super(props);
 
@@ -28,24 +54,13 @@ export default class Geometry2DRepresentation extends Component {
     this.currentVisibility = true;
 
     // Create vtk.js actor/mapper
-    this.actor = vtkActor2D.newInstance({
-      visibility: false,
-      representationId: props.id,
-    });
+    this.actor = vtkActor.newInstance({ visibility: false });
     this.lookupTable = vtkColorTransferFunction.newInstance();
-    this.transformCoordinate = vtkCoordinate.newInstance({
-      coordinateSystem:
-        this.props.transformCoordinate?.coordinateSystem ?? Coordinate.DISPLAY,
-    });
-    this.mapper = vtkMapper2D.newInstance({
+    this.mapper = vtkGlyph3DMapper.newInstance({
       lookupTable: this.lookupTable,
-      useLookupTableScalarRange: false,
-      scalarVisibility: false,
-      transformCoordinate: this.transformCoordinate,
+      useLookupTableScalarRange: true,
     });
     this.actor.setMapper(this.mapper);
-
-    this.subscriptions = [];
   }
 
   render() {
@@ -53,7 +68,7 @@ export default class Geometry2DRepresentation extends Component {
       <ViewContext.Consumer>
         {(view) => {
           if (!this.view) {
-            view.renderer.addActor2D(this.actor);
+            view.renderer.addActor(this.actor);
             this.view = view;
           }
           return (
@@ -79,10 +94,6 @@ export default class Geometry2DRepresentation extends Component {
   }
 
   componentWillUnmount() {
-    while (this.subscriptions.length) {
-      this.subscriptions.pop().unsubscribe();
-    }
-
     if (this.view && this.view.renderer) {
       this.view.renderer.removeActor(this.actor);
     }
@@ -95,20 +106,10 @@ export default class Geometry2DRepresentation extends Component {
 
     this.lookupTable.delete();
     this.lookupTable = null;
-
-    this.transformCoordinate.delete();
-    this.transformCoordinate = null;
   }
 
   update(props, previous) {
-    const {
-      actor,
-      mapper,
-      property,
-      colorMapPreset,
-      colorDataRange,
-      transformCoordinate,
-    } = props;
+    const { actor, mapper, property, colorMapPreset, colorDataRange } = props;
     let changed = false;
 
     if (actor && (!previous || actor !== previous.actor)) {
@@ -123,7 +124,6 @@ export default class Geometry2DRepresentation extends Component {
 
     if (
       colorMapPreset &&
-      this.lookupTable &&
       (!previous || colorMapPreset !== previous.colorMapPreset)
     ) {
       changed = true;
@@ -135,21 +135,12 @@ export default class Geometry2DRepresentation extends Component {
 
     if (
       colorDataRange &&
-      this.lookupTable &&
-      (!previous || !vec2Equals(colorDataRange, previous.colorDataRange))
+      (!previous ||
+        !smartEqualsShallow(colorDataRange, previous.colorDataRange))
     ) {
       changed = true;
       this.lookupTable.setMappingRange(...colorDataRange);
       this.lookupTable.updateRange();
-    }
-
-    if (
-      transformCoordinate &&
-      this.transformCoordinate &&
-      (!previous || transformCoordinate !== previous.transformCoordinate)
-    ) {
-      changed = true;
-      this.transformCoordinate.set(transformCoordinate);
     }
 
     // actor visibility
@@ -160,8 +151,8 @@ export default class Geometry2DRepresentation extends Component {
         changed;
     }
 
+    // trigger render
     if (changed) {
-      // trigger render
       this.dataChanged();
     }
   }
@@ -183,49 +174,7 @@ export default class Geometry2DRepresentation extends Component {
   }
 }
 
-Geometry2DRepresentation.defaultProps = {
+GeometryRepresentation.defaultProps = {
   colorMapPreset: 'erdc_rainbow_bright',
   colorDataRange: [0, 1],
-};
-
-Geometry2DRepresentation.propTypes = {
-  /**
-   * The ID used to identify this component.
-   */
-  id: PropTypes.string,
-
-  /**
-   * Properties to set to the actor
-   */
-  actor: PropTypes.object,
-
-  /**
-   * Properties to set to the actor
-   */
-  mapper: PropTypes.object,
-
-  /**
-   * Properties to set to the actor.property
-   */
-  property: PropTypes.object,
-
-  /**
-   * Preset name for the lookup table color map
-   */
-  colorMapPreset: PropTypes.string,
-
-  /**
-   * Data range use for the colorMap
-   */
-  colorDataRange: PropTypes.arrayOf(PropTypes.number),
-
-  /**
-   * Coordinate system that the input dataset is in.
-   */
-  transformCoordinate: PropTypes.object,
-
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
 };

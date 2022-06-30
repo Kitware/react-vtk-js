@@ -1,24 +1,56 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 
 import { ViewContext, RepresentationContext, DownstreamContext } from './View';
-import { smartEqualsShallow } from '../utils';
+import { vec2Equals } from '../utils';
 
-import vtkActor from '@kitware/vtk.js/Rendering/Core/Actor.js';
-import vtkGlyph3DMapper from '@kitware/vtk.js/Rendering/Core/Glyph3DMapper.js';
+import vtkActor2D from '@kitware/vtk.js/Rendering/Core/Actor2D.js';
+import vtkMapper2D from '@kitware/vtk.js/Rendering/Core/Mapper2D.js';
 import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps.js';
 import vtkColorTransferFunction from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction.js';
+import vtkCoordinate from '@kitware/vtk.js/Rendering/Core/Coordinate.js';
+import { Coordinate } from '@kitware/vtk.js/Rendering/Core/Coordinate/Constants.js';
+
+interface Geometry2DRepresentationProps {
+  /**
+   * The ID used to identify this component.
+   */
+  id?: string;
+  /**
+   * Properties to set to the actor
+   */
+  actor?: object;
+  /**
+   * Properties to set to the actor
+   */
+  mapper?: object;
+  /**
+   * Properties to set to the actor.property
+   */
+  property?: object;
+  /**
+   * Preset name for the lookup table color map
+   */
+  colorMapPreset?: string;
+  /**
+   * Data range use for the colorMap
+   */
+  colorDataRange?: number[];
+  /**
+   * Coordinate system that the input dataset is in.
+   */
+  transformCoordinate?: object;
+  children?: React.ReactNode[] | React.ReactNode;
+}
 
 /**
- * GlyphRepresentation using a source on port=1 as Glyph and the points of the source on port=0 to position the given glyphs
+ * Geometry2DRepresentation is useful for rendering polydata in 2D screen space.
  * It takes the following set of properties:
- *    - actor: Properties to assign to the vtkActor
- *    - mapper: Properties to assign to the vtkGlyph3DMapper
- *    - property: Properties to assign to the vtkProperty (actor.getProperty())
- *    - colorMapPreset: Name of the preset to use for controlling the color mapping
- *    - colorDataRange: Range to use for the color scale
+ *   - representation: ['POINTS', 'WIREFRAME', 'SURFACE'],
+ *   - pointSize: 1,
+ *   - color: [1,1,1],
+ *   - opacity: 1,
  */
-export default class GeometryRepresentation extends Component {
+export default class Geometry2DRepresentation extends Component<Geometry2DRepresentationProps> {
   constructor(props) {
     super(props);
 
@@ -27,13 +59,24 @@ export default class GeometryRepresentation extends Component {
     this.currentVisibility = true;
 
     // Create vtk.js actor/mapper
-    this.actor = vtkActor.newInstance({ visibility: false });
+    this.actor = vtkActor2D.newInstance({
+      visibility: false,
+      representationId: props.id,
+    });
     this.lookupTable = vtkColorTransferFunction.newInstance();
-    this.mapper = vtkGlyph3DMapper.newInstance({
+    this.transformCoordinate = vtkCoordinate.newInstance({
+      coordinateSystem:
+        this.props.transformCoordinate?.coordinateSystem ?? Coordinate.DISPLAY,
+    });
+    this.mapper = vtkMapper2D.newInstance({
       lookupTable: this.lookupTable,
-      useLookupTableScalarRange: true,
+      useLookupTableScalarRange: false,
+      scalarVisibility: false,
+      transformCoordinate: this.transformCoordinate,
     });
     this.actor.setMapper(this.mapper);
+
+    this.subscriptions = [];
   }
 
   render() {
@@ -41,7 +84,7 @@ export default class GeometryRepresentation extends Component {
       <ViewContext.Consumer>
         {(view) => {
           if (!this.view) {
-            view.renderer.addActor(this.actor);
+            view.renderer.addActor2D(this.actor);
             this.view = view;
           }
           return (
@@ -67,6 +110,10 @@ export default class GeometryRepresentation extends Component {
   }
 
   componentWillUnmount() {
+    while (this.subscriptions.length) {
+      this.subscriptions.pop().unsubscribe();
+    }
+
     if (this.view && this.view.renderer) {
       this.view.renderer.removeActor(this.actor);
     }
@@ -79,10 +126,20 @@ export default class GeometryRepresentation extends Component {
 
     this.lookupTable.delete();
     this.lookupTable = null;
+
+    this.transformCoordinate.delete();
+    this.transformCoordinate = null;
   }
 
   update(props, previous) {
-    const { actor, mapper, property, colorMapPreset, colorDataRange } = props;
+    const {
+      actor,
+      mapper,
+      property,
+      colorMapPreset,
+      colorDataRange,
+      transformCoordinate,
+    } = props;
     let changed = false;
 
     if (actor && (!previous || actor !== previous.actor)) {
@@ -97,6 +154,7 @@ export default class GeometryRepresentation extends Component {
 
     if (
       colorMapPreset &&
+      this.lookupTable &&
       (!previous || colorMapPreset !== previous.colorMapPreset)
     ) {
       changed = true;
@@ -108,12 +166,21 @@ export default class GeometryRepresentation extends Component {
 
     if (
       colorDataRange &&
-      (!previous ||
-        !smartEqualsShallow(colorDataRange, previous.colorDataRange))
+      this.lookupTable &&
+      (!previous || !vec2Equals(colorDataRange, previous.colorDataRange))
     ) {
       changed = true;
       this.lookupTable.setMappingRange(...colorDataRange);
       this.lookupTable.updateRange();
+    }
+
+    if (
+      transformCoordinate &&
+      this.transformCoordinate &&
+      (!previous || transformCoordinate !== previous.transformCoordinate)
+    ) {
+      changed = true;
+      this.transformCoordinate.set(transformCoordinate);
     }
 
     // actor visibility
@@ -124,8 +191,8 @@ export default class GeometryRepresentation extends Component {
         changed;
     }
 
-    // trigger render
     if (changed) {
+      // trigger render
       this.dataChanged();
     }
   }
@@ -147,44 +214,7 @@ export default class GeometryRepresentation extends Component {
   }
 }
 
-GeometryRepresentation.defaultProps = {
+Geometry2DRepresentation.defaultProps = {
   colorMapPreset: 'erdc_rainbow_bright',
   colorDataRange: [0, 1],
-};
-
-GeometryRepresentation.propTypes = {
-  /**
-   * The ID used to identify this component.
-   */
-  id: PropTypes.string,
-
-  /**
-   * Properties to set to the actor
-   */
-  actor: PropTypes.object,
-
-  /**
-   * Properties to set to the vtkGlyph3DMapper
-   */
-  mapper: PropTypes.object,
-
-  /**
-   * Properties to set to the actor.property
-   */
-  property: PropTypes.object,
-
-  /**
-   * Preset name for the lookup table color map
-   */
-  colorMapPreset: PropTypes.string,
-
-  /**
-   * Data range use for the colorMap
-   */
-  colorDataRange: PropTypes.arrayOf(PropTypes.number),
-
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
 };

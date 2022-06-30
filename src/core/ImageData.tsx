@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 
 import {
   RepresentationContext,
@@ -8,6 +7,34 @@ import {
 } from './View';
 
 import vtkImageData from '@kitware/vtk.js/Common/DataModel/ImageData.js';
+
+interface ImageDataProps {
+  /**
+   * The ID used to identify this component.
+   */
+  id?: string;
+  /**
+   * downstream connection port
+   */
+  port?: number;
+  /**
+   * Number of points along x, y, z
+   */
+  dimensions?: number[];
+  /**
+   * Spacing along x, y, z between points in world coordinates
+   */
+  spacing?: number[];
+  /**
+   * World coordinate of the lower left corner of your vtkImageData (i=0, j=0, k=0).
+   */
+  origin?: number[];
+  /**
+   * 3x3 matrix use to orient the image data
+   */
+  direction?: number[];
+  children?: React.ReactNode[] | React.ReactNode;
+}
 
 /**
  * ImageData is exposing a vtkImageData to a downstream filter
@@ -21,7 +48,7 @@ import vtkImageData from '@kitware/vtk.js/Common/DataModel/ImageData.js';
  *       0, 0, 1
  *     ]
  */
-export default class ImageData extends Component {
+export default class ImageData extends Component<ImageDataProps> {
   constructor(props) {
     super(props);
 
@@ -93,41 +120,4 @@ ImageData.defaultProps = {
   spacing: [1, 1, 1],
   origin: [0, 0, 0],
   direction: [1, 0, 0, 0, 1, 0, 0, 0, 1],
-};
-
-ImageData.propTypes = {
-  /**
-   * The ID used to identify this component.
-   */
-  id: PropTypes.string,
-
-  /**
-   * downstream connection port
-   */
-  port: PropTypes.number,
-
-  /**
-   * Number of points along x, y, z
-   */
-  dimensions: PropTypes.arrayOf(PropTypes.number),
-
-  /**
-   * Spacing along x, y, z between points in world coordinates
-   */
-  spacing: PropTypes.arrayOf(PropTypes.number),
-
-  /**
-   * World coordinate of the lower left corner of your vtkImageData (i=0, j=0, k=0).
-   */
-  origin: PropTypes.arrayOf(PropTypes.number),
-
-  /**
-   * 3x3 matrix use to orient the image data
-   */
-  direction: PropTypes.arrayOf(PropTypes.number),
-
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
 };

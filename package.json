@@ -9,7 +9,9 @@
   "module": "dist/esm/index.js",
   "source": "src/index.js",
   "dependencies": {
-    "@babel/runtime": "^7.12.5"
+    "@babel/runtime": "^7.12.5",
+    "@rollup/plugin-typescript": "^8.3.3",
+    "typescript": "^4.7.4"
   },
   "scripts": {
     "prebuild": "npm run fix",
@@ -18,7 +20,7 @@
     "test": "npm run test:lint && npm run test:build",
     "test:build": "npm run build",
     "test:lint": "eslint src",
-    "fix:prettier": "prettier --config .prettierrc --write \"src/**/*.js\"",
+    "fix:prettier": "prettier --config .prettierrc --write \"src/**/*.{ts,tsx}\"",
     "fix:eslint": "eslint --fix src",
     "fix": "npm run fix:prettier && npm run fix:eslint",
     "predeploy": "cd usage && npm install && npm run build",
@@ -28,7 +30,7 @@
     "dev": "rollup ./src/index.js -c --watch"
   },
   "peerDependencies": {
-    "@kitware/vtk.js": "^24.17.0",
+    "@kitware/vtk.js": "^25.0.1",
     "react": "^16.0.0"
   },
   "devDependencies": {
@@ -36,15 +38,20 @@
     "@babel/plugin-transform-runtime": "^7.12.10",
     "@babel/preset-env": "^7.12.11",
     "@babel/preset-react": "^7.12.10",
-    "@kitware/vtk.js": "^24.17.0",
+    "@kitware/vtk.js": "^25.0.1",
     "@rollup/plugin-babel": "^5.2.2",
     "@rollup/plugin-commonjs": "17.0.0",
     "@rollup/plugin-eslint": "^8.0.1",
     "@rollup/plugin-node-resolve": "^11.1.0",
+    "@types/prop-types": "^15.7.5",
+    "@types/react": "^16.14.28",
+    "@types/react-dom": "^16.9.16",
+    "@typescript-eslint/eslint-plugin": "^5.30.0",
+    "@typescript-eslint/parser": "^5.30.0",
     "babel-eslint": "^10.0.3",
     "commitizen": "4.2.2",
     "cross-env": "^7.0.2",
-    "eslint": "^6.8.0",
+    "eslint": "^8.18.0",
     "eslint-config-prettier": "^6.7.0",
     "eslint-config-standard": "^14.1.0",
     "eslint-config-standard-react": "^9.2.0",

@@ -1,12 +1,15 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { DataSetContext, FieldsContext } from './View';
+
+interface PointDataProps {
+  children?: React.ReactNode[] | React.ReactNode;
+}
 
 /**
  * PointData is exposing a vtkPointData to a downstream element
  */
-export default function PointData(props) {
+export default function PointData(props: PointDataProps) {
   return (
     <DataSetContext.Consumer>
       {(dataset) => (
@@ -19,10 +22,3 @@ export default function PointData(props) {
 }
 
 PointData.defaultProps = {};
-
-PointData.propTypes = {
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
-};

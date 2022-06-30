@@ -152,7 +152,6 @@ class ViewController extends Component {
 }
 
 ViewController.defaultProps = View.defaultProps;
-ViewController.propTypes = View.propTypes;
 
 export default function ViewContainer(props) {
   return (

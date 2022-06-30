@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 
 import { toTypedArray, smartEqualsShallow } from '../utils';
 
@@ -10,6 +9,42 @@ import {
 } from './View';
 
 import vtkPolyData from '@kitware/vtk.js/Common/DataModel/PolyData.js';
+
+interface PolyDataProps {
+  /**
+   * The ID used to identify this component.
+   */
+  id?: string;
+  /**
+   * downstream connection port
+   */
+  port?: number;
+  /**
+   * xyz coordinates ([] | TypedArray | { bvals, dtype, shape })
+   */
+  points?: number[] | object | Float64Array | Float32Array;
+  /**
+   * verts cells
+   */
+  verts?: number[] | object | Uint8Array | Uint16Array | Uint32Array;
+  /**
+   * lines cells
+   */
+  lines?: number[] | object | Uint8Array | Uint16Array | Uint32Array;
+  /**
+   * polys cells
+   */
+  polys?: number[] | object | Uint8Array | Uint16Array | Uint32Array;
+  /**
+   * strips cells
+   */
+  strips?: number[] | object | Uint8Array | Uint16Array | Uint32Array;
+  /**
+   * Type of connectivity `manual` or implicit such as `points`, `triangles`, `strips`
+   */
+  connectivity?: string;
+  children?: React.ReactNode[] | React.ReactNode;
+}
 
 /**
  * PolyData is exposing a vtkPolyData to a downstream filter
@@ -22,7 +57,7 @@ import vtkPolyData from '@kitware/vtk.js/Common/DataModel/PolyData.js';
  * Cell connectivity helper property:
  *   - connectivity: 'manual', // [manual, points, triangles, strips]
  */
-export default class PolyData extends Component {
+export default class PolyData extends Component<PolyDataProps> {
   constructor(props) {
     super(props);
 
@@ -177,80 +212,4 @@ PolyData.defaultProps = {
   port: 0,
   points: [],
   connectivity: 'manual',
-};
-
-PolyData.propTypes = {
-  /**
-   * The ID used to identify this component.
-   */
-  id: PropTypes.string,
-
-  /**
-   * downstream connection port
-   */
-  port: PropTypes.number,
-
-  /**
-   * xyz coordinates ([] | TypedArray | { bvals, dtype, shape })
-   */
-  points: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.number),
-    PropTypes.object,
-    PropTypes.instanceOf(Float64Array),
-    PropTypes.instanceOf(Float32Array),
-  ]),
-
-  /**
-   * verts cells
-   */
-  verts: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.number),
-    PropTypes.object,
-    PropTypes.instanceOf(Uint8Array),
-    PropTypes.instanceOf(Uint16Array),
-    PropTypes.instanceOf(Uint32Array),
-  ]),
-
-  /**
-   * lines cells
-   */
-  lines: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.number),
-    PropTypes.object,
-    PropTypes.instanceOf(Uint8Array),
-    PropTypes.instanceOf(Uint16Array),
-    PropTypes.instanceOf(Uint32Array),
-  ]),
-
-  /**
-   * polys cells
-   */
-  polys: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.number),
-    PropTypes.object,
-    PropTypes.instanceOf(Uint8Array),
-    PropTypes.instanceOf(Uint16Array),
-    PropTypes.instanceOf(Uint32Array),
-  ]),
-
-  /**
-   * strips cells
-   */
-  strips: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.number),
-    PropTypes.object,
-    PropTypes.instanceOf(Uint8Array),
-    PropTypes.instanceOf(Uint16Array),
-    PropTypes.instanceOf(Uint32Array),
-  ]),
-
-  /**
-   * Type of connectivity `manual` or implicit such as `points`, `triangles`, `strips`
-   */
-  connectivity: PropTypes.string,
-
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
 };
