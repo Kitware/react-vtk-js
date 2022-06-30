@@ -54,6 +54,14 @@ interface ReaderProps {
  *   - parseAsArrayBuffer: base64String
  */
 export default class Reader extends Component<ReaderProps> {
+  static defaultProps = {
+    port: 0,
+    vtkClass: '',
+    renderOnUpdate: true,
+    resetCameraOnUpdate: true,
+    options: { binary: true },
+  };
+
   constructor(props) {
     super(props);
 
@@ -177,11 +185,3 @@ export default class Reader extends Component<ReaderProps> {
     }
   }
 }
-
-Reader.defaultProps = {
-  port: 0,
-  vtkClass: '',
-  renderOnUpdate: true,
-  resetCameraOnUpdate: true,
-  options: { binary: true },
-};

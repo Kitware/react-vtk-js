@@ -20,5 +20,3 @@ export default function PointData(props: PointDataProps) {
     </DataSetContext.Consumer>
   );
 }
-
-PointData.defaultProps = {};

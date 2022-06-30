@@ -51,6 +51,11 @@ interface Geometry2DRepresentationProps {
  *   - opacity: 1,
  */
 export default class Geometry2DRepresentation extends Component<Geometry2DRepresentationProps> {
+  static defaultProps = {
+    colorMapPreset: 'erdc_rainbow_bright',
+    colorDataRange: [0, 1],
+  };
+
   constructor(props) {
     super(props);
 
@@ -213,8 +218,3 @@ export default class Geometry2DRepresentation extends Component<Geometry2DRepres
     }
   }
 }
-
-Geometry2DRepresentation.defaultProps = {
-  colorMapPreset: 'erdc_rainbow_bright',
-  colorDataRange: [0, 1],
-};

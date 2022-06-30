@@ -23,6 +23,11 @@ interface VolumeControllerProps {
  * VolumeController is a GUI to control the piecewise function
  */
 export default class VolumeController extends Component<VolumeControllerProps> {
+  static defaultProps = {
+    size: [400, 150],
+    rescaleColorMap: true,
+  };
+
   constructor(props) {
     super(props);
     this.subscriptions = [];
@@ -102,8 +107,3 @@ export default class VolumeController extends Component<VolumeControllerProps> {
     }
   }
 }
-
-VolumeController.defaultProps = {
-  size: [400, 150],
-  rescaleColorMap: true,
-};

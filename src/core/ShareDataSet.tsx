@@ -52,6 +52,11 @@ interface ShareDataSetProps {
 
  */
 export default class ShareDataSet extends Component<ShareDataSetProps> {
+  static defaultProps = {
+    port: 0,
+    name: 'shared',
+  };
+
   getTrivialProducer() {
     let trivialProducer = SHARED_INSTANCES[this.props.name];
     if (!trivialProducer) {
@@ -137,8 +142,3 @@ export default class ShareDataSet extends Component<ShareDataSetProps> {
     }
   }
 }
-
-ShareDataSet.defaultProps = {
-  port: 0,
-  name: 'shared',
-};

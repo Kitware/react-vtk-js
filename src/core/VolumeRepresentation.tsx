@@ -45,6 +45,11 @@ interface VolumeRepresentationProps {
  *   - color: [1,1,1],
  */
 export default class VolumeRepresentation extends Component<VolumeRepresentationProps> {
+  static defaultProps = {
+    colorMapPreset: 'erdc_rainbow_bright',
+    colorDataRange: 'auto',
+  };
+
   constructor(props) {
     super(props);
 
@@ -205,8 +210,3 @@ export default class VolumeRepresentation extends Component<VolumeRepresentation
     }
   }
 }
-
-VolumeRepresentation.defaultProps = {
-  colorMapPreset: 'erdc_rainbow_bright',
-  colorDataRange: 'auto',
-};

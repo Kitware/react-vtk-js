@@ -52,6 +52,14 @@ interface DataArrayProps {
  *   - registration: 'addArray', 'setScalars', ...
  */
 export default class DataArray extends Component<DataArrayProps> {
+  static defaultProps = {
+    name: 'scalars',
+    type: 'Float32Array',
+    values: [],
+    numberOfComponents: 1,
+    registration: 'addArray',
+  };
+
   constructor(props) {
     super(props);
 
@@ -131,11 +139,3 @@ export default class DataArray extends Component<DataArrayProps> {
     }
   }
 }
-
-DataArray.defaultProps = {
-  name: 'scalars',
-  type: 'Float32Array',
-  values: [],
-  numberOfComponents: 1,
-  registration: 'addArray',
-};

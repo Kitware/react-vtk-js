@@ -69,6 +69,11 @@ interface SliceRepresentationProps {
  *   - color: [1,1,1],
  */
 export default class SliceRepresentation extends Component<SliceRepresentationProps> {
+  static defaultProps = {
+    colorMapPreset: 'Grayscale',
+    colorDataRange: 'auto',
+  };
+
   constructor(props) {
     super(props);
 
@@ -263,8 +268,3 @@ export default class SliceRepresentation extends Component<SliceRepresentationPr
     }
   }
 }
-
-SliceRepresentation.defaultProps = {
-  colorMapPreset: 'Grayscale',
-  colorDataRange: 'auto',
-};

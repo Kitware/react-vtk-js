@@ -49,6 +49,14 @@ interface ImageDataProps {
  *     ]
  */
 export default class ImageData extends Component<ImageDataProps> {
+  static defaultProps = {
+    port: 0,
+    dimensions: [1, 1, 1],
+    spacing: [1, 1, 1],
+    origin: [0, 0, 0],
+    direction: [1, 0, 0, 0, 1, 0, 0, 0, 1],
+  };
+
   constructor(props) {
     super(props);
 
@@ -113,11 +121,3 @@ export default class ImageData extends Component<ImageDataProps> {
     }
   }
 }
-
-ImageData.defaultProps = {
-  port: 0,
-  dimensions: [1, 1, 1],
-  spacing: [1, 1, 1],
-  origin: [0, 0, 0],
-  direction: [1, 0, 0, 0, 1, 0, 0, 0, 1],
-};

@@ -44,6 +44,14 @@ interface CalculatorProps {
  *   - formula: fn
  */
 export default class Calculator extends Component<CalculatorProps> {
+  static defaultProps = {
+    port: 0,
+    name: 'scalars',
+    location: 'POINT',
+    arrays: [],
+    formula: (xyz) => xyz[0],
+  };
+
   constructor(props) {
     super(props);
 
@@ -86,11 +94,3 @@ export default class Calculator extends Component<CalculatorProps> {
     this.calculator = null;
   }
 }
-
-Calculator.defaultProps = {
-  port: 0,
-  name: 'scalars',
-  location: 'POINT',
-  arrays: [],
-  formula: (xyz) => xyz[0],
-};

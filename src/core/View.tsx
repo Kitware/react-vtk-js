@@ -32,7 +32,9 @@ import { FieldAssociations } from '@kitware/vtk.js/Common/DataModel/DataSet/Cons
 // ----------------------------------------------------------------------------
 
 export const ViewContext = React.createContext<IvtkObject | null>(null);
-export const RepresentationContext = React.createContext<IvtkObject | null>(null);
+export const RepresentationContext = React.createContext<IvtkObject | null>(
+  null
+);
 export const DataSetContext = React.createContext<IvtkObject | null>(null);
 export const FieldsContext = React.createContext<IvtkObject | null>(null);
 export const DownstreamContext = React.createContext<IvtkObject | null>(null);
@@ -112,7 +114,7 @@ const RENDERER_STYLE = {
   overflow: 'hidden',
 };
 
-interface ViewProps {
+export interface ViewProps {
   /**
    * The ID used to identify this component.
    */
@@ -245,6 +247,60 @@ interface ViewProps {
  *   - `showOrientationAxes`: true
  */
 export default class View extends Component<ViewProps> {
+  static defaultProps = {
+    style: {
+      width: '100%',
+      height: '100%',
+    },
+    background: [0.2, 0.3, 0.4],
+    cameraPosition: [0, 0, 1],
+    cameraViewUp: [0, 1, 0],
+    cameraParallelProjection: false,
+    triggerRender: 0,
+    triggerResetCamera: 0,
+    interactorSettings: [
+      {
+        button: 1,
+        action: 'Rotate',
+      },
+      {
+        button: 2,
+        action: 'Pan',
+      },
+      {
+        button: 3,
+        action: 'Zoom',
+        scrollEnabled: true,
+      },
+      {
+        button: 1,
+        action: 'Pan',
+        alt: true,
+      },
+      {
+        button: 1,
+        action: 'Zoom',
+        control: true,
+      },
+      {
+        button: 1,
+        action: 'Select',
+        shift: true,
+      },
+      {
+        button: 1,
+        action: 'Roll',
+        alt: true,
+        shift: true,
+      },
+    ],
+    interactive: true,
+    pickingModes: [],
+    showCubeAxes: false,
+    pointerSize: 0,
+    showOrientationAxes: false,
+  };
+
   constructor(props) {
     super(props);
     this.containerRef = React.createRef();
@@ -790,57 +846,3 @@ export default class View extends Component<ViewProps> {
     return [];
   }
 }
-
-View.defaultProps = {
-  style: {
-    width: '100%',
-    height: '100%',
-  },
-  background: [0.2, 0.3, 0.4],
-  cameraPosition: [0, 0, 1],
-  cameraViewUp: [0, 1, 0],
-  cameraParallelProjection: false,
-  triggerRender: 0,
-  triggerResetCamera: 0,
-  interactorSettings: [
-    {
-      button: 1,
-      action: 'Rotate',
-    },
-    {
-      button: 2,
-      action: 'Pan',
-    },
-    {
-      button: 3,
-      action: 'Zoom',
-      scrollEnabled: true,
-    },
-    {
-      button: 1,
-      action: 'Pan',
-      alt: true,
-    },
-    {
-      button: 1,
-      action: 'Zoom',
-      control: true,
-    },
-    {
-      button: 1,
-      action: 'Select',
-      shift: true,
-    },
-    {
-      button: 1,
-      action: 'Roll',
-      alt: true,
-      shift: true,
-    },
-  ],
-  interactive: true,
-  pickingModes: [],
-  showCubeAxes: false,
-  pointerSize: 0,
-  showOrientationAxes: false,
-};

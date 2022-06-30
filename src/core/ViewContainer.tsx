@@ -5,11 +5,13 @@ import vtkRenderWindow from '@kitware/vtk.js/Rendering/Core/RenderWindow.js';
 import vtkRenderWindowInteractor from '@kitware/vtk.js/Rendering/Core/RenderWindowInteractor.js';
 import vtkRenderer from '@kitware/vtk.js/Rendering/Core/Renderer.js';
 
-import View from './View';
+import View, { ViewProps } from './View';
 import { MultiViewRootContext } from './MultiViewRoot';
 
-class ViewController extends Component {
-  constructor(props) {
+class ViewController extends Component<ViewProps> {
+  static defaultProps = View.defaultProps;
+
+  constructor(props: ViewProps) {
     super(props);
 
     this.renderer = vtkRenderer.newInstance();
@@ -150,8 +152,6 @@ class ViewController extends Component {
     }
   }
 }
-
-ViewController.defaultProps = View.defaultProps;
 
 export default function ViewContainer(props) {
   return (

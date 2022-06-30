@@ -20,5 +20,3 @@ export default function FieldData(props: FieldDataProps) {
     </DataSetContext.Consumer>
   );
 }
-
-FieldData.defaultProps = {};

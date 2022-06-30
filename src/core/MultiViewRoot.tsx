@@ -33,6 +33,11 @@ const RENDERER_STYLE = {
 };
 
 export default class MultiViewRoot extends Component {
+  static defaultProps = {
+    triggerRender: 0,
+    disabled: false,
+  };
+
   constructor(props) {
     super(props);
     this.containerRef = React.createRef();
@@ -190,11 +195,6 @@ export default class MultiViewRoot extends Component {
     }
   }
 }
-
-MultiViewRoot.defaultProps = {
-  triggerRender: 0,
-  disabled: false,
-};
 
 export const propTypes = {
   /**

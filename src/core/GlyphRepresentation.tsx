@@ -46,6 +46,11 @@ interface GeometryRepresentationProps {
  *    - colorDataRange: Range to use for the color scale
  */
 export default class GeometryRepresentation extends Component<GeometryRepresentationProps> {
+  static defaultProps = {
+    colorMapPreset: 'erdc_rainbow_bright',
+    colorDataRange: [0, 1],
+  };
+
   constructor(props) {
     super(props);
 
@@ -173,8 +178,3 @@ export default class GeometryRepresentation extends Component<GeometryRepresenta
     }
   }
 }
-
-GeometryRepresentation.defaultProps = {
-  colorMapPreset: 'erdc_rainbow_bright',
-  colorDataRange: [0, 1],
-};

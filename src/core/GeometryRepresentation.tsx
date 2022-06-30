@@ -69,6 +69,14 @@ interface GeometryRepresentationProps {
  *   - color: [1,1,1],
  */
 export default class GeometryRepresentation extends Component<GeometryRepresentationProps> {
+  static defaultProps = {
+    colorMapPreset: 'erdc_rainbow_bright',
+    colorDataRange: [0, 1],
+    showCubeAxes: false,
+    showScalarBar: false,
+    scalarBarTitle: '',
+  };
+
   constructor(props) {
     super(props);
 
@@ -310,11 +318,3 @@ export default class GeometryRepresentation extends Component<GeometryRepresenta
     }
   }
 }
-
-GeometryRepresentation.defaultProps = {
-  colorMapPreset: 'erdc_rainbow_bright',
-  colorDataRange: [0, 1],
-  showCubeAxes: false,
-  showScalarBar: false,
-  scalarBarTitle: '',
-};

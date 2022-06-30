@@ -20,5 +20,3 @@ export default function CellData(props: CellDataProps) {
     </DataSetContext.Consumer>
   );
 }
-
-CellData.defaultProps = {};

@@ -58,6 +58,12 @@ interface PolyDataProps {
  *   - connectivity: 'manual', // [manual, points, triangles, strips]
  */
 export default class PolyData extends Component<PolyDataProps> {
+  static defaultProps = {
+    port: 0,
+    points: [],
+    connectivity: 'manual',
+  };
+
   constructor(props) {
     super(props);
 
@@ -207,9 +213,3 @@ export default class PolyData extends Component<PolyDataProps> {
     }
   }
 }
-
-PolyData.defaultProps = {
-  port: 0,
-  points: [],
-  connectivity: 'manual',
-};
