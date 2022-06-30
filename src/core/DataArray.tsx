@@ -14,7 +14,7 @@ interface DataArrayProps {
   /**
    * Typed array name
    */
-  type?: string;
+  type?: string | null;
   /**
    * Field name
    */
@@ -32,7 +32,8 @@ interface DataArrayProps {
     | Int8Array
     | Uint32Array
     | Uint16Array
-    | Uint8Array;
+    | Uint8Array
+    | null;
   /**
    * Number of components / Tuple size
    */

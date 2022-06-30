@@ -62,7 +62,11 @@ export default class Reader extends Component<ReaderProps> {
     options: { binary: true },
   };
 
-  constructor(props) {
+  reader: IvtkObject | null;
+  representation?: IvtkObject | null;
+  downstream?: IvtkObject | null;
+
+  constructor(props: ReaderProps) {
     super(props);
 
     // Create vtk.js algorithm
