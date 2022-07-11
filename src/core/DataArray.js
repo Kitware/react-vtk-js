@@ -59,7 +59,7 @@ export default class DataArray extends Component {
   }
 
   update(props, previous) {
-    const { name, type, values, numberOfComponents } = props;
+    const { name, type, values, numberOfComponents, range } = props;
     const klass = TYPED_ARRAYS[type];
     let changeDetected = false;
 
@@ -79,6 +79,9 @@ export default class DataArray extends Component {
 
     if (values && (changeDetected || !previous || values !== previous.values)) {
       this.array.setData(toTypedArray(values, klass), numberOfComponents);
+      if (range) {
+        this.array.setRange(range, numberOfComponents);
+      }
       changeDetected = true;
     }
 
