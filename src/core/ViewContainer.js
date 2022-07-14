@@ -13,7 +13,7 @@ class ViewController extends Component {
     super(props);
 
     this.renderer = vtkRenderer.newInstance();
-    this.viewRef = React.createRef();
+    this.view = null;
     this.resizeObserver = new ResizeObserver(() => this.onResize());
 
     if (props.root) {
@@ -28,6 +28,7 @@ class ViewController extends Component {
 
     this.onEnter = this.onEnter.bind(this);
     this.onResize = this.onResize.bind(this);
+    this.setViewRef = this.setViewRef.bind(this);
   }
 
   componentDidMount() {
@@ -41,9 +42,8 @@ class ViewController extends Component {
     }
     this.renderWindow.addRenderer(this.renderer);
 
-    const view = this.viewRef.current;
-    const container = view?.containerRef.current;
-    if (view && container) {
+    const container = this.view?.containerRef.current;
+    if (this.view && container) {
       container.addEventListener('pointerenter', this.onEnter);
       if (this.props.root) {
         this.props.root.observeRendererResize(container, this.renderer);
@@ -53,7 +53,7 @@ class ViewController extends Component {
         if (this.props.interactive) {
           this.interactor.bindEvents(container);
         }
-        this.interactor.setInteractorStyle(view.style);
+        this.interactor.setInteractorStyle(this.view.style);
         // initial resize
         this.onResize();
       }
@@ -61,8 +61,7 @@ class ViewController extends Component {
   }
 
   componentWillUnmount() {
-    const view = this.viewRef.current;
-    const container = view.containerRef.current;
+    const container = this.view?.containerRef.current;
     container.removeEventListener('pointerenter', this.onEnter);
 
     this.resizeObserver.disconnect();
@@ -110,10 +109,19 @@ class ViewController extends Component {
         renderWindowView={this.openglRenderWindow}
         renderer={this.renderer}
         interactor={this.interactor}
-        ref={this.viewRef}
+        ref={this.setViewRef}
         {...filteredProps}
       />
     );
+  }
+
+  // sets both the forwarded ref and the internal view ref
+  // in order for external refs to point to the inner View
+  setViewRef(el) {
+    this.view = el;
+    if (this.props.forwardedRef) {
+      this.props.forwardedRef.current = el;
+    }
   }
 
   bindInteractorEvents(el) {
@@ -129,17 +137,16 @@ class ViewController extends Component {
   }
 
   onEnter() {
-    const view = this.viewRef.current;
-    const container = view?.containerRef.current;
+    const container = this.view?.containerRef.current;
     if (this.props.root && container) {
       this.bindInteractorEvents(container);
       this.interactor.setCurrentRenderer(this.renderer);
-      this.interactor.setInteractorStyle(view.style);
+      this.interactor.setInteractorStyle(this.view.style);
     }
   }
 
   onResize() {
-    const container = this.viewRef.current?.containerRef.current;
+    const container = this.view?.containerRef.current;
     if (container && !this.props.root) {
       const devicePixelRatio = window.devicePixelRatio || 1;
       const { width, height } = container.getBoundingClientRect();
@@ -154,10 +161,8 @@ class ViewController extends Component {
 ViewController.defaultProps = View.defaultProps;
 ViewController.propTypes = View.propTypes;
 
-export default function ViewContainer(props) {
-  return (
-    <MultiViewRootContext.Consumer>
-      {(root) => <ViewController {...props} root={root} />}
-    </MultiViewRootContext.Consumer>
-  );
-}
+export default React.forwardRef((props, ref) => (
+  <MultiViewRootContext.Consumer>
+    {(root) => <ViewController forwardedRef={ref} {...props} root={root} />}
+  </MultiViewRootContext.Consumer>
+));
