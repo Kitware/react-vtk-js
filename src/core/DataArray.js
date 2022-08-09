@@ -53,7 +53,7 @@ export default class DataArray extends Component {
   }
 
   componentWillUnmount() {
-    this.fields.removeArray(this.array.getName(());
+    this.fields.removeArray(this.array.getName());
     this.array.delete();
     this.array = null;
   }
