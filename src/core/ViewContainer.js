@@ -158,8 +158,10 @@ class ViewController extends Component {
 ViewController.defaultProps = View.defaultProps;
 ViewController.propTypes = View.propTypes;
 
-export default React.forwardRef((props, ref) => (
-  <MultiViewRootContext.Consumer>
-    {(root) => <ViewController forwardedRef={ref} {...props} root={root} />}
-  </MultiViewRootContext.Consumer>
-));
+export default React.forwardRef(function ViewContainer(props, ref) {
+  return (
+    <MultiViewRootContext.Consumer>
+      {(root) => <ViewController forwardedRef={ref} {...props} root={root} />}
+    </MultiViewRootContext.Consumer>
+  );
+});
