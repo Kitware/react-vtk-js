@@ -307,7 +307,12 @@ export default class View extends Component {
         this.getScreenEventPositionFor(e),
         e
       );
-    this.onMouseMove = (e) => this.hover(this.getScreenEventPositionFor(e), e);
+    this.onMouseMove = (e) => {
+      // Only trigger hover if it's listed in the picking modes
+      if (this.props.pickingModes.indexOf('hover') !== -1) {
+        this.hover(this.getScreenEventPositionFor(e), e);
+      }
+    };
     this.lastSelection = [];
 
     this.onBoxSelectChange = select;
