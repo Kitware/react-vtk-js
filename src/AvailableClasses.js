@@ -10,6 +10,7 @@ import '@kitware/vtk.js/IO/Core/DataAccessHelper/HttpDataAccessHelper';
 import '@kitware/vtk.js/IO/Core/DataAccessHelper/JSZipDataAccessHelper';
 
 // Sources
+import '@kitware/vtk.js/Filters/Sources/CircleSource.js';
 import '@kitware/vtk.js/Filters/Sources/ConcentricCylinderSource.js';
 import '@kitware/vtk.js/Filters/Sources/ConeSource.js';
 import '@kitware/vtk.js/Filters/Sources/CubeSource.js';
