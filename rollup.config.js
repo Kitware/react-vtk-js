@@ -8,7 +8,7 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 const plugins = [
   !process.env.NOLINT &&
     eslint({
-      include: 'src/**/*.js',
+      include: 'src/**/*.[tj]sx?',
       exclude: 'node_modules/**',
     }),
   babel({
@@ -36,6 +36,7 @@ const external = [
 ];
 
 export default [
+  /*
   {
     input: 'src/index.js',
     output: [
@@ -72,6 +73,48 @@ export default [
         browser: true,
       }),
       ...plugins,
+    ],
+  },
+  */
+  {
+    input: 'src/index.ts',
+    output: {
+      dir: 'dist/ts',
+      format: 'esm',
+      preserveModules: true,
+      preserveModulesRoot: 'src',
+    },
+    external: [
+      '@babel/runtime',
+      '@kitware/vtk.js',
+      'prop-types',
+      'react',
+      'regenerator-runtime',
+    ],
+    plugins: [
+      nodeResolve({
+        browser: true,
+        preferBuiltins: false,
+        extensions: ['.js', '.ts', '.tsx'],
+      }),
+      commonjs(),
+      babel({
+        include: 'src/**',
+        exclude: '**/node_modules/**',
+        extensions: ['.js', '.ts', '.tsx'],
+        babelHelpers: 'runtime',
+        presets: [
+          '@babel/env',
+          [
+            '@babel/preset-react',
+            {
+              runtime: 'automatic',
+            },
+          ],
+          '@babel/preset-typescript',
+        ],
+        plugins: ['@babel/plugin-transform-runtime'],
+      }),
     ],
   },
 ];

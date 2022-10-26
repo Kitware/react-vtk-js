@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+      "target": "es2017",
+      "module": "esnext",
+      "moduleResolution": "node",
+      "noEmitOnError": true,
+      "lib": ["es2017", "DOM"],
+      "strict": true,
+      "esModuleInterop": false,
+      "outDir": "dist/ts",
+      "rootDir": "./",
+      "jsx": "react-jsx",
+      "allowSyntheticDefaultImports": true
+    },
+    "include": ["./src/**/*.ts", "./src/**/*.tsx"]
+  }
+  
