@@ -3,6 +3,7 @@ import vtk from '@kitware/vtk.js/vtk';
 import { PropsWithChildren, useCallback, useEffect } from 'react';
 import { VtkConstructor } from '../types';
 import useGetterRef from '../utils-ts/useGetterRef';
+import { usePrevious } from '../utils-ts/usePrevious';
 import useUnmount from '../utils-ts/useUnmount';
 import {
   DownstreamContext,
@@ -28,6 +29,7 @@ interface Props extends PropsWithChildren {
 }
 
 export default function Algorithm(props: Props) {
+  const prev = usePrevious(props);
   const { vtkClass, state, port = 0 } = props;
 
   const createAlgo = useCallback(() => {
@@ -48,7 +50,7 @@ export default function Algorithm(props: Props) {
     if (!algoRef.current) {
       algoRef.current = createAlgo();
       algoChanged = true;
-    } else if (algoRef.current.getClassName() !== vtkClass) {
+    } else if (vtkClass !== prev?.vtkClass) {
       const curAlgo = algoRef.current;
       const newAlgo = createAlgo();
 
@@ -81,6 +83,7 @@ export default function Algorithm(props: Props) {
       }
     }
   }, [
+    prev,
     vtkClass,
     state,
     port,

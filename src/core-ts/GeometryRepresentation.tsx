@@ -359,6 +359,8 @@ export default forwardRef(function GeometryRepresentation(
       getActor,
       getMapper,
       dataChanged: () => {
+        // TODO when algorithm updates, need to update mapper?
+        getMapper().modified();
         view.requestRender();
       },
       dataAvailable: () => {
