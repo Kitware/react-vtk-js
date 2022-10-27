@@ -85,17 +85,22 @@ interface Props extends PropsWithChildren {
   connectivity?: string;
 }
 
+const DefaultProps = {
+  port: 0,
+  points: [],
+  connectivity: 'manual',
+};
+
 export default forwardRef(function PolyData(props: Props, fwdRef) {
   const {
-    port = 0,
-    points = [],
-    connectivity = 'manual',
+    port = DefaultProps.port,
+    points = DefaultProps.points,
+    connectivity = DefaultProps.connectivity,
     verts,
     lines,
     polys,
     strips,
   } = props;
-  const prev = usePrevious(props);
 
   const [pdRef, getPolyData] = useGetterRef(() => vtkPolyData.newInstance());
 
@@ -125,6 +130,8 @@ export default forwardRef(function PolyData(props: Props, fwdRef) {
   );
 
   useImperativeHandle(fwdRef, () => dataset);
+
+  const prev = usePrevious({ ...DefaultProps, ...props });
 
   // update polydata
   useEffect(() => {

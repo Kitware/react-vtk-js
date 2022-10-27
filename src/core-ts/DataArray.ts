@@ -1,16 +1,14 @@
 import vtkDataArray from '@kitware/vtk.js/Common/Core/DataArray';
-import { useEffect } from 'react';
-import { usePrevious } from '../utils-ts/usePrevious';
-import { TYPED_ARRAYS } from '@kitware/vtk.js/macros';
-import { useDataset, useFieldData } from './contexts';
-import { toTypedArray, TypedArrayLookup } from '../utils-ts';
-import { DataArrayValues } from '../types';
 import { vtkRange } from '@kitware/vtk.js/interfaces';
-import useUnmount from '../utils-ts/useUnmount';
-import { useOrderedUnmountEffect } from '../utils-ts/useOrderedUnmountEffect';
+import { TYPED_ARRAYS } from '@kitware/vtk.js/macros';
+import { useEffect } from 'react';
+import { DataArrayValues } from '../types';
+import { toTypedArray, TypedArrayLookup } from '../utils-ts';
 import useGetterRef from '../utils-ts/useGetterRef';
-
-// -----
+import { useOrderedUnmountEffect } from '../utils-ts/useOrderedUnmountEffect';
+import { usePrevious } from '../utils-ts/usePrevious';
+import useUnmount from '../utils-ts/useUnmount';
+import { useDataset, useFieldData } from './contexts';
 
 interface Props {
   /**
@@ -52,7 +50,7 @@ const DefaultProps = {
 };
 
 export default function DataArray(props: Props) {
-  const prev = usePrevious(props);
+  const prev = usePrevious({ ...DefaultProps, ...props });
 
   const [daRef, getDataArray] = useGetterRef(() =>
     vtkDataArray.newInstance({
