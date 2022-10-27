@@ -25,7 +25,7 @@
     "deploy": "gh-pages -d usage/dist -f -r $GIT_PUBLISH_URL",
     "commit": "git cz",
     "semantic-release": "semantic-release",
-    "dev": "rollup ./src/index.js -c --watch"
+    "dev": "rollup -c --watch"
   },
   "peerDependencies": {
     "@kitware/vtk.js": "^26.5.3",
