@@ -90,6 +90,7 @@ export default [
       'react',
       'react/jsx-runtime',
       'regenerator-runtime',
+      'deep-equal',
     ],
     plugins: [
       nodeResolve({

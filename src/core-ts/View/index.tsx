@@ -15,6 +15,11 @@ import { useOrderedUnmountContext } from '../../utils-ts/useOrderedUnmountEffect
 import { ViewContext } from '../contexts';
 import useCamera from './useCamera';
 import useInteractor from './useInteractor';
+import {
+  ManipulatorSettings,
+  useInteractorStyle,
+  useInteractorStyleManipulatorSettings,
+} from './useInteractorStyle';
 import useRenderer from './useRenderer';
 import useRenderWindow from './useRenderWindow';
 import useRenderWindowView from './useRenderWindowView';
@@ -53,7 +58,7 @@ interface Props extends PropsWithChildren {
    * Configure the interactions
    * TODO fix
    */
-  interactorSettings?: Record<string, unknown>[];
+  interactorSettings?: ManipulatorSettings[];
 
   /**
    * Enable/Disable interaction
@@ -152,6 +157,42 @@ const DefaultProps = {
     width: '100%',
     height: '100%',
   } as CSSProperties,
+  interactorSettings: [
+    {
+      button: 1,
+      action: 'Rotate',
+    },
+    {
+      button: 2,
+      action: 'Pan',
+    },
+    {
+      button: 3,
+      action: 'Zoom',
+      scrollEnabled: true,
+    },
+    {
+      button: 1,
+      action: 'Pan',
+      alt: true,
+    },
+    {
+      button: 1,
+      action: 'Zoom',
+      control: true,
+    },
+    {
+      button: 1,
+      action: 'Select',
+      shift: true,
+    },
+    {
+      button: 1,
+      action: 'Roll',
+      alt: true,
+      shift: true,
+    },
+  ] as ManipulatorSettings[],
 };
 
 export default forwardRef(function View(props: Props, fwdRef) {
@@ -161,6 +202,7 @@ export default forwardRef(function View(props: Props, fwdRef) {
     background = DefaultProps.background,
     interactive = DefaultProps.interactive,
     autoResetCamera = DefaultProps.autoResetCamera,
+    interactorSettings = DefaultProps.interactorSettings,
     camera: cameraProps,
   } = props;
 
@@ -176,6 +218,10 @@ export default forwardRef(function View(props: Props, fwdRef) {
     containerRef.current,
     interactive
   );
+
+  const [getInteractorStyle, setInteractorStyle] =
+    useInteractorStyle(getInteractor);
+  useInteractorStyleManipulatorSettings(getInteractorStyle, interactorSettings);
 
   // handle renders
   const [renderRequested, setRenderRequested] = useState(false);
@@ -202,6 +248,7 @@ export default forwardRef(function View(props: Props, fwdRef) {
       getInteractor,
       getAPISpecificRenderWindow: getRWView,
       getCamera,
+      setInteractorStyle,
       /**
        * Requests a vtk.js render.
        *
@@ -217,7 +264,14 @@ export default forwardRef(function View(props: Props, fwdRef) {
         requestRender();
       },
     };
-  }, [getRWView, getRenderer, getRenderWindow, getInteractor, getCamera]);
+  }, [
+    getRWView,
+    getRenderer,
+    getRenderWindow,
+    getInteractor,
+    getCamera,
+    setInteractorStyle,
+  ]);
 
   // expose the view as a ref for imperative control
   useImperativeHandle(fwdRef, () => view);

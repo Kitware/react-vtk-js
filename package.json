@@ -9,7 +9,9 @@
   "module": "dist/ts/index.js",
   "source": "src/index.ts",
   "dependencies": {
-    "@babel/runtime": "^7.12.5"
+    "@babel/eslint-parser": "^7.19.1",
+    "@babel/runtime": "^7.19.0",
+    "deep-equal": "^2.0.5"
   },
   "scripts": {
     "prebuild": "npm run fix",
@@ -42,6 +44,7 @@
     "@rollup/plugin-commonjs": "22.0.2",
     "@rollup/plugin-eslint": "^8.0.2",
     "@rollup/plugin-node-resolve": "^14.1.0",
+    "@types/deep-equal": "^1.0.1",
     "@types/react": "^18.0.21",
     "@typescript-eslint/eslint-plugin": "^5.40.1",
     "@typescript-eslint/parser": "^5.40.1",
