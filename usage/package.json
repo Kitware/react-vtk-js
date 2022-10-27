@@ -10,13 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "fflate": "^0.7.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-vtk-js": "file:.."
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^1.0.7",
-    "vite": "^2.8.0"
+    "@vitejs/plugin-react": "^2.2.0",
+    "vite": "^3.2.0"
   }
 }
