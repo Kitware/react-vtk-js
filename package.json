@@ -8,6 +8,20 @@
   "main": "dist/umd/react-vtk.js",
   "module": "dist/esm/index.js",
   "source": "src/index.js",
+  "exports": {
+    ".": {
+      "browser": "./dist/cjs/react-vtk.js",
+      "umd": "./dist/umd/react-vtk.js",
+      "import": "./dist/esm/index.js",
+      "package.json": "./package.json",
+      "default": "./dist/esm/index.js"
+    },
+    "./light": {
+      "import": "./dist/esm/light.js",
+      "default": "./dist/esm/light.js",
+      "package.json": "./package.json"
+    }
+  },
   "dependencies": {
     "@babel/runtime": "^7.12.5"
   },
