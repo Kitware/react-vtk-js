@@ -1,3 +1,4 @@
+import { ICameraInitialValues } from '@kitware/vtk.js/Rendering/Core/Camera';
 import { Nullable, Vector3 } from '@kitware/vtk.js/types';
 import {
   CSSProperties,
@@ -12,6 +13,7 @@ import {
 import { IView } from '../../types';
 import { useOrderedUnmountContext } from '../../utils-ts/useOrderedUnmountEffect';
 import { ViewContext } from '../contexts';
+import useCamera from './useCamera';
 import useInteractor from './useInteractor';
 import useRenderer from './useRenderer';
 import useRenderWindow from './useRenderWindow';
@@ -59,24 +61,9 @@ interface Props extends PropsWithChildren {
   interactive?: boolean;
 
   /**
-   * Initial camera position from an object in [0,0,0]
+   * Camera properties, such as position, focal point, etc.
    */
-  cameraPosition?: Vector3;
-
-  /**
-   * Initial camera focal point from an object in [0,0,0]
-   */
-  cameraFocalPoint?: Vector3;
-
-  /**
-   * Initial camera position from an object in [0,0,0]
-   */
-  cameraViewUp?: Vector3;
-
-  /**
-   * Use parallel projection (default: false)
-   */
-  cameraParallelProjection?: boolean;
+  camera?: ICameraInitialValues;
 
   /**
    * Whether to automatically call resetCamera() (default: true)
@@ -174,6 +161,7 @@ export default forwardRef(function View(props: Props, fwdRef) {
     background = DefaultProps.background,
     interactive = DefaultProps.interactive,
     autoResetCamera = DefaultProps.autoResetCamera,
+    camera: cameraProps,
   } = props;
 
   const containerRef = useRef<Nullable<HTMLDivElement>>(null);
@@ -189,6 +177,7 @@ export default forwardRef(function View(props: Props, fwdRef) {
     interactive
   );
 
+  // handle renders
   const [renderRequested, setRenderRequested] = useState(false);
   const requestRender = () => setRenderRequested(true);
 
@@ -202,13 +191,17 @@ export default forwardRef(function View(props: Props, fwdRef) {
     }
   }, [renderRequested, autoResetCamera, getRenderer, getRenderWindow]);
 
+  // camera
+  const getCamera = useCamera(getRenderer, requestRender, cameraProps);
+
+  // view API
   const view = useMemo<IView>(() => {
     return {
       getRenderer,
       getRenderWindow,
       getInteractor,
       getAPISpecificRenderWindow: getRWView,
-      getCamera: () => getRenderer().getActiveCamera(),
+      getCamera,
       /**
        * Requests a vtk.js render.
        *
@@ -224,11 +217,12 @@ export default forwardRef(function View(props: Props, fwdRef) {
         requestRender();
       },
     };
-  }, [getRWView, getRenderer, getRenderWindow, getInteractor]);
+  }, [getRWView, getRenderer, getRenderWindow, getInteractor, getCamera]);
 
   // expose the view as a ref for imperative control
   useImperativeHandle(fwdRef, () => view);
 
+  // handle resizing
   useViewResize(containerRef, view);
 
   const { style = DefaultProps.style } = props;
