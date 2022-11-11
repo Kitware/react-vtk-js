@@ -1,9 +1,9 @@
-import { createContext, useContext } from 'react';
+import vtkDataSet from '@kitware/vtk.js/Common/DataModel/DataSet';
 import vtkDataSetAttributes from '@kitware/vtk.js/Common/DataModel/DataSetAttributes';
 import vtkFieldData from '@kitware/vtk.js/Common/DataModel/DataSetAttributes/FieldData';
-import vtkDataSet from '@kitware/vtk.js/Common/DataModel/DataSet';
 import { Nullable } from '@kitware/vtk.js/types';
-import { IRepresentation, IView, IDownstream, IDataset } from '../types';
+import { createContext, useContext } from 'react';
+import { IDataset, IDownstream, IRepresentation, IView } from '../types';
 
 export const FieldDataContext =
   createContext<Nullable<() => vtkDataSetAttributes | vtkFieldData>>(null);

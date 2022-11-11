@@ -1,15 +1,13 @@
-import React from 'react';
-
 import {
-  View,
-  GeometryRepresentation,
   Geometry2DRepresentation,
+  GeometryRepresentation,
   PolyData,
+  View,
 } from 'react-vtk-js';
 
+import { Coordinate } from '@kitware/vtk.js/Rendering/Core/Coordinate/Constants';
 import { Representation } from '@kitware/vtk.js/Rendering/Core/Property/Constants';
 import { DisplayLocation } from '@kitware/vtk.js/Rendering/Core/Property2D/Constants';
-import { Coordinate } from '@kitware/vtk.js/Rendering/Core/Coordinate/Constants';
 
 // React complains about unique key prop but I don't see why
 function Example(props) {
