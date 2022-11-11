@@ -1,8 +1,6 @@
 import vtkActor, {
   IActorInitialValues,
 } from '@kitware/vtk.js/Rendering/Core/Actor';
-import vtkColorTransferFunction from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction';
-import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps';
 import vtkMapper, {
   IMapperInitialValues,
 } from '@kitware/vtk.js/Rendering/Core/Mapper';
@@ -16,19 +14,15 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { IRepresentation, IView } from '../types';
-import { compareShallowObject, compareVector2 } from '../utils-ts/comparators';
-import useBooleanAccumulator, {
-  BooleanAccumulator,
-} from '../utils-ts/useBooleanAccumulator';
+import { IRepresentation } from '../types';
+import { compareShallowObject } from '../utils-ts/comparators';
+import useBooleanAccumulator from '../utils-ts/useBooleanAccumulator';
 import useComparableEffect from '../utils-ts/useComparableEffect';
-import useGetterRef from '../utils-ts/useGetterRef';
-import {
-  useOrderedUnmountContext,
-  useOrderedUnmountEffect,
-} from '../utils-ts/useOrderedUnmountEffect';
-import useUnmount from '../utils-ts/useUnmount';
+import { useOrderedUnmountContext } from '../utils-ts/useOrderedUnmountEffect';
 import { DownstreamContext, RepresentationContext, useView } from './contexts';
+import useColorTransferFunction from './modules/useColorTransferFunction';
+import useMapper from './modules/useMapper';
+import useProp from './modules/useProp';
 
 interface Props extends PropsWithChildren {
   /**
@@ -178,144 +172,6 @@ function useCubeAxes(
 }
 */
 
-function useLookupTable(props: Props, trackModified: BooleanAccumulator) {
-  const [lutRef, getLUT] = useGetterRef(() =>
-    vtkColorTransferFunction.newInstance()
-  );
-  const {
-    colorDataRange: range = DefaultProps.colorDataRange,
-    colorMapPreset: presetName = DefaultProps.colorMapPreset,
-  } = props;
-
-  useComparableEffect(
-    () => {
-      if (!presetName || !range) return;
-      const lut = getLUT();
-      const preset = vtkColorMaps.getPresetByName(presetName);
-      lut.applyColorMap(preset);
-      lut.setMappingRange(range[0], range[1]);
-      lut.updateRange();
-      trackModified(true);
-    },
-    [presetName, range] as const,
-    ([curPreset, curRange], [oldPreset, oldRange]) =>
-      curPreset === oldPreset && compareVector2(curRange, oldRange)
-  );
-
-  useUnmount(() => {
-    if (lutRef.current) {
-      lutRef.current.delete();
-      lutRef.current = null;
-    }
-  });
-
-  return getLUT;
-}
-
-function useMapper(
-  getLookupTable: () => vtkColorTransferFunction,
-  props: Props,
-  trackModified: BooleanAccumulator
-) {
-  const [mapperRef, getMapper] = useGetterRef(() =>
-    vtkMapper.newInstance({
-      lookupTable: getLookupTable(),
-      useLookupTableScalarRange: true,
-    } as IMapperInitialValues)
-  );
-  const { mapper: mapperProps } = props;
-
-  useEffect(() => {
-    getMapper().setLookupTable(getLookupTable());
-  }, [getMapper, getLookupTable]);
-
-  useComparableEffect(
-    () => {
-      if (!mapperProps) return;
-      trackModified(getMapper().set(mapperProps));
-    },
-    [mapperProps],
-    ([cur], [prev]) => compareShallowObject(cur, prev)
-  );
-
-  useUnmount(() => {
-    if (mapperRef.current) {
-      mapperRef.current.delete();
-      mapperRef.current = null;
-    }
-  });
-
-  return getMapper;
-}
-
-function useActor(
-  view: IView,
-  getMapper: () => vtkMapper,
-  dataAvailable: boolean,
-  props: Props,
-  trackModified: BooleanAccumulator
-) {
-  const [actorRef, getActor] = useGetterRef(() =>
-    vtkActor.newInstance({ visibility: false })
-  );
-  const { id, actor: actorProps, property: propertyProps } = props;
-
-  useEffect(() => {
-    getActor().set({ representationID: id });
-  }, [id, getActor]);
-
-  useEffect(() => {
-    getActor().setMapper(getMapper());
-  }, [getActor, getMapper]);
-
-  // add to renderer
-  useOrderedUnmountEffect(() => {
-    const actor = getActor();
-    const renderer = view.getRenderer();
-    renderer.addActor(actor);
-    return () => {
-      renderer.removeActor(actor);
-    };
-  }, [view, getActor]);
-
-  // set actor props
-  useComparableEffect(
-    () => {
-      if (!actorProps) return;
-      trackModified(getActor().set(actorProps));
-    },
-    [actorProps],
-    ([cur], [prev]) => compareShallowObject(cur, prev)
-  );
-
-  // handle visibility as a special case
-  const { visibility = true } = actorProps ?? {};
-  useEffect(() => {
-    const visible = dataAvailable && visibility;
-    trackModified(getActor().setVisibility(visible));
-  }, [dataAvailable, visibility, getActor, trackModified]);
-
-  // set actor property props
-  useComparableEffect(
-    () => {
-      if (!propertyProps) return;
-      trackModified(getActor().getProperty().set(propertyProps));
-    },
-    [propertyProps],
-    ([cur], [prev]) => compareShallowObject(cur, prev)
-  );
-
-  // cleanup on unmount
-  useUnmount(() => {
-    if (actorRef.current) {
-      actorRef.current.delete();
-      actorRef.current = null;
-    }
-  });
-
-  return getActor;
-}
-
 export default forwardRef(function GeometryRepresentation(
   props: Props,
   fwdRef
@@ -331,21 +187,65 @@ export default forwardRef(function GeometryRepresentation(
   */
   const view = useView();
   const [modifiedRef, trackModified, resetModified] = useBooleanAccumulator();
-
   const [dataAvailable, setDataAvailable] = useState(false);
 
-  const getLookupTable = useLookupTable(props, trackModified);
-  const getMapper = useMapper(getLookupTable, props, trackModified);
-  const getActor = useActor(
-    view,
-    getMapper,
-    dataAvailable,
-    props,
+  // --- LUT --- //
+
+  const getLookupTable = useColorTransferFunction(
+    props.colorMapPreset ?? DefaultProps.colorMapPreset,
+    props.colorDataRange ?? DefaultProps.colorDataRange,
     trackModified
+  );
+
+  // --- mapper --- //
+
+  const getMapper = useMapper<vtkMapper, IMapperInitialValues>(
+    () =>
+      vtkMapper.newInstance({
+        lookupTable: getLookupTable(),
+        useLookupTableScalarRange: true,
+      } as IMapperInitialValues),
+    props.mapper,
+    trackModified
+  );
+
+  useEffect(() => {
+    getMapper().setLookupTable(getLookupTable());
+  }, [getMapper, getLookupTable]);
+
+  // --- actor --- //
+
+  const actorProps = {
+    ...props.actor,
+    visibility: dataAvailable && (props.actor?.visibility ?? true),
+  };
+  const getActor = useProp<vtkActor, IActorInitialValues>({
+    constructor: () => vtkActor.newInstance({ visibility: false }),
+    view,
+    id: props.id,
+    props: actorProps,
+    trackModified,
+  });
+
+  useEffect(() => {
+    getActor().setMapper(getMapper());
+  }, [getActor, getMapper]);
+
+  // set actor property props
+  const { property: propertyProps } = props;
+  useComparableEffect(
+    () => {
+      if (!propertyProps) return;
+      trackModified(getActor().getProperty().set(propertyProps));
+    },
+    [propertyProps],
+    ([cur], [prev]) => compareShallowObject(cur, prev)
   );
 
   //   const scalarBarActor = useScalarBarActor(view, false, lookupTable);
   //   const cubeAxes = useCubeAxes(view, false, mapper);
+
+  // --- //
 
   useEffect(() => {
     if (view && modifiedRef.current) {
