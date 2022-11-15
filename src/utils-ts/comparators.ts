@@ -1,4 +1,4 @@
-import { Vector2 } from '@kitware/vtk.js/types';
+import { Vector2, Vector3 } from '@kitware/vtk.js/types';
 
 export function valueCompareFirst<T extends unknown[]>(cur: T, prev: T) {
   return !!cur[0] && cur[0] !== prev[0];
@@ -20,6 +20,8 @@ export function shallowArrayCompareFirst<T extends unknown[][]>(
 
 /**
  * Compares two objects.
+ *
+ * If any object is undefined, then the comparison fails.
  */
 export function compareShallowObject<T>(
   cur: T | undefined,
@@ -41,6 +43,9 @@ export function compareShallowObject<T>(
   );
 }
 
+/**
+ * Compares 2D vectors.
+ */
 export function compareVector2(
   cur: Vector2 | undefined,
   prev: Vector2 | undefined
@@ -48,4 +53,34 @@ export function compareVector2(
   if (cur === prev) return true;
   if (!cur || !prev) return false;
   return cur[0] === prev[0] && cur[1] === prev[1];
+}
+
+/**
+ * Compares 3D vectors.
+ *
+ * If any vector is undefined, then the comparison fails.
+ */
+export function compareVector3(
+  cur: Vector3 | undefined,
+  prev: Vector3 | undefined
+) {
+  if (cur === prev) return true;
+  if (!cur || !prev) return false;
+  return cur[0] === prev[0] && cur[1] === prev[1] && cur[2] === prev[2];
+}
+
+/**
+ * Compares arrays shallowly.
+ */
+export function compareShallowArray(
+  cur: unknown[] | undefined,
+  prev: unknown[] | undefined
+) {
+  if (cur === prev) return true;
+  if (!cur || !prev) return false;
+  if (cur.length !== prev.length) return false;
+  for (let i = 0; i < cur.length; i++) {
+    if (cur[i] !== prev[i]) return false;
+  }
+  return true;
 }
