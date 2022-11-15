@@ -10,20 +10,20 @@ import {
   useRef,
   useState,
 } from 'react';
-import { IView } from '../../types';
-import { useOrderedUnmountContext } from '../../utils-ts/useOrderedUnmountEffect';
-import { ViewContext } from '../contexts';
-import useCamera from './useCamera';
-import useInteractor from './useInteractor';
+import { IView } from '../types';
+import { useOrderedUnmountContext } from '../utils-ts/useOrderedUnmountEffect';
+import { ViewContext } from './contexts';
+import useCamera from './modules/useCamera';
+import useInteractor from './modules/useInteractor';
 import {
   ManipulatorSettings,
   useInteractorStyle,
   useInteractorStyleManipulatorSettings,
-} from './useInteractorStyle';
-import useRenderer from './useRenderer';
-import useRenderWindow from './useRenderWindow';
-import useRenderWindowView from './useRenderWindowView';
-import { useViewResize } from './useViewResize';
+} from './modules/useInteractorStyle';
+import useRenderer from './modules/useRenderer';
+import useRenderWindow from './modules/useRenderWindow';
+import useRenderWindowView from './modules/useRenderWindowView';
+import { useViewResize } from './modules/useViewResize';
 
 const RENDERER_STYLE: CSSProperties = {
   position: 'absolute',
