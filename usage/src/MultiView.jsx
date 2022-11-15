@@ -6,7 +6,7 @@ import ProcessingPipeline from './Geometry/ProcessingPipeline';
 import Cutter from './Geometry/CutterExample';
 import Glyph from './Geometry/Glyph';
 
-import { MultiViewRoot } from 'react-vtk-js';
+import { MultiViewRoot } from 'react-vtk-js/light';
 
 const points = [];
 const scalars = [];

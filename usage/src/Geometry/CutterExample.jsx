@@ -2,7 +2,7 @@ import React from 'react';
 
 import { newInstance as newVtkPlaneInstance } from '@kitware/vtk.js/Common/DataModel/Plane.js';
 
-import { Algorithm, View, GeometryRepresentation, Reader } from 'react-vtk-js';
+import { Algorithm, View, GeometryRepresentation, Reader } from 'react-vtk-js/light';
 
 function Example(props) {
   const plane = newVtkPlaneInstance({

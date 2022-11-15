@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { View, PointCloudRepresentation } from 'react-vtk-js';
+import { View, PointCloudRepresentation } from 'react-vtk-js/light';
 
 const points = [];
 const scalars = [];

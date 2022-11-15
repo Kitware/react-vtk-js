@@ -5,7 +5,7 @@ import {
   VolumeRepresentation,
   VolumeController,
   Reader,
-} from 'react-vtk-js';
+} from 'react-vtk-js/light';
 
 function Example(props) {
   const array = [];

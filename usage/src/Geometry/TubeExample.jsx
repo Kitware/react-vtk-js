@@ -4,7 +4,7 @@ import {
   GeometryRepresentation,
   PolyData,
   Algorithm,
-} from 'react-vtk-js';
+} from 'react-vtk-js/light';
 
 function Example(props) {
   return (

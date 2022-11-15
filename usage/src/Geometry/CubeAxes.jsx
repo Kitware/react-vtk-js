@@ -6,7 +6,7 @@ import {
   PolyData,
   PointData,
   DataArray,
-} from 'react-vtk-js';
+} from 'react-vtk-js/light';
 
 const points = [];
 const scalars = [];

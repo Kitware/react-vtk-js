@@ -10,7 +10,7 @@ import {
   ImageData,
   PointData,
   DataArray,
-} from 'react-vtk-js';
+} from 'react-vtk-js/light';
 
 function generateRandomVolumeField(iMax, jMax, kMax) {
   const array = [];

@@ -9,7 +9,7 @@ import {
   Contexts,
   VolumeController,
   VolumeRepresentation,
-} from 'react-vtk-js';
+} from 'react-vtk-js/light';
 
 function Slider(props) {
   const view = useContext(Contexts.ViewContext);

@@ -5,7 +5,7 @@ import {
   GeometryRepresentation,
   Geometry2DRepresentation,
   PolyData,
-} from 'react-vtk-js';
+} from 'react-vtk-js/light';
 
 import { Representation } from '@kitware/vtk.js/Rendering/Core/Property/Constants';
 import { DisplayLocation } from '@kitware/vtk.js/Rendering/Core/Property2D/Constants';

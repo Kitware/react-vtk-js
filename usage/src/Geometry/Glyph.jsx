@@ -6,7 +6,7 @@ import {
   GlyphRepresentation,
   Algorithm,
   ShareDataSet,
-} from 'react-vtk-js';
+} from 'react-vtk-js/light';
 
 // React complains about unique key prop but I don't see why
 function Example(props) {

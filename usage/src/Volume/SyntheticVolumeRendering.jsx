@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { View, VolumeDataRepresentation } from 'react-vtk-js';
+import { View, VolumeDataRepresentation } from 'react-vtk-js/light';
 
 function Example(props) {
   const array = [];

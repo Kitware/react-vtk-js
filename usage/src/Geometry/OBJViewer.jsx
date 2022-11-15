@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { View, GeometryRepresentation, Reader } from 'react-vtk-js';
+import { View, GeometryRepresentation, Reader } from 'react-vtk-js/light';
 
 // React complains about unique key prop but I don't see why
 function Example(props) {
