@@ -1,3 +1,4 @@
+import vtkInteractorStyle from '@kitware/vtk.js/Interaction/Style/InteractorStyle';
 import { vtkObject } from '@kitware/vtk.js/interfaces';
 import vtkCamera from '@kitware/vtk.js/Rendering/Core/Camera';
 import vtkRenderer from '@kitware/vtk.js/Rendering/Core/Renderer';
@@ -39,6 +40,8 @@ export interface IView {
   getRenderWindow(): vtkRenderWindow;
   getAPISpecificRenderWindow(): vtkOpenGLRenderWindow;
   getInteractor(): vtkRenderWindowInteractor;
+  getInteractorStyle(): vtkInteractorStyle;
+  setInteractorStyle(style: vtkInteractorStyle): void;
   getCamera(): vtkCamera;
   requestRender(): void;
   resetCamera(boundsToUse?: Bounds): void;

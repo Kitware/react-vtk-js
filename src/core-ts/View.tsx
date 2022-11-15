@@ -1,9 +1,11 @@
+import vtkInteractorStyle from '@kitware/vtk.js/Interaction/Style/InteractorStyle';
 import { ICameraInitialValues } from '@kitware/vtk.js/Rendering/Core/Camera';
-import { Nullable, Vector3 } from '@kitware/vtk.js/types';
+import { Bounds, Nullable, Vector3 } from '@kitware/vtk.js/types';
 import {
   CSSProperties,
   forwardRef,
   PropsWithChildren,
+  useCallback,
   useEffect,
   useImperativeHandle,
   useMemo,
@@ -84,18 +86,11 @@ interface Props extends PropsWithChildren {
   autoResetCamera?: boolean;
 
   /**
-   * Property use to trigger a render when changing.
-
-   * TODO remove because the recommended way is to use a ref
-   */
-  // triggerRender?: number;
-
-  /**
-   * Property use to trigger a resetCamera when changing.
+   * Whether to automatically re-set the interactor style's center of rotation. (default: true)
    *
-   * TODO remove because the recommended way is to use a ref
+   * This is a convenience property for interactor styles that support setCenterOfRotation().
    */
-  // triggerResetCamera?: number;
+  autoCenterOfRotation?: boolean;
 
   /**
    * List of picking listeners to bind. By default it is disabled (empty array).
@@ -152,6 +147,7 @@ interface Props extends PropsWithChildren {
 const DefaultProps = {
   interactive: true,
   autoResetCamera: true,
+  autoCenterOfRotation: true,
   background: [0.2, 0.3, 0.4] as Vector3,
   style: {
     width: '100%',
@@ -202,6 +198,7 @@ export default forwardRef(function View(props: Props, fwdRef) {
     background = DefaultProps.background,
     interactive = DefaultProps.interactive,
     autoResetCamera = DefaultProps.autoResetCamera,
+    autoCenterOfRotation = DefaultProps.autoCenterOfRotation,
     interactorSettings = DefaultProps.interactorSettings,
     camera: cameraProps,
   } = props;
@@ -223,24 +220,45 @@ export default forwardRef(function View(props: Props, fwdRef) {
     useInteractorStyle(getInteractor);
   useInteractorStyleManipulatorSettings(getInteractorStyle, interactorSettings);
 
-  // handle renders
+  // --- rendering state --- //
+
   const [renderRequested, setRenderRequested] = useState(false);
   const requestRender = () => setRenderRequested(true);
+
+  // --- camera --- //
+
+  const getCamera = useCamera(getRenderer, requestRender, cameraProps);
+
+  const resetCamera = useCallback(
+    (boundsToUse?: Bounds) => {
+      getRenderer().resetCamera(boundsToUse);
+      if (
+        autoCenterOfRotation &&
+        'setCenterOfRotation' in getInteractorStyle()
+      ) {
+        const style = getInteractorStyle() as vtkInteractorStyle & {
+          setCenterOfRotation(center: Vector3): boolean;
+        };
+        style.setCenterOfRotation(getCamera().getFocalPoint());
+      }
+    },
+    [autoCenterOfRotation, getRenderer, getInteractorStyle, getCamera]
+  );
+
+  // --- handle renders --- //
 
   useEffect(() => {
     if (renderRequested) {
       if (autoResetCamera) {
-        getRenderer().resetCamera();
+        resetCamera();
       }
       getRenderWindow().render();
       setRenderRequested(false);
     }
-  }, [renderRequested, autoResetCamera, getRenderer, getRenderWindow]);
+  }, [renderRequested, autoResetCamera, resetCamera, getRenderWindow]);
 
-  // camera
-  const getCamera = useCamera(getRenderer, requestRender, cameraProps);
+  // --- view API --- //
 
-  // view API
   const view = useMemo<IView>(() => {
     return {
       getRenderer,
@@ -248,6 +266,7 @@ export default forwardRef(function View(props: Props, fwdRef) {
       getInteractor,
       getAPISpecificRenderWindow: getRWView,
       getCamera,
+      getInteractorStyle,
       setInteractorStyle,
       /**
        * Requests a vtk.js render.
@@ -259,8 +278,8 @@ export default forwardRef(function View(props: Props, fwdRef) {
       /**
        * Resets the camera.
        */
-      resetCamera: () => {
-        getRenderer().resetCamera();
+      resetCamera: (boundsToUse?: Bounds) => {
+        resetCamera(boundsToUse);
         requestRender();
       },
     };
@@ -270,7 +289,9 @@ export default forwardRef(function View(props: Props, fwdRef) {
     getRenderWindow,
     getInteractor,
     getCamera,
+    getInteractorStyle,
     setInteractorStyle,
+    resetCamera,
   ]);
 
   // expose the view as a ref for imperative control
