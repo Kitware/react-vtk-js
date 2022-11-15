@@ -25,7 +25,7 @@ import vtkInteractorStyleManipulator from '@kitware/vtk.js/Interaction/Style/Int
 import vtkRenderWindowInteractor from '@kitware/vtk.js/Rendering/Core/RenderWindowInteractor';
 import { Nullable } from '@kitware/vtk.js/types';
 import deepEqual from 'deep-equal';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import useComparableEffect from '../../utils-ts/useComparableEffect';
 import useGetterRef from '../../utils-ts/useGetterRef';
 import useUnmount from '../../utils-ts/useUnmount';
@@ -136,14 +136,17 @@ export function useInteractorStyle(
     }
   });
 
-  const setStyle = (style: vtkInteractorStyle) => {
-    if (!externalStyle && styleRef.current) {
-      styleRef.current.delete();
-    }
-    styleRef.current = style;
-    // should help retrigger effects dependent on the style
-    setExternalStyle(style);
-  };
+  const setStyle = useCallback(
+    (style: vtkInteractorStyle) => {
+      if (!externalStyle && styleRef.current) {
+        styleRef.current.delete();
+      }
+      styleRef.current = style;
+      // should help retrigger effects dependent on the style
+      setExternalStyle(style);
+    },
+    [externalStyle, styleRef]
+  );
 
   return [getStyle, setStyle] as const;
 }
