@@ -155,19 +155,18 @@ export function RegisterDataSet(props: RegisterDataSetProps) {
 
   // --- //
 
-  const api = useMemo<IDownstream>(
+  const downstream = useMemo<IDownstream>(
     () => ({
       setInputData(obj) {
         share.register(id, obj);
       },
       setInputConnection(conn) {
-        api.setInputData(conn());
+        downstream.setInputData(conn());
       },
     }),
     [id, share]
   );
 
-  const getAPI = useCallback(() => api, [api]);
   const mockRepresentation = useMemo<IRepresentation>(
     () => ({
       dataChanged() {
@@ -182,7 +181,7 @@ export function RegisterDataSet(props: RegisterDataSetProps) {
 
   return (
     <RepresentationContext.Provider value={mockRepresentation}>
-      <DownstreamContext.Provider value={getAPI}>
+      <DownstreamContext.Provider value={downstream}>
         {props.children}
       </DownstreamContext.Provider>
     </RepresentationContext.Provider>
@@ -199,14 +198,14 @@ export function UseDataSet(props: UseDataSetProps) {
   const share = useShareDataSet();
   // TODO if useDataSet is input to an algorithm, should representation be null?
   const representation = useRepresentation();
-  const getDownstream = useDownstream();
+  const downstream = useDownstream();
 
   useEffect(() => {
     return share.onDataAvailable(id, (ds) => {
-      getDownstream().setInputData(ds as vtkObject, port);
+      downstream.setInputData(ds as vtkObject, port);
       representation.dataAvailable();
     });
-  }, [id, port, representation, getDownstream, share]);
+  }, [id, port, representation, downstream, share]);
 
   useEffect(() => {
     return share.onDataChanged(id, () => {

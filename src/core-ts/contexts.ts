@@ -44,8 +44,7 @@ export function useRepresentation() {
   if (!rep) throw new Error('No representation context!');
   return rep;
 }
-export const DownstreamContext =
-  createContext<Nullable<() => IDownstream>>(null);
+export const DownstreamContext = createContext<Nullable<IDownstream>>(null);
 
 export function useDownstream() {
   const ds = useContext(DownstreamContext);

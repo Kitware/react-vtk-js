@@ -1,7 +1,7 @@
 import { vtkAlgorithm, vtkObject } from '@kitware/vtk.js/interfaces';
 import vtk from '@kitware/vtk.js/vtk';
-import { PropsWithChildren, useCallback, useEffect } from 'react';
-import { VtkConstructor } from '../types';
+import { PropsWithChildren, useCallback, useEffect, useMemo } from 'react';
+import { IDownstream, VtkConstructor } from '../types';
 import useGetterRef from '../utils-ts/useGetterRef';
 import { usePrevious } from '../utils-ts/usePrevious';
 import useUnmount from '../utils-ts/useUnmount';
@@ -42,7 +42,7 @@ export default function Algorithm(props: Props) {
   const [algoRef, getAlgorithm] = useGetterRef(() => createAlgo());
 
   const representation = useRepresentation();
-  const getDownstream = useDownstream();
+  const downstream = useDownstream();
 
   useEffect(() => {
     let algoChanged = false;
@@ -76,7 +76,7 @@ export default function Algorithm(props: Props) {
     }
 
     if (algoChanged) {
-      getDownstream().setInputConnection(algoRef.current.getOutputPort(), port);
+      downstream.setInputConnection(algoRef.current.getOutputPort(), port);
       // if a source algo, then it already produces data
       if (algoRef.current.getNumberOfInputPorts() === 0) {
         representation.dataAvailable();
@@ -90,7 +90,7 @@ export default function Algorithm(props: Props) {
     createAlgo,
     algoRef,
     representation,
-    getDownstream,
+    downstream,
   ]);
 
   useUnmount(() => {
@@ -100,8 +100,17 @@ export default function Algorithm(props: Props) {
     }
   });
 
+  const fwdDownstream = useMemo<IDownstream>(
+    () => ({
+      setInputData: (...args) => getAlgorithm().setInputData(...args),
+      setInputConnection: (...args) =>
+        getAlgorithm().setInputConnection(...args),
+    }),
+    [getAlgorithm]
+  );
+
   return (
-    <DownstreamContext.Provider value={getAlgorithm}>
+    <DownstreamContext.Provider value={fwdDownstream}>
       {props.children}
     </DownstreamContext.Provider>
   );

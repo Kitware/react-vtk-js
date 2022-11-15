@@ -14,7 +14,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { IRepresentation } from '../types';
+import { IDownstream, IRepresentation } from '../types';
 import { compareShallowObject } from '../utils-ts/comparators';
 import useBooleanAccumulator from '../utils-ts/useBooleanAccumulator';
 import useComparableEffect from '../utils-ts/useComparableEffect';
@@ -267,12 +267,20 @@ export default forwardRef(function GeometryRepresentation(
     [view]
   );
 
+  const downstream = useMemo<IDownstream>(
+    () => ({
+      setInputData: (...args) => getMapper().setInputData(...args),
+      setInputConnection: (...args) => getMapper().setInputConnection(...args),
+    }),
+    [getMapper]
+  );
+
   useImperativeHandle(fwdRef, () => representation);
 
   return (
     <OrderedUnmountContext.Provider>
       <RepresentationContext.Provider value={representation}>
-        <DownstreamContext.Provider value={getMapper}>
+        <DownstreamContext.Provider value={downstream}>
           {props.children}
         </DownstreamContext.Provider>
       </RepresentationContext.Provider>

@@ -102,7 +102,7 @@ export default forwardRef(function PolyData(props: Props, fwdRef) {
   const OrderedUnmountContext = useOrderedUnmountContext();
 
   const representation = useRepresentation();
-  const getDownstream = useDownstream();
+  const downstream = useDownstream();
 
   // dataset API
   const dataset = useMemo<IDataset<vtkPolyData>>(
@@ -112,7 +112,6 @@ export default forwardRef(function PolyData(props: Props, fwdRef) {
         const pd = getPolyData();
         pd.modified();
 
-        const downstream = getDownstream();
         downstream.setInputData(pd, port);
 
         // Let the representation know that we have data
@@ -121,7 +120,7 @@ export default forwardRef(function PolyData(props: Props, fwdRef) {
         }
       },
     }),
-    [representation, port, getPolyData, getDownstream]
+    [port, representation, downstream, getPolyData]
   );
 
   useImperativeHandle(fwdRef, () => dataset);
