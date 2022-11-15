@@ -21,11 +21,6 @@ import { DatasetContext, useDownstream, useRepresentation } from './contexts';
 
 interface Props extends PropsWithChildren {
   /**
-   * The ID used to identify this component.
-   */
-  id?: string;
-
-  /**
    * downstream connection port
    */
   port?: number;
@@ -126,7 +121,7 @@ export default forwardRef(function PolyData(props: Props, fwdRef) {
         }
       },
     }),
-    [getPolyData, getDownstream, representation, port]
+    [representation, port, getPolyData, getDownstream]
   );
 
   useImperativeHandle(fwdRef, () => dataset);
