@@ -72,6 +72,25 @@ export default function DataArray(props: Props) {
     range,
   } = props;
 
+  // register array with the dataset must happen before dataset.modified()
+  // cleanup should happend before the polydata is deleted
+  useOrderedUnmountEffect(() => {
+    const array = getDataArray();
+    const ds = dataset.getDataSet();
+    const fieldData = getFieldData();
+
+    const register = fieldData[registration as keyof typeof fieldData] as (
+      da: vtkDataArray
+    ) => void;
+    register(array);
+
+    ds.modified();
+
+    return () => {
+      fieldData.removeArray(array.getName());
+    };
+  }, [registration, dataset, getDataArray, getFieldData]);
+
   useEffect(() => {
     const array = getDataArray();
 
@@ -92,25 +111,6 @@ export default function DataArray(props: Props) {
 
     if (modified) dataset.modified();
   });
-
-  // register array with the dataset
-  // cleanup should happend before the polydata is deleted
-  useOrderedUnmountEffect(() => {
-    const array = getDataArray();
-    const ds = dataset.getDataSet();
-    const fieldData = getFieldData();
-
-    const register = fieldData[registration as keyof typeof fieldData] as (
-      da: vtkDataArray
-    ) => void;
-    register(array);
-
-    ds.modified();
-
-    return () => {
-      fieldData.removeArray(array.getName());
-    };
-  }, [registration, dataset, getDataArray, getFieldData]);
 
   useUnmount(() => {
     if (daRef.current) {
