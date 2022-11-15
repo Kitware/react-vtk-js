@@ -3,7 +3,13 @@ import vtkDataSetAttributes from '@kitware/vtk.js/Common/DataModel/DataSetAttrib
 import vtkFieldData from '@kitware/vtk.js/Common/DataModel/DataSetAttributes/FieldData';
 import { Nullable } from '@kitware/vtk.js/types';
 import { createContext, useContext } from 'react';
-import { IDataset, IDownstream, IRepresentation, IView } from '../types';
+import {
+  IDataset,
+  IDownstream,
+  IRepresentation,
+  IShareDataset,
+  IView,
+} from '../types';
 
 export const FieldDataContext =
   createContext<Nullable<() => vtkDataSetAttributes | vtkFieldData>>(null);
@@ -45,4 +51,12 @@ export function useDownstream() {
   const ds = useContext(DownstreamContext);
   if (!ds) throw new Error('No downstream context!');
   return ds;
+}
+
+export const ShareDataSetContext = createContext<Nullable<IShareDataset>>(null);
+
+export function useShareDataSet() {
+  const share = useContext(ShareDataSetContext);
+  if (!share) throw new Error('No ShareDataSet context!');
+  return share;
 }

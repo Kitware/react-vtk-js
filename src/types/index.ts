@@ -1,7 +1,5 @@
 import { vtkObject } from '@kitware/vtk.js/interfaces';
-import vtkAbstractMapper from '@kitware/vtk.js/Rendering/Core/AbstractMapper';
 import vtkCamera from '@kitware/vtk.js/Rendering/Core/Camera';
-import vtkProp from '@kitware/vtk.js/Rendering/Core/Prop';
 import vtkRenderer from '@kitware/vtk.js/Rendering/Core/Renderer';
 import vtkRenderWindow from '@kitware/vtk.js/Rendering/Core/RenderWindow';
 import vtkRenderWindowInteractor from '@kitware/vtk.js/Rendering/Core/RenderWindowInteractor';
@@ -46,14 +44,9 @@ export interface IView {
   resetCamera(boundsToUse?: Bounds): void;
 }
 
-export interface IRepresentation<
-  A extends vtkProp = vtkProp,
-  M extends vtkAbstractMapper = vtkAbstractMapper
-> {
+export interface IRepresentation {
   dataAvailable(): void;
   dataChanged(): void;
-  getActor(): A;
-  getMapper(): M;
 }
 
 // There is no sufficient type that overlaps classes like
@@ -66,4 +59,16 @@ export interface IDownstream {
 export interface IDataset<T> {
   getDataSet(): T;
   modified(): void;
+}
+
+export type StopEventListener = () => void;
+export type DataCallback = <T>(ds: T | null) => void;
+
+export interface IShareDataset {
+  register(name: string, dataset: unknown): void;
+  unregister(name: string): void;
+  dispatchDataAvailable(name: string): void;
+  dispatchDataChanged(name: string): void;
+  onDataAvailable(name: string, callback: DataCallback): StopEventListener;
+  onDataChanged(name: string, callback: DataCallback): StopEventListener;
 }

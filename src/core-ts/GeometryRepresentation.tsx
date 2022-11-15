@@ -254,10 +254,8 @@ export default forwardRef(function GeometryRepresentation(
     }
   });
 
-  const representation = useMemo<IRepresentation<vtkActor, vtkMapper>>(
+  const representation = useMemo<IRepresentation>(
     () => ({
-      getActor,
-      getMapper,
       dataChanged: () => {
         view.requestRender();
       },
@@ -266,7 +264,7 @@ export default forwardRef(function GeometryRepresentation(
         representation.dataChanged();
       },
     }),
-    [view, getActor, getMapper]
+    [view]
   );
 
   useImperativeHandle(fwdRef, () => representation);
