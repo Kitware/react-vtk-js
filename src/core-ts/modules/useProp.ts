@@ -34,7 +34,7 @@ export default function useProp<
   const [actorRef, getActor] = useGetterRef(constructor);
 
   useEffect(() => {
-    getActor().set({ representationID: id });
+    getActor().set({ representationID: id }, true /* noWarning */);
   }, [id, getActor]);
 
   // add to renderer
