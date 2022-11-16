@@ -26,6 +26,7 @@ import vtkRenderWindowInteractor from '@kitware/vtk.js/Rendering/Core/RenderWind
 import { Nullable } from '@kitware/vtk.js/types';
 import deepEqual from 'deep-equal';
 import { useCallback, useEffect, useState } from 'react';
+import deletionRegistry from '../../utils-ts/DeletionRegistry';
 import useComparableEffect from '../../utils-ts/useComparableEffect';
 import useGetterRef from '../../utils-ts/useGetterRef';
 import useUnmount from '../../utils-ts/useUnmount';
@@ -122,7 +123,9 @@ export function useInteractorStyle(
 
   const [styleRef, getStyle] = useGetterRef<vtkInteractorStyle>(() => {
     setExternalStyle(null);
-    return vtkInteractorStyleManipulator.newInstance();
+    const style = vtkInteractorStyleManipulator.newInstance();
+    deletionRegistry.register(style, () => style.delete());
+    return style;
   });
 
   useEffect(() => {
@@ -131,7 +134,7 @@ export function useInteractorStyle(
 
   useUnmount(() => {
     if (styleRef.current && !externalStyle) {
-      styleRef.current.delete();
+      deletionRegistry.markForDeletion(styleRef.current);
       styleRef.current = null;
     }
   });
@@ -139,7 +142,7 @@ export function useInteractorStyle(
   const setStyle = useCallback(
     (style: vtkInteractorStyle) => {
       if (!externalStyle && styleRef.current) {
-        styleRef.current.delete();
+        deletionRegistry.markForDeletion(styleRef.current);
       }
       styleRef.current = style;
       // should help retrigger effects dependent on the style

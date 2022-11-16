@@ -35,3 +35,29 @@ export function toTypedArray(
 
   return values;
 }
+
+export function pick<T extends object, K extends keyof T>(
+  source: T,
+  ...keys: K[]
+): Pick<T, K> {
+  const lookup = new Set<K>(keys);
+  return Object.entries(source)
+    .filter(([key]) => lookup.has(key as K))
+    .reduce(
+      (out, [key, value]) => ({ ...out, [key]: value }),
+      {} as Pick<T, K>
+    );
+}
+
+export function omit<T extends object, K extends keyof T>(
+  source: T,
+  ...keys: K[]
+): Omit<T, K> {
+  const lookup = new Set<K>(keys);
+  return Object.entries(source)
+    .filter(([key]) => !lookup.has(key as K))
+    .reduce(
+      (out, [key, value]) => ({ ...out, [key]: value }),
+      {} as Omit<T, K>
+    );
+}

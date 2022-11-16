@@ -4,6 +4,7 @@ import '@kitware/vtk.js/Rendering/OpenGL/Profiles/Glyph';
 import '@kitware/vtk.js/Rendering/OpenGL/Profiles/Volume';
 
 export { default as Algorithm } from './core-ts/Algorithm';
+export * as Contexts from './core-ts/contexts';
 export { default as DataArray } from './core-ts/DataArray';
 export { default as Geometry2DRepresentation } from './core-ts/Geometry2DRepresentation';
 export { default as GeometryRepresentation } from './core-ts/GeometryRepresentation';

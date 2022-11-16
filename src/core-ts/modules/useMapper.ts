@@ -1,5 +1,6 @@
 import vtkAbstractMapper from '@kitware/vtk.js/Rendering/Core/AbstractMapper';
 import { compareShallowObject } from '../../utils-ts/comparators';
+import deletionRegistry from '../../utils-ts/DeletionRegistry';
 import { BooleanAccumulator } from '../../utils-ts/useBooleanAccumulator';
 import useComparableEffect from '../../utils-ts/useComparableEffect';
 import useGetterRef from '../../utils-ts/useGetterRef';
@@ -13,7 +14,11 @@ export default function useMapper<M extends vtkAbstractMapper, I>(
   props: I | undefined,
   trackModified: BooleanAccumulator
 ) {
-  const [mapperRef, getMapper] = useGetterRef(constructor);
+  const [mapperRef, getMapper] = useGetterRef(() => {
+    const m = constructor();
+    deletionRegistry.register(m, () => m.delete());
+    return m;
+  });
 
   useComparableEffect(
     () => {
@@ -26,7 +31,7 @@ export default function useMapper<M extends vtkAbstractMapper, I>(
 
   useUnmount(() => {
     if (mapperRef.current) {
-      mapperRef.current.delete();
+      deletionRegistry.markForDeletion(mapperRef.current);
       mapperRef.current = null;
     }
   });

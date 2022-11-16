@@ -20,8 +20,11 @@ import { IDownstream, IRepresentation } from '../types';
 import { compareShallowObject } from '../utils-ts/comparators';
 import useBooleanAccumulator from '../utils-ts/useBooleanAccumulator';
 import useComparableEffect from '../utils-ts/useComparableEffect';
-import { useOrderedUnmountContext } from '../utils-ts/useOrderedUnmountEffect';
-import { DownstreamContext, RepresentationContext, useView } from './contexts';
+import {
+  DownstreamContext,
+  RepresentationContext,
+  useRendererContext,
+} from './contexts';
 import useColorTransferFunction from './modules/useColorTransferFunction';
 import useCoordinate from './modules/useCoordinate';
 import useMapper from './modules/useMapper';
@@ -76,9 +79,6 @@ export default forwardRef(function Geometry2DRepresentation(
   props: Props,
   fwdRef
 ) {
-  const OrderedUnmountContext = useOrderedUnmountContext();
-
-  const view = useView();
   const [modifiedRef, trackModified, resetModified] = useBooleanAccumulator();
   const [dataAvailable, setDataAvailable] = useState(false);
 
@@ -117,7 +117,6 @@ export default forwardRef(function Geometry2DRepresentation(
   };
   const getActor = useProp<vtkActor2D, IActor2DInitialValues>({
     constructor: () => vtkActor2D.newInstance({ visibility: false }),
-    view,
     id: props.id,
     props: actorProps,
     trackModified,
@@ -144,9 +143,11 @@ export default forwardRef(function Geometry2DRepresentation(
 
   // --- //
 
+  const renderer = useRendererContext();
+
   useEffect(() => {
-    if (view && modifiedRef.current) {
-      view.requestRender();
+    if (modifiedRef.current) {
+      renderer.requestRender();
       resetModified();
     }
   });
@@ -154,14 +155,14 @@ export default forwardRef(function Geometry2DRepresentation(
   const representation = useMemo<IRepresentation>(
     () => ({
       dataChanged: () => {
-        view.requestRender();
+        renderer.requestRender();
       },
       dataAvailable: () => {
         setDataAvailable(true);
         representation.dataChanged();
       },
     }),
-    [view]
+    [renderer]
   );
 
   const downstream = useMemo<IDownstream>(
@@ -175,12 +176,10 @@ export default forwardRef(function Geometry2DRepresentation(
   useImperativeHandle(fwdRef, () => representation);
 
   return (
-    <OrderedUnmountContext.Provider>
-      <RepresentationContext.Provider value={representation}>
-        <DownstreamContext.Provider value={downstream}>
-          {props.children}
-        </DownstreamContext.Provider>
-      </RepresentationContext.Provider>
-    </OrderedUnmountContext.Provider>
+    <RepresentationContext.Provider value={representation}>
+      <DownstreamContext.Provider value={downstream}>
+        {props.children}
+      </DownstreamContext.Provider>
+    </RepresentationContext.Provider>
   );
 });

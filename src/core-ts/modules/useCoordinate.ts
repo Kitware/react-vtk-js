@@ -2,6 +2,7 @@ import vtkCoordinate, {
   ICoordinateInitialValues,
 } from '@kitware/vtk.js/Rendering/Core/Coordinate';
 import { compareShallowObject } from '../../utils-ts/comparators';
+import deletionRegistry from '../../utils-ts/DeletionRegistry';
 import { BooleanAccumulator } from '../../utils-ts/useBooleanAccumulator';
 import useComparableEffect from '../../utils-ts/useComparableEffect';
 import useGetterRef from '../../utils-ts/useGetterRef';
@@ -11,9 +12,11 @@ export default function useCoordinate(
   props: ICoordinateInitialValues,
   trackModified: BooleanAccumulator
 ) {
-  const [ref, getCoordinate] = useGetterRef(() =>
-    vtkCoordinate.newInstance(props)
-  );
+  const [ref, getCoordinate] = useGetterRef(() => {
+    const coord = vtkCoordinate.newInstance(props);
+    deletionRegistry.register(coord, () => coord.delete());
+    return coord;
+  });
 
   useComparableEffect(
     () => {
@@ -27,7 +30,7 @@ export default function useCoordinate(
 
   useUnmount(() => {
     if (ref.current) {
-      ref.current.delete();
+      deletionRegistry.markForDeletion(ref.current);
       ref.current = null;
     }
   });

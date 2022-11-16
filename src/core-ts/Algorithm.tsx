@@ -2,6 +2,7 @@ import { vtkAlgorithm, vtkObject } from '@kitware/vtk.js/interfaces';
 import vtk from '@kitware/vtk.js/vtk';
 import { PropsWithChildren, useCallback, useEffect, useMemo } from 'react';
 import { IDownstream, VtkConstructor } from '../types';
+import deletionRegistry from '../utils-ts/DeletionRegistry';
 import useGetterRef from '../utils-ts/useGetterRef';
 import { usePrevious } from '../utils-ts/usePrevious';
 import useUnmount from '../utils-ts/useUnmount';
@@ -39,7 +40,11 @@ export default function Algorithm(props: Props) {
     return vtkClass.newInstance(state) as vtkAlgorithm & vtkObject;
   }, [vtkClass, state]);
 
-  const [algoRef, getAlgorithm] = useGetterRef(() => createAlgo());
+  const [algoRef, getAlgorithm] = useGetterRef(() => {
+    const algo = createAlgo();
+    deletionRegistry.register(algo, () => algo.delete());
+    return algo;
+  });
 
   const representation = useRepresentation();
   const downstream = useDownstream();
@@ -66,7 +71,7 @@ export default function Algorithm(props: Props) {
       }
 
       algoRef.current = newAlgo;
-      curAlgo.delete();
+      deletionRegistry.markForDeletion(curAlgo);
       algoChanged = true;
     } else if (state) {
       const modified = algoRef.current.set(state);
@@ -95,7 +100,7 @@ export default function Algorithm(props: Props) {
 
   useUnmount(() => {
     if (algoRef.current) {
-      algoRef.current.delete();
+      deletionRegistry.markForDeletion(algoRef.current);
       algoRef.current = null;
     }
   });

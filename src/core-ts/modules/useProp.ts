@@ -2,20 +2,19 @@ import vtkProp, {
   IPropInitialValues,
 } from '@kitware/vtk.js/Rendering/Core/Prop';
 import { useEffect } from 'react';
-import { IView } from '../../types';
 import { compareShallowObject } from '../../utils-ts/comparators';
+import deletionRegistry from '../../utils-ts/DeletionRegistry';
 import { BooleanAccumulator } from '../../utils-ts/useBooleanAccumulator';
 import useComparableEffect from '../../utils-ts/useComparableEffect';
 import useGetterRef from '../../utils-ts/useGetterRef';
-import { useOrderedUnmountEffect } from '../../utils-ts/useOrderedUnmountEffect';
 import useUnmount from '../../utils-ts/useUnmount';
+import { useRendererContext } from '../contexts';
 
 /**
  * Params to useProp.
  */
 type Params<T, A> = {
   constructor: () => T;
-  view: IView;
   id: string | undefined;
   props: A | undefined;
   trackModified: BooleanAccumulator;
@@ -30,22 +29,29 @@ type Params<T, A> = {
 export default function useProp<
   T extends vtkProp,
   A extends IPropInitialValues
->({ constructor, view, id, props, trackModified }: Params<T, A>) {
-  const [actorRef, getActor] = useGetterRef(constructor);
+>({ constructor, id, props, trackModified }: Params<T, A>) {
+  const renderer = useRendererContext();
+  const [actorRef, getActor] = useGetterRef(() => {
+    const a = constructor();
+    deletionRegistry.register(a, () => a.delete());
+    return a;
+  });
 
   useEffect(() => {
     getActor().set({ representationID: id }, true /* noWarning */);
   }, [id, getActor]);
 
   // add to renderer
-  useOrderedUnmountEffect(() => {
+  useEffect(() => {
     const actor = getActor();
-    const renderer = view.getRenderer();
-    renderer.addActor(actor);
+    const ren = renderer.get();
+    deletionRegistry.incRefCount(ren);
+    ren.addActor(actor);
     return () => {
-      renderer.removeActor(actor);
+      ren.removeActor(actor);
+      deletionRegistry.decRefCount(ren);
     };
-  }, [view, getActor]);
+  }, [renderer, getActor]);
 
   // set actor props
   useComparableEffect(
@@ -60,7 +66,7 @@ export default function useProp<
   // cleanup on unmount
   useUnmount(() => {
     if (actorRef.current) {
-      actorRef.current.delete();
+      deletionRegistry.markForDeletion(actorRef.current);
       actorRef.current = null;
     }
   });

@@ -4,8 +4,8 @@ import { TYPED_ARRAYS } from '@kitware/vtk.js/macros';
 import { useEffect } from 'react';
 import { DataArrayValues } from '../types';
 import { toTypedArray, TypedArrayLookup } from '../utils-ts';
+import deletionRegistry from '../utils-ts/DeletionRegistry';
 import useGetterRef from '../utils-ts/useGetterRef';
-import { useOrderedUnmountEffect } from '../utils-ts/useOrderedUnmountEffect';
 import { usePrevious } from '../utils-ts/usePrevious';
 import useUnmount from '../utils-ts/useUnmount';
 import { useDataset, useFieldData } from './contexts';
@@ -52,12 +52,14 @@ const DefaultProps = {
 export default function DataArray(props: Props) {
   const prev = usePrevious({ ...DefaultProps, ...props });
 
-  const [daRef, getDataArray] = useGetterRef(() =>
-    vtkDataArray.newInstance({
+  const [daRef, getDataArray] = useGetterRef(() => {
+    const da = vtkDataArray.newInstance({
       name: 'scalars',
       empty: true,
-    })
-  );
+    });
+    deletionRegistry.register(da, () => da.delete());
+    return da;
+  });
 
   const getFieldData = useFieldData();
   const dataset = useDataset();
@@ -74,9 +76,11 @@ export default function DataArray(props: Props) {
 
   // register array with the dataset must happen before dataset.modified()
   // cleanup should happend before the polydata is deleted
-  useOrderedUnmountEffect(() => {
+  useEffect(() => {
     const array = getDataArray();
     const ds = dataset.getDataSet();
+    deletionRegistry.incRefCount(ds);
+
     const fieldData = getFieldData();
 
     const register = fieldData[registration as keyof typeof fieldData] as (
@@ -88,6 +92,7 @@ export default function DataArray(props: Props) {
 
     return () => {
       fieldData.removeArray(array.getName());
+      deletionRegistry.decRefCount(ds);
     };
   }, [registration, dataset, getDataArray, getFieldData]);
 
@@ -114,7 +119,7 @@ export default function DataArray(props: Props) {
 
   useUnmount(() => {
     if (daRef.current) {
-      daRef.current.delete();
+      deletionRegistry.markForDeletion(daRef.current);
       daRef.current = null;
     }
   });

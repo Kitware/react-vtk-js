@@ -1,32 +1,38 @@
 import vtkRenderWindowInteractor from '@kitware/vtk.js/Rendering/Core/RenderWindowInteractor';
-import vtkOpenGLRenderWindow from '@kitware/vtk.js/Rendering/OpenGL/RenderWindow';
-import { Nullable } from '@kitware/vtk.js/types';
 import { useEffect } from 'react';
+import deletionRegistry from '../../utils-ts/DeletionRegistry';
 import useGetterRef from '../../utils-ts/useGetterRef';
 import useUnmount from '../../utils-ts/useUnmount';
+import { IOpenGLRenderWindow } from '../OpenGLRenderWindow';
 
-export default function useInteractor(
-  getRWView: () => vtkOpenGLRenderWindow,
-  container: Nullable<HTMLElement>,
-  interactive: boolean
-) {
+export default function useInteractor(openglRenderWindow: IOpenGLRenderWindow) {
   const [interactorRef, getInteractor] = useGetterRef(() => {
-    return vtkRenderWindowInteractor.newInstance();
+    const interactor = vtkRenderWindowInteractor.newInstance();
+    deletionRegistry.register(interactor, () => interactor.delete());
+    return interactor;
   });
 
   useEffect(() => {
-    if (!container || !interactive) return;
+    const container = openglRenderWindow.getContainer();
+    if (!container) return;
+
     const interactor = getInteractor();
-    const rwView = getRWView();
+    const rwView = openglRenderWindow.get();
+    deletionRegistry.incRefCount(rwView);
 
     interactor.setView(rwView);
     interactor.initialize();
     interactor.bindEvents(container);
-  }, [interactive, container, getRWView, getInteractor]);
+    return () => {
+      interactor.disable();
+      interactor.unbindEvents();
+      deletionRegistry.decRefCount(rwView);
+    };
+  }, [openglRenderWindow, getInteractor]);
 
   useUnmount(() => {
     if (interactorRef.current) {
-      interactorRef.current.delete();
+      deletionRegistry.markForDeletion(interactorRef.current);
       interactorRef.current = null;
     }
   });

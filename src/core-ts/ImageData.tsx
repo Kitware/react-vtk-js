@@ -8,8 +8,8 @@ import {
   useMemo,
 } from 'react';
 import { IDataset } from '../types';
+import deletionRegistry from '../utils-ts/DeletionRegistry';
 import useGetterRef from '../utils-ts/useGetterRef';
-import { useOrderedUnmountContext } from '../utils-ts/useOrderedUnmountEffect';
 import useUnmount from '../utils-ts/useUnmount';
 import { DatasetContext, useDownstream, useRepresentation } from './contexts';
 
@@ -57,9 +57,11 @@ export default forwardRef(function PolyData(props: Props, fwdRef) {
     direction = DefaultProps.direction,
   } = props;
 
-  const [imRef, getImageData] = useGetterRef(() => vtkImageData.newInstance());
-
-  const OrderedUnmountContext = useOrderedUnmountContext();
+  const [imRef, getImageData] = useGetterRef(() => {
+    const im = vtkImageData.newInstance();
+    deletionRegistry.register(im, () => im.delete());
+    return im;
+  });
 
   const representation = useRepresentation();
   const downstream = useDownstream();
@@ -96,16 +98,14 @@ export default forwardRef(function PolyData(props: Props, fwdRef) {
 
   useUnmount(() => {
     if (imRef.current) {
-      imRef.current.delete();
+      deletionRegistry.markForDeletion(imRef.current);
       imRef.current = null;
     }
   });
 
   return (
-    <OrderedUnmountContext.Provider>
-      <DatasetContext.Provider value={dataset}>
-        {props.children}
-      </DatasetContext.Provider>
-    </OrderedUnmountContext.Provider>
+    <DatasetContext.Provider value={dataset}>
+      {props.children}
+    </DatasetContext.Provider>
   );
 });

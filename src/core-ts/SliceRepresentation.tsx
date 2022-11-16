@@ -18,8 +18,11 @@ import { IDownstream, IRepresentation } from '../types';
 import { compareShallowObject } from '../utils-ts/comparators';
 import useBooleanAccumulator from '../utils-ts/useBooleanAccumulator';
 import useComparableEffect from '../utils-ts/useComparableEffect';
-import { useOrderedUnmountContext } from '../utils-ts/useOrderedUnmountEffect';
-import { DownstreamContext, RepresentationContext, useView } from './contexts';
+import {
+  DownstreamContext,
+  RepresentationContext,
+  useRendererContext,
+} from './contexts';
 import useColorTransferFunction from './modules/useColorTransferFunction';
 import useMapper from './modules/useMapper';
 import useProp from './modules/useProp';
@@ -92,9 +95,6 @@ const DefaultProps = {
 };
 
 export default forwardRef(function SliceRepresentation(props: Props, fwdRef) {
-  const OrderedUnmountContext = useOrderedUnmountContext();
-
-  const view = useView();
   const [modifiedRef, trackModified, resetModified] = useBooleanAccumulator();
   const [dataAvailable, setDataAvailable] = useState(false);
 
@@ -128,7 +128,6 @@ export default forwardRef(function SliceRepresentation(props: Props, fwdRef) {
   };
   const getActor = useProp({
     constructor: () => vtkImageSlice.newInstance(),
-    view,
     id: props.id,
     props: actorProps,
     trackModified,
@@ -184,9 +183,11 @@ export default forwardRef(function SliceRepresentation(props: Props, fwdRef) {
 
   // --- //
 
+  const renderer = useRendererContext();
+
   useEffect(() => {
-    if (view && modifiedRef.current) {
-      view.requestRender();
+    if (modifiedRef.current) {
+      renderer.requestRender();
       resetModified();
     }
   });
@@ -194,14 +195,14 @@ export default forwardRef(function SliceRepresentation(props: Props, fwdRef) {
   const representation = useMemo<IRepresentation>(
     () => ({
       dataChanged: () => {
-        view.requestRender();
+        renderer.requestRender();
       },
       dataAvailable: () => {
         setDataAvailable(true);
         representation.dataChanged();
       },
     }),
-    [view]
+    [renderer]
   );
 
   const downstream = useMemo<IDownstream>(
@@ -215,12 +216,10 @@ export default forwardRef(function SliceRepresentation(props: Props, fwdRef) {
   useImperativeHandle(fwdRef, () => representation);
 
   return (
-    <OrderedUnmountContext.Provider>
-      <RepresentationContext.Provider value={representation}>
-        <DownstreamContext.Provider value={downstream}>
-          {props.children}
-        </DownstreamContext.Provider>
-      </RepresentationContext.Provider>
-    </OrderedUnmountContext.Provider>
+    <RepresentationContext.Provider value={representation}>
+      <DownstreamContext.Provider value={downstream}>
+        {props.children}
+      </DownstreamContext.Provider>
+    </RepresentationContext.Provider>
   );
 });

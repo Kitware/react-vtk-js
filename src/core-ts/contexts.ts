@@ -6,53 +6,57 @@ import { createContext, useContext } from 'react';
 import {
   IDataset,
   IDownstream,
+  IRenderer,
+  IRenderWindow,
   IRepresentation,
   IShareDataset,
-  IView,
 } from '../types';
 
+export const RenderWindowContext = createContext<Nullable<IRenderWindow>>(null);
+export const RendererContext = createContext<IRenderer | null>(null);
 export const FieldDataContext =
   createContext<Nullable<() => vtkDataSetAttributes | vtkFieldData>>(null);
+export const DatasetContext = createContext<Nullable<IDataset<unknown>>>(null);
+export const RepresentationContext =
+  createContext<Nullable<IRepresentation>>(null);
+export const DownstreamContext = createContext<Nullable<IDownstream>>(null);
+export const ShareDataSetContext = createContext<Nullable<IShareDataset>>(null);
+
+export function useRenderWindowContext() {
+  const rw = useContext(RenderWindowContext);
+  if (!rw) throw new Error('No RenderWindow context!');
+  return rw;
+}
+
+export function useRendererContext() {
+  const r = useContext(RendererContext);
+  if (!r) throw new Error('No Renderer context!');
+  return r;
+}
 
 export function useFieldData<T = vtkFieldData>() {
   const fd = useContext(FieldDataContext);
-  if (!fd) throw new Error('No field data context!');
+  if (!fd) throw new Error('No FieldData context!');
   return fd as () => T;
 }
 
-export const DatasetContext = createContext<Nullable<IDataset<unknown>>>(null);
-
 export function useDataset<T = vtkDataSet>() {
   const ds = useContext(DatasetContext);
-  if (!ds) throw new Error('No dataset context!');
+  if (!ds) throw new Error('No Dataset context!');
   return ds as IDataset<T>;
 }
 
-export const ViewContext = createContext<Nullable<IView>>(null);
-
-export function useView() {
-  const view = useContext(ViewContext);
-  if (!view) throw new Error('No view context!');
-  return view;
-}
-
-export const RepresentationContext =
-  createContext<Nullable<IRepresentation>>(null);
-
 export function useRepresentation() {
   const rep = useContext(RepresentationContext);
-  if (!rep) throw new Error('No representation context!');
+  if (!rep) throw new Error('No Representation context!');
   return rep;
 }
-export const DownstreamContext = createContext<Nullable<IDownstream>>(null);
 
 export function useDownstream() {
   const ds = useContext(DownstreamContext);
-  if (!ds) throw new Error('No downstream context!');
+  if (!ds) throw new Error('No Downstream context!');
   return ds;
 }
-
-export const ShareDataSetContext = createContext<Nullable<IShareDataset>>(null);
 
 export function useShareDataSet() {
   const share = useContext(ShareDataSetContext);

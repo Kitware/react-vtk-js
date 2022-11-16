@@ -35,6 +35,23 @@ export type VtkConstructor<T = unknown, P = Record<string, unknown>> = {
   newInstance(initalValues?: P): T;
 };
 
+export interface IRenderWindow {
+  get(): vtkRenderWindow;
+  getInteractor(): vtkRenderWindowInteractor;
+  getInteractorStyle(): vtkInteractorStyle;
+  setInteractorStyle(style: vtkInteractorStyle): void;
+  /**
+   * Internal use. Use requestRender() on the Renderer context.
+   */
+  _queueRender(): void;
+}
+
+export interface IRenderer {
+  get(): vtkRenderer;
+  resetCamera(): void;
+  requestRender(): void;
+}
+
 export interface IView {
   getRenderer(): vtkRenderer;
   getRenderWindow(): vtkRenderWindow;

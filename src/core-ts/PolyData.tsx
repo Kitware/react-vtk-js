@@ -13,8 +13,8 @@ import {
   TypedArrayConstructor,
 } from '../types';
 import { dataArraySize, toTypedArray } from '../utils-ts';
+import deletionRegistry from '../utils-ts/DeletionRegistry';
 import useGetterRef from '../utils-ts/useGetterRef';
-import { useOrderedUnmountContext } from '../utils-ts/useOrderedUnmountEffect';
 import { usePrevious } from '../utils-ts/usePrevious';
 import useUnmount from '../utils-ts/useUnmount';
 import { DatasetContext, useDownstream, useRepresentation } from './contexts';
@@ -97,9 +97,11 @@ export default forwardRef(function PolyData(props: Props, fwdRef) {
     strips,
   } = props;
 
-  const [pdRef, getPolyData] = useGetterRef(() => vtkPolyData.newInstance());
-
-  const OrderedUnmountContext = useOrderedUnmountContext();
+  const [pdRef, getPolyData] = useGetterRef(() => {
+    const pd = vtkPolyData.newInstance();
+    deletionRegistry.register(pd, () => pd.delete());
+    return pd;
+  });
 
   const representation = useRepresentation();
   const downstream = useDownstream();
@@ -215,16 +217,14 @@ export default forwardRef(function PolyData(props: Props, fwdRef) {
 
   useUnmount(() => {
     if (pdRef.current) {
-      pdRef.current.delete();
+      deletionRegistry.markForDeletion(pdRef.current);
       pdRef.current = null;
     }
   });
 
   return (
-    <OrderedUnmountContext.Provider>
-      <DatasetContext.Provider value={dataset}>
-        {props.children}
-      </DatasetContext.Provider>
-    </OrderedUnmountContext.Provider>
+    <DatasetContext.Provider value={dataset}>
+      {props.children}
+    </DatasetContext.Provider>
   );
 });

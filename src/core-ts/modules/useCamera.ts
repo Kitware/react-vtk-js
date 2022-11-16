@@ -3,12 +3,13 @@ import vtkRenderer from '@kitware/vtk.js/Rendering/Core/Renderer';
 import { Vector3 } from '@kitware/vtk.js/types';
 import { useCallback } from 'react';
 import { compareShallowObject } from '../../utils-ts/comparators';
+import { BooleanAccumulator } from '../../utils-ts/useBooleanAccumulator';
 import useComparableEffect from '../../utils-ts/useComparableEffect';
 
 export default function useCamera(
   getRenderer: () => vtkRenderer,
-  requestRender: () => void,
-  cameraProps?: ICameraInitialValues
+  cameraProps: ICameraInitialValues | undefined,
+  trackModified: BooleanAccumulator
 ) {
   const getCamera = useCallback(
     () => getRenderer().getActiveCamera(),
@@ -36,9 +37,7 @@ export default function useCamera(
 
       // camera.set doesn't return whether a change occurred,
       // since setPosition/etc. don't return this flag.
-      if (mtime < camera.getMTime()) {
-        requestRender();
-      }
+      trackModified(mtime < camera.getMTime());
     },
     [cameraProps],
     ([cur], [prev]) => compareShallowObject(cur, prev)

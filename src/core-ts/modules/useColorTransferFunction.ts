@@ -2,6 +2,7 @@ import vtkColorTransferFunction from '@kitware/vtk.js/Rendering/Core/ColorTransf
 import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps';
 import { Vector2 } from '@kitware/vtk.js/types';
 import { compareVector2 } from '../../utils-ts/comparators';
+import deletionRegistry from '../../utils-ts/DeletionRegistry';
 import { BooleanAccumulator } from '../../utils-ts/useBooleanAccumulator';
 import useComparableEffect from '../../utils-ts/useComparableEffect';
 import useGetterRef from '../../utils-ts/useGetterRef';
@@ -12,9 +13,11 @@ export default function useColorTransferFunction(
   range: Vector2,
   trackModified: BooleanAccumulator
 ) {
-  const [lutRef, getLUT] = useGetterRef(() =>
-    vtkColorTransferFunction.newInstance()
-  );
+  const [lutRef, getLUT] = useGetterRef(() => {
+    const func = vtkColorTransferFunction.newInstance();
+    deletionRegistry.register(func, () => func.delete());
+    return func;
+  });
 
   useComparableEffect(
     () => {
@@ -33,7 +36,7 @@ export default function useColorTransferFunction(
 
   useUnmount(() => {
     if (lutRef.current) {
-      lutRef.current.delete();
+      deletionRegistry.markForDeletion(lutRef.current);
       lutRef.current = null;
     }
   });
