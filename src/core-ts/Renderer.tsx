@@ -139,7 +139,7 @@ export default forwardRef(function Renderer(props: Props, fwdRef) {
         const ren = getRenderer();
         ren.setDraw(true);
         if (autoResetCamera) {
-          ren.resetCamera();
+          resetCamera();
         }
         renderWindow._queueRender();
       },
