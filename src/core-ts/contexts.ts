@@ -6,21 +6,33 @@ import { createContext, useContext } from 'react';
 import {
   IDataset,
   IDownstream,
+  IOpenGLRenderWindow,
   IRenderer,
   IRenderWindow,
   IRepresentation,
   IShareDataset,
 } from '../types';
 
+export const OpenGLRenderWindowContext =
+  createContext<IOpenGLRenderWindow | null>(null);
+
 export const RenderWindowContext = createContext<Nullable<IRenderWindow>>(null);
+
 export const RendererContext = createContext<IRenderer | null>(null);
+
 export const FieldDataContext =
   createContext<Nullable<() => vtkDataSetAttributes | vtkFieldData>>(null);
+
 export const DatasetContext = createContext<Nullable<IDataset<unknown>>>(null);
+
 export const RepresentationContext =
   createContext<Nullable<IRepresentation>>(null);
+
 export const DownstreamContext = createContext<Nullable<IDownstream>>(null);
+
 export const ShareDataSetContext = createContext<Nullable<IShareDataset>>(null);
+
+export const MultiViewRootContext = createContext<boolean>(false);
 
 export function useRenderWindowContext() {
   const rw = useContext(RenderWindowContext);

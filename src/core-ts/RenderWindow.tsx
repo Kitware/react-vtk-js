@@ -15,14 +15,13 @@ import useGetterRef from '../utils-ts/useGetterRef';
 import useMount from '../utils-ts/useMount';
 import useResizeObserver from '../utils-ts/useResizeObserver';
 import useUnmount from '../utils-ts/useUnmount';
-import { RenderWindowContext } from './contexts';
+import { OpenGLRenderWindowContext, RenderWindowContext } from './contexts';
 import useInteractor from './modules/useInteractor';
 import {
   ManipulatorSettings,
   useInteractorStyle,
   useInteractorStyleManipulatorSettings,
 } from './modules/useInteractorStyle';
-import { OpenGLRenderWindowContext } from './OpenGLRenderWindow';
 
 export interface Props extends PropsWithChildren {
   /**

@@ -74,4 +74,3 @@ export class DeletionRegistry {
 
 const deletionRegistry = new DeletionRegistry();
 export default deletionRegistry;
-(window as any).dr = deletionRegistry;

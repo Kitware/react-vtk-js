@@ -35,6 +35,11 @@ export type VtkConstructor<T = unknown, P = Record<string, unknown>> = {
   newInstance(initalValues?: P): T;
 };
 
+export interface IOpenGLRenderWindow {
+  get(): vtkOpenGLRenderWindow;
+  getContainer(): HTMLElement | null;
+}
+
 export interface IRenderWindow {
   get(): vtkRenderWindow;
   getInteractor(): vtkRenderWindowInteractor;

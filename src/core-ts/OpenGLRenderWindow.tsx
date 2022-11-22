@@ -1,6 +1,5 @@
 import vtkOpenGLRenderWindow from '@kitware/vtk.js/Rendering/OpenGL/RenderWindow';
 import {
-  createContext,
   CSSProperties,
   forwardRef,
   HTMLProps,
@@ -10,9 +9,11 @@ import {
   useMemo,
   useRef,
 } from 'react';
+import { IOpenGLRenderWindow } from '../types';
 import deletionRegistry from '../utils-ts/DeletionRegistry';
 import useGetterRef from '../utils-ts/useGetterRef';
 import useUnmount from '../utils-ts/useUnmount';
+import { OpenGLRenderWindowContext } from './contexts';
 
 const RENDERER_STYLE: CSSProperties = {
   position: 'absolute',
@@ -20,14 +21,6 @@ const RENDERER_STYLE: CSSProperties = {
   height: '100%',
   overflow: 'hidden',
 };
-
-export interface IOpenGLRenderWindow {
-  get(): vtkOpenGLRenderWindow;
-  getContainer(): HTMLElement | null;
-}
-
-export const OpenGLRenderWindowContext =
-  createContext<IOpenGLRenderWindow | null>(null);
 
 export interface Props extends PropsWithChildren, HTMLProps<HTMLDivElement> {}
 
