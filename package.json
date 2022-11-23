@@ -10,16 +10,16 @@
   "source": "src/index.js",
   "exports": {
     ".": {
+      "import": "./dist/esm/index.js",
       "browser": "./dist/cjs/react-vtk.js",
       "umd": "./dist/umd/react-vtk.js",
-      "import": "./dist/esm/index.js",
       "package.json": "./package.json",
       "default": "./dist/esm/index.js"
     },
     "./light": {
       "import": "./dist/esm/light.js",
-      "default": "./dist/esm/light.js",
-      "package.json": "./package.json"
+      "package.json": "./package.json",
+      "default": "./dist/esm/light.js"
     }
   },
   "dependencies": {
