@@ -191,14 +191,17 @@ export default class GeometryRepresentation extends Component {
       this.lookupTable.updateRange();
     }
 
-    if (showCubeAxes && this.cubeAxes == null) {
-      changed = true;
-      this.initCubeAxes();
+    if (showCubeAxes) {
+      if (this.cubeAxes == null) {
+        changed = true;
+        this.initCubeAxes();
+      }
 
       if (
         cubeAxesStyle &&
         (!previous || cubeAxesStyle !== previous.cubeAxesStyle)
       ) {
+        changed = true;
         this.cubeAxes.set(cubeAxesStyle);
       }
     }
