@@ -24,24 +24,21 @@ class ViewController extends Component {
       this.renderWindow = vtkRenderWindow.newInstance();
       this.openglRenderWindow = vtkOpenGLRenderWindow.newInstance();
       this.interactor = vtkRenderWindowInteractor.newInstance();
+
+      this.renderWindow.addView(this.openglRenderWindow);
+      if (props.interactive) {
+        this.interactor.setView(this.openglRenderWindow);
+        this.interactor.initialize();
+      }
     }
 
+    this.renderWindow.addRenderer(this.renderer);
     this.onEnter = this.onEnter.bind(this);
     this.onResize = this.onResize.bind(this);
     this.setViewRef = this.setViewRef.bind(this);
   }
 
   componentDidMount() {
-    if (!this.props.root) {
-      this.renderWindow.addView(this.openglRenderWindow);
-
-      if (this.props.interactive) {
-        this.interactor.setView(this.openglRenderWindow);
-        this.interactor.initialize();
-      }
-    }
-    this.renderWindow.addRenderer(this.renderer);
-
     const container = this.view?.containerRef.current;
     if (this.view && container) {
       container.addEventListener('pointerenter', this.onEnter);
