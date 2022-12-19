@@ -1,1 +1,0 @@
-import{a}from"./index.1c03acd7.js";import{x as e,P as i}from"./light.28f52a0f.js";function t(s){const r=[];for(;r.length<1e3;)r.push(Math.random());return a("div",{style:{width:"100%",height:"100%"},children:a(e,{id:"0",children:a(i,{spacing:[1,1,1],dimensions:[10,10,10],origin:[0,0,0],scalars:r,rescaleColorMap:!1})})})}export{t as default};
