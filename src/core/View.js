@@ -203,7 +203,7 @@ export default class View extends Component {
       }
       switch (e.code) {
         case 'KeyR':
-          this.resetCamera();
+          if (props.keybindResetCamera) this.resetCamera();
           break;
         default:
           // console.log(e.code);
@@ -706,6 +706,7 @@ View.defaultProps = {
   showCubeAxes: false,
   pointerSize: 0,
   showOrientationAxes: false,
+  keybindResetCamera: true,
 };
 
 View.propTypes = {
@@ -860,4 +861,9 @@ View.propTypes = {
    * Show/Hide orientation axes.
    */
   showOrientationAxes: PropTypes.bool,
+
+  /**
+   * Trigger/Not Trigger resetcamera on KeyR
+   */
+  keybindResetCamera: PropTypes.bool,
 };
