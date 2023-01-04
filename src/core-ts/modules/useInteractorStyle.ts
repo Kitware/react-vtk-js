@@ -98,7 +98,7 @@ export function useInteractorStyleManipulatorSettings(
 ) {
   useComparableEffect(
     () => {
-      if (getStyle().getClassName() !== 'vtkInteractorStyleManipulator') return;
+      if (!getStyle().isA('vtkInteractorStyleManipulator')) return;
       const style = getStyle() as vtkInteractorStyleManipulator;
       style.removeAllManipulators();
       // always add gestures
@@ -129,8 +129,17 @@ export function useInteractorStyle(
   });
 
   useEffect(() => {
-    getInteractor().setInteractorStyle(getStyle());
-  });
+    const interactor = getInteractor();
+    const style = getStyle();
+    deletionRegistry.incRefCount(interactor);
+    interactor.setInteractorStyle(style);
+    return () => {
+      if (interactor.getInteractorStyle() === style) {
+        interactor.setInteractorStyle(null);
+      }
+      deletionRegistry.decRefCount(interactor);
+    };
+  }, [getInteractor, getStyle]);
 
   useUnmount(() => {
     if (styleRef.current && !externalStyle) {
@@ -145,7 +154,6 @@ export function useInteractorStyle(
         deletionRegistry.markForDeletion(styleRef.current);
       }
       styleRef.current = style;
-      // should help retrigger effects dependent on the style
       setExternalStyle(style);
     },
     [externalStyle, styleRef]
