@@ -1,0 +1,1 @@
+import{a as t}from"./index.302827cb.js";import{x as r,V as e,R as a}from"./light.170c2bea.js";function d(i){return t("div",{style:{width:"100%",height:"100%"},children:t(r,{children:t(e,{property:{color:[.3,.3,.3]},children:t(a,{vtkClass:"vtkOBJReader",url:"https://kitware.github.io/vtk-js-datasets/data/obj-mtl/star-wars-vader-tie-fighter.obj"})})})})}export{d as default};
