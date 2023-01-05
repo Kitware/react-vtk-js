@@ -120,30 +120,11 @@ export default forwardRef(function RenderWindow(props: Props, fwdRef) {
   const [renderRequested, setRenderRequested] = useState(false);
   const queueRender = () => setRenderRequested(true);
 
-  // allow drawing during animation
-  useEffect(() => {
-    const interactor = getInteractor();
-    const renderWindow = getRenderWindow();
-    const startSub = interactor.onStartAnimation(() => {
-      renderWindow.getRenderers().forEach((ren) => ren.setDraw(true));
-    });
-
-    const endSub = interactor.onEndAnimation(() => {
-      renderWindow.getRenderers().forEach((ren) => ren.setDraw(false));
-    });
-
-    return () => {
-      startSub.unsubscribe();
-      endSub.unsubscribe();
-    };
-  }, [getInteractor, getRenderWindow]);
-
   useEffect(() => {
     if (renderRequested) {
       setRenderRequested(false);
       const renderWindow = getRenderWindow();
       renderWindow.render();
-      renderWindow.getRenderers().forEach((ren) => ren.setDraw(false));
     }
   }, [renderRequested, getRenderWindow]);
 
