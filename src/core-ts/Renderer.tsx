@@ -141,7 +141,7 @@ export default forwardRef(function Renderer(props: Props, fwdRef) {
         if (autoResetCamera) {
           resetCamera();
         }
-        renderWindow._queueRender();
+        renderWindow.requestRender();
       },
     }),
     [autoResetCamera, renderWindow, resetCamera, getRenderer]

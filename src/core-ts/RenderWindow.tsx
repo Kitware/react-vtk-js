@@ -155,7 +155,7 @@ export default forwardRef(function RenderWindow(props: Props, fwdRef) {
       getInteractor,
       getInteractorStyle,
       setInteractorStyle,
-      _queueRender: queueRender,
+      requestRender: queueRender,
     }),
     [getRenderWindow, getInteractor, getInteractorStyle, setInteractorStyle]
   );

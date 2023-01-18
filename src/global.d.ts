@@ -1,3 +1,13 @@
+declare module '@kitware/vtk.js/type-patches' {
+  import vtkRenderer from '@kitware/vtk.js/Rendering/Core/Renderer';
+  import vtkRenderWindowInteractor from '@kitware/vtk.js/Rendering/Core/RenderWindowInteractor';
+
+  export interface FixedVTKRenderWindowInteractor
+    extends vtkRenderWindowInteractor {
+    setCurrentRenderer(ren: vtkRenderer): void;
+  }
+}
+
 declare module '@kitware/vtk.js/Rendering/Core/CubeAxesActor' {
   import vtkActor from '@kitware/vtk.js/Rendering/Core/Actor';
   export interface vtkCubeAxesActor extends vtkActor {

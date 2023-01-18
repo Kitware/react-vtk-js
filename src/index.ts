@@ -9,6 +9,7 @@ export { default as DataArray } from './core-ts/DataArray';
 export { default as Geometry2DRepresentation } from './core-ts/Geometry2DRepresentation';
 export { default as GeometryRepresentation } from './core-ts/GeometryRepresentation';
 export { default as ImageData } from './core-ts/ImageData';
+export { default as MultiViewRoot } from './core-ts/MultiViewRoot';
 export { default as OpenGLRenderWindow } from './core-ts/OpenGLRenderWindow';
 export { default as PointData } from './core-ts/PointData';
 export { default as PolyData } from './core-ts/PolyData';

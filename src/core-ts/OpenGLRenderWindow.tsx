@@ -15,17 +15,19 @@ import useGetterRef from '../utils-ts/useGetterRef';
 import useUnmount from '../utils-ts/useUnmount';
 import { OpenGLRenderWindowContext } from './contexts';
 
-const RENDERER_STYLE: CSSProperties = {
+const RENDERWINDOW_STYLE: CSSProperties = {
   position: 'absolute',
   width: '100%',
   height: '100%',
   overflow: 'hidden',
 };
 
-export interface Props extends PropsWithChildren, HTMLProps<HTMLDivElement> {}
+export interface Props extends PropsWithChildren, HTMLProps<HTMLDivElement> {
+  renderWindowStyle?: CSSProperties;
+}
 
 export default forwardRef(function OpenGLRenderWindow(props: Props, fwdRef) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const rwContainerRef = useRef<HTMLDivElement | null>(null);
 
   const [viewRef, getRWView] = useGetterRef(() => {
     const view = vtkOpenGLRenderWindow.newInstance();
@@ -35,7 +37,7 @@ export default forwardRef(function OpenGLRenderWindow(props: Props, fwdRef) {
 
   useEffect(() => {
     const view = getRWView();
-    view.setContainer(containerRef.current as HTMLElement);
+    view.setContainer(rwContainerRef.current as HTMLElement);
     return () => {
       // FIXME setContainer API should allow null
       view.setContainer(null as unknown as HTMLElement);
@@ -52,14 +54,14 @@ export default forwardRef(function OpenGLRenderWindow(props: Props, fwdRef) {
   const api = useMemo<IOpenGLRenderWindow>(
     () => ({
       get: getRWView,
-      getContainer: () => containerRef.current,
+      getContainer: () => rwContainerRef.current,
     }),
     [getRWView]
   );
 
   useImperativeHandle(fwdRef, () => api);
 
-  const { children, style, ...containerProps } = props;
+  const { children, style, renderWindowStyle, ...containerProps } = props;
   const containerStyle = useMemo<CSSProperties>(
     () => ({
       position: 'relative',
@@ -70,9 +72,17 @@ export default forwardRef(function OpenGLRenderWindow(props: Props, fwdRef) {
     [style]
   );
 
+  const rwContainerStyle = useMemo<CSSProperties>(
+    () => ({
+      ...RENDERWINDOW_STYLE,
+      ...renderWindowStyle,
+    }),
+    [renderWindowStyle]
+  );
+
   return (
     <div {...containerProps} style={containerStyle}>
-      <div ref={containerRef} style={RENDERER_STYLE} />
+      <div ref={rwContainerRef} style={rwContainerStyle} />
       <OpenGLRenderWindowContext.Provider value={api}>
         {children}
       </OpenGLRenderWindowContext.Provider>

@@ -45,10 +45,7 @@ export interface IRenderWindow {
   getInteractor(): vtkRenderWindowInteractor;
   getInteractorStyle(): vtkInteractorStyle;
   setInteractorStyle(style: vtkInteractorStyle): void;
-  /**
-   * Internal use. Use requestRender() on the Renderer context.
-   */
-  _queueRender(): void;
+  requestRender(): void;
 }
 
 export interface IRenderer {
