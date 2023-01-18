@@ -136,8 +136,6 @@ export default forwardRef(function Renderer(props: Props, fwdRef) {
       get: getRenderer,
       resetCamera,
       requestRender: () => {
-        const ren = getRenderer();
-        ren.setDraw(true);
         if (autoResetCamera) {
           resetCamera();
         }
