@@ -10,7 +10,7 @@ import {
   TypedArray,
   vtkPipelineConnection,
 } from '@kitware/vtk.js/types';
-import { NUMPY_DTYPES } from '../utils-ts/numpy';
+import { NUMPY_DTYPES } from './utils-ts/numpy';
 
 export type NumpyEncodedArray = {
   bvals: string;
@@ -50,19 +50,21 @@ export interface IRenderWindow {
 
 export interface IRenderer {
   get(): vtkRenderer;
-  resetCamera(): void;
+  resetCamera(boundsToUse?: Bounds): void;
   requestRender(): void;
 }
 
 export interface IView {
-  getRenderer(): vtkRenderer;
-  getRenderWindow(): vtkRenderWindow;
-  getAPISpecificRenderWindow(): vtkOpenGLRenderWindow;
-  getInteractor(): vtkRenderWindowInteractor;
-  getInteractorStyle(): vtkInteractorStyle;
-  setInteractorStyle(style: vtkInteractorStyle): void;
-  getCamera(): vtkCamera;
+  isInMultiViewRoot(): boolean;
+  getRenderer(): IRenderer | null;
+  getRenderWindow(): IRenderWindow | null;
+  getOpenGLRenderWindow(): IOpenGLRenderWindow | null;
+  // getAPISpecificRenderWindow(): vtkOpenGLRenderWindow;
+  // getInteractor(): vtkRenderWindowInteractor;
+  // getInteractorStyle(): vtkInteractorStyle;
+  // setInteractorStyle(style: vtkInteractorStyle): void;
   requestRender(): void;
+  getCamera(): vtkCamera | null;
   resetCamera(boundsToUse?: Bounds): void;
 }
 

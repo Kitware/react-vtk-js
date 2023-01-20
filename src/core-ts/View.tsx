@@ -1,4 +1,5 @@
 import { FixedVTKRenderWindowInteractor } from '@kitware/vtk.js/type-patches';
+import { Bounds } from '@kitware/vtk.js/types';
 import {
   CSSProperties,
   forwardRef,
@@ -10,7 +11,7 @@ import {
   useMemo,
   useRef,
 } from 'react';
-import { IOpenGLRenderWindow, IRenderer, IRenderWindow } from '../types';
+import { IOpenGLRenderWindow, IRenderer, IRenderWindow, IView } from '../types';
 import { omit, pick } from '../utils-ts';
 import { ResizeWatcherContext } from '../utils-ts/ResizeWatcher';
 import { useEventListener } from '../utils-ts/useEventListener';
@@ -65,13 +66,6 @@ interface Props
   // showOrientationAxes?: boolean;
 }
 
-interface IView {
-  isInMultiViewRoot(): boolean;
-  getOpenGLRenderWindow(): IOpenGLRenderWindow | null;
-  getRenderWindow(): IRenderWindow | null;
-  getRenderer(): IRenderer | null;
-}
-
 const SingleView = forwardRef(function SingleView(props: Props, fwdRef) {
   // view API just exposes the render window + renderer
   const openGLRenderWindowRef = useRef<IOpenGLRenderWindow | null>(null);
@@ -102,6 +96,10 @@ const SingleView = forwardRef(function SingleView(props: Props, fwdRef) {
       getOpenGLRenderWindow: () => openGLRenderWindowRef.current,
       getRenderWindow: () => renderWindowRef.current,
       getRenderer: () => rendererRef.current,
+      requestRender: () => rendererRef.current?.requestRender(),
+      getCamera: () => rendererRef.current?.get().getActiveCamera() ?? null,
+      resetCamera: (boundsToUse?: Bounds) =>
+        rendererRef.current?.resetCamera(boundsToUse),
     }),
     []
   );
@@ -221,6 +219,10 @@ const ParentedView = forwardRef(function ParentedView(props: Props, fwdRef) {
       getOpenGLRenderWindow: () => openGLRenderWindowAPI,
       getRenderWindow: () => renderWindowAPI,
       getRenderer: () => rendererRef.current,
+      requestRender: () => rendererRef.current?.requestRender(),
+      getCamera: () => rendererRef.current?.get().getActiveCamera() ?? null,
+      resetCamera: (boundsToUse?: Bounds) =>
+        rendererRef.current?.resetCamera(boundsToUse),
     }),
     [openGLRenderWindowAPI, renderWindowAPI]
   );
@@ -263,6 +265,10 @@ export default forwardRef(function View(props: Props, fwdRef) {
       getOpenGLRenderWindow: () => getView()?.getOpenGLRenderWindow() ?? null,
       getRenderWindow: () => getView()?.getRenderWindow() ?? null,
       getRenderer: () => getView()?.getRenderer() ?? null,
+      requestRender: () => getView()?.requestRender(),
+      getCamera: () => getView()?.getCamera() ?? null,
+      resetCamera: (boundsToUse?: Bounds) =>
+        getView()?.resetCamera(boundsToUse),
     };
   }, [multiViewRoot]);
 
