@@ -256,10 +256,14 @@ export default forwardRef(function View(props: Props, fwdRef) {
   const multiViewRoot = useContext(MultiViewRootContext);
 
   const api = useMemo<IView | null>(() => {
-    if (multiViewRoot) {
-      return parentedViewRef.current;
-    }
-    return singleViewRef.current;
+    const getView = () =>
+      multiViewRoot ? parentedViewRef.current : singleViewRef.current;
+    return {
+      isInMultiViewRoot: () => multiViewRoot,
+      getOpenGLRenderWindow: () => getView()?.getOpenGLRenderWindow() ?? null,
+      getRenderWindow: () => getView()?.getRenderWindow() ?? null,
+      getRenderer: () => getView()?.getRenderer() ?? null,
+    };
   }, [multiViewRoot]);
 
   useImperativeHandle(fwdRef, () => api);
