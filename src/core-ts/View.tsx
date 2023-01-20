@@ -66,6 +66,9 @@ interface Props
   // showOrientationAxes?: boolean;
 }
 
+/**
+ * A standalone View (not within a MultiViewRoot).
+ */
 const SingleView = forwardRef(function SingleView(props: Props, fwdRef) {
   // view API just exposes the render window + renderer
   const openGLRenderWindowRef = useRef<IOpenGLRenderWindow | null>(null);
@@ -120,6 +123,9 @@ const SingleView = forwardRef(function SingleView(props: Props, fwdRef) {
   );
 });
 
+/**
+ * A View that is within a MultiViewRoot.
+ */
 const ParentedView = forwardRef(function ParentedView(props: Props, fwdRef) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const rendererRef = useRef<IRenderer | null>(null);
