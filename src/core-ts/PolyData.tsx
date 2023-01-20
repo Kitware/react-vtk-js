@@ -212,7 +212,10 @@ export default forwardRef(function PolyData(props: Props, fwdRef) {
       }
     }
 
-    if (modified) dataset.modified();
+    if (modified) {
+      polyData.computeBounds();
+      dataset.modified();
+    }
   });
 
   useUnmount(() => {
