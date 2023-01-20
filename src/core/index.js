@@ -5,6 +5,7 @@ import vtkPointData from './PointData';
 import vtkPolyData from './PolyData';
 import vtkReader from './Reader';
 import vtkShareDataSet from './ShareDataSet';
+import vtkDataset from './Dataset';
 import vtkView from './ViewContainer';
 import vtkGeometryRepresentation from './GeometryRepresentation';
 import vtkGeometry2DRepresentation from './Geometry2DRepresentation';
@@ -24,6 +25,7 @@ export const PointData = vtkPointData;
 export const PolyData = vtkPolyData;
 export const Reader = vtkReader;
 export const ShareDataSet = vtkShareDataSet;
+export const DataSet = vtkDataset;
 export const View = vtkView;
 export const GeometryRepresentation = vtkGeometryRepresentation;
 export const Geometry2DRepresentation = vtkGeometry2DRepresentation;
@@ -44,6 +46,7 @@ export default {
   PolyData: vtkPolyData,
   Reader: vtkReader,
   ShareDataSet: vtkShareDataSet,
+  Dataset: vtkDataset,
   View: vtkView,
   GeometryRepresentation: vtkGeometryRepresentation,
   Geometry2DRepresentation: vtkGeometry2DRepresentation,

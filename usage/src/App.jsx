@@ -12,6 +12,7 @@ const SourceViewer = lazy(() => import('./Geometry/SourceViewer'));
 const Glyph = lazy(() => import('./Geometry/Glyph'));
 const CutterExample = lazy(() => import('./Geometry/CutterExample'));
 const SliceRendering = lazy(() => import('./Volume/SliceRendering'));
+const ImageSeriesRendering = lazy(() => import('./Volume/ImageSeriesRendering'));
 const SyntheticVolumeRendering = lazy(() =>
   import('./Volume/SyntheticVolumeRendering')
 );
@@ -30,6 +31,7 @@ const demos = [
   'Geometry/Glyph',
   'Geometry/CutterExample',
   'Volume/SliceRendering',
+  'Volume/ImageSeriesRendering',
   'Volume/SyntheticVolumeRendering',
   'Volume/VolumeRendering',
   'Volume/DynamicUpdate',
@@ -90,6 +92,7 @@ function App() {
           {example === 'Geometry/Glyph' && <Glyph />}
           {example === 'Geometry/CutterExample' && <CutterExample />}
           {example === 'Volume/SliceRendering' && <SliceRendering />}
+          {example === 'Volume/ImageSeriesRendering' && <ImageSeriesRendering />}
           {example === 'Volume/SyntheticVolumeRendering' && (
             <SyntheticVolumeRendering />
           )}
