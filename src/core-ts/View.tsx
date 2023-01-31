@@ -1,4 +1,3 @@
-import vtkInteractorStyle from '@kitware/vtk.js/Interaction/Style/InteractorStyle';
 import { FixedVTKRenderWindowInteractor } from '@kitware/vtk.js/type-patches';
 import { Bounds } from '@kitware/vtk.js/types';
 import {
@@ -157,12 +156,12 @@ const SingleView = forwardRef(function SingleView(props: Props, fwdRef) {
   const [getInteractorStyle, setInteractorStyle] =
     useInteractorStyle(getInteractor);
 
-  const { interactorSettings = DefaultProps.interactorSettings } = props;
+  const {
+    interactorSettings = DefaultProps.interactorSettings,
+    autoCenterOfRotation = DefaultProps.autoCenterOfRotation,
+  } = props;
   useInteractorStyleManipulatorSettings(getInteractorStyle, interactorSettings);
 
-  // --- reset camera --- //
-
-  const { autoCenterOfRotation = DefaultProps.autoCenterOfRotation } = props;
   useApplyCenterOfRotation(
     rendererRef,
     getInteractorStyle,
@@ -215,8 +214,7 @@ const ParentedView = forwardRef(function ParentedView(props: Props, fwdRef) {
     'background',
     'interactive',
     'camera',
-    'autoResetCamera',
-    'autoCenterOfRotation'
+    'autoResetCamera'
   );
 
   const openGLRenderWindowAPI = useContext(OpenGLRenderWindowContext);
@@ -229,16 +227,42 @@ const ParentedView = forwardRef(function ParentedView(props: Props, fwdRef) {
     throw new Error('RenderWindow is missing inside the MultiViewRoot');
   }
 
-  // --- interactor binding --- //
+  // --- interactor & style binding --- //
 
+  const getInteractor = useCallback(
+    () => renderWindowAPI.getInteractor(),
+    [renderWindowAPI]
+  );
+
+  const [getInteractorStyle, setInteractorStyle] =
+    useInteractorStyle(getInteractor);
+
+  const {
+    interactorSettings = DefaultProps.interactorSettings,
+    autoCenterOfRotation = DefaultProps.autoCenterOfRotation,
+  } = props;
+  useInteractorStyleManipulatorSettings(getInteractorStyle, interactorSettings);
+
+  useApplyCenterOfRotation(
+    rendererRef,
+    getInteractorStyle,
+    autoCenterOfRotation
+  );
+
+  /**
+   * 1. Switch to targeted renderer.
+   * 2. Switch to this View's interactor style.
+   */
   useEventListener(containerRef, 'pointerenter', (ev: PointerEvent) => {
     const rendererAPI = rendererRef.current;
     if (!rendererAPI) return;
 
-    const interactor = renderWindowAPI.getInteractor();
+    const interactor = getInteractor();
+
     (interactor as FixedVTKRenderWindowInteractor).setCurrentRenderer(
       rendererAPI.get()
     );
+    interactor.setInteractorStyle(getInteractorStyle());
 
     const oldContainer = interactor.getContainer();
     const newContainer = containerRef.current;
@@ -305,18 +329,19 @@ const ParentedView = forwardRef(function ParentedView(props: Props, fwdRef) {
       getOpenGLRenderWindow: () => openGLRenderWindowAPI,
       getRenderWindow: () => renderWindowAPI,
       getRenderer: () => rendererRef.current,
-      // TODO
-      getInteractorStyle: () => ({} as unknown as vtkInteractorStyle),
-      // TODO
-      setInteractorStyle: (style) => {
-        console.log(style);
-      },
+      getInteractorStyle: () => getInteractorStyle(),
+      setInteractorStyle: (style) => setInteractorStyle(style),
       requestRender: () => rendererRef.current?.requestRender(),
       getCamera: () => rendererRef.current?.get().getActiveCamera() ?? null,
       resetCamera: (boundsToUse?: Bounds) =>
         rendererRef.current?.resetCamera(boundsToUse),
     }),
-    [openGLRenderWindowAPI, renderWindowAPI]
+    [
+      openGLRenderWindowAPI,
+      renderWindowAPI,
+      getInteractorStyle,
+      setInteractorStyle,
+    ]
   );
 
   useImperativeHandle(fwdRef, () => api);
