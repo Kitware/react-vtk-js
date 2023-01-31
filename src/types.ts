@@ -43,8 +43,6 @@ export interface IOpenGLRenderWindow {
 export interface IRenderWindow {
   get(): vtkRenderWindow;
   getInteractor(): vtkRenderWindowInteractor;
-  getInteractorStyle(): vtkInteractorStyle;
-  setInteractorStyle(style: vtkInteractorStyle): void;
   requestRender(): void;
 }
 
@@ -61,8 +59,8 @@ export interface IView {
   getOpenGLRenderWindow(): IOpenGLRenderWindow | null;
   // getAPISpecificRenderWindow(): vtkOpenGLRenderWindow;
   // getInteractor(): vtkRenderWindowInteractor;
-  // getInteractorStyle(): vtkInteractorStyle;
-  // setInteractorStyle(style: vtkInteractorStyle): void;
+  getInteractorStyle(): vtkInteractorStyle | null;
+  setInteractorStyle(style: vtkInteractorStyle): void;
   requestRender(): void;
   getCamera(): vtkCamera | null;
   resetCamera(boundsToUse?: Bounds): void;

@@ -23,7 +23,6 @@ import vtkMouseCameraTrackballZoomToMouseManipulator, {
 import vtkInteractorStyle from '@kitware/vtk.js/Interaction/Style/InteractorStyle';
 import vtkInteractorStyleManipulator from '@kitware/vtk.js/Interaction/Style/InteractorStyleManipulator';
 import vtkRenderWindowInteractor from '@kitware/vtk.js/Rendering/Core/RenderWindowInteractor';
-import { Nullable } from '@kitware/vtk.js/types';
 import deepEqual from 'deep-equal';
 import { useCallback, useEffect, useState } from 'react';
 import deletionRegistry from '../../utils-ts/DeletionRegistry';
@@ -116,10 +115,11 @@ export function useInteractorStyleManipulatorSettings(
 }
 
 export function useInteractorStyle(
-  getInteractor: () => vtkRenderWindowInteractor
+  getInteractor: () => vtkRenderWindowInteractor | null
 ) {
-  const [externalStyle, setExternalStyle] =
-    useState<Nullable<vtkInteractorStyle>>(null);
+  const [externalStyle, setExternalStyle] = useState<vtkInteractorStyle | null>(
+    null
+  );
 
   const [styleRef, getStyle] = useGetterRef<vtkInteractorStyle>(() => {
     setExternalStyle(null);
@@ -130,16 +130,22 @@ export function useInteractorStyle(
 
   useEffect(() => {
     const interactor = getInteractor();
-    const style = getStyle();
-    deletionRegistry.incRefCount(interactor);
+    if (!interactor) return;
+
+    const style = externalStyle ?? getStyle();
     interactor.setInteractorStyle(style);
+
+    deletionRegistry.incRefCount(interactor);
+    deletionRegistry.incRefCount(style);
+
     return () => {
       if (interactor.getInteractorStyle() === style) {
         interactor.setInteractorStyle(null);
       }
       deletionRegistry.decRefCount(interactor);
+      deletionRegistry.incRefCount(style);
     };
-  }, [getInteractor, getStyle]);
+  });
 
   useUnmount(() => {
     if (styleRef.current && !externalStyle) {

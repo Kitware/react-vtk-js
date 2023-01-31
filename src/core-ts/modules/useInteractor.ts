@@ -1,9 +1,9 @@
 import vtkRenderWindowInteractor from '@kitware/vtk.js/Rendering/Core/RenderWindowInteractor';
 import { useEffect } from 'react';
+import { IOpenGLRenderWindow } from '../../types';
 import deletionRegistry from '../../utils-ts/DeletionRegistry';
 import useGetterRef from '../../utils-ts/useGetterRef';
 import useUnmount from '../../utils-ts/useUnmount';
-import { IOpenGLRenderWindow } from '../OpenGLRenderWindow';
 
 export default function useInteractor(openglRenderWindow: IOpenGLRenderWindow) {
   const [interactorRef, getInteractor] = useGetterRef(() => {

@@ -17,62 +17,10 @@ import useResizeObserver from '../utils-ts/useResizeObserver';
 import useUnmount from '../utils-ts/useUnmount';
 import { OpenGLRenderWindowContext, RenderWindowContext } from './contexts';
 import useInteractor from './modules/useInteractor';
-import {
-  ManipulatorSettings,
-  useInteractorStyle,
-  useInteractorStyleManipulatorSettings,
-} from './modules/useInteractorStyle';
 
-export interface Props extends PropsWithChildren {
-  /**
-   * Configure the interactions
-   */
-  interactorSettings?: ManipulatorSettings[];
-}
+export type Props = PropsWithChildren;
 
-const DefaultProps = {
-  interactorSettings: [
-    {
-      button: 1,
-      action: 'Rotate',
-    },
-    {
-      button: 2,
-      action: 'Pan',
-    },
-    {
-      button: 3,
-      action: 'Zoom',
-      scrollEnabled: true,
-    },
-    {
-      button: 1,
-      action: 'Pan',
-      alt: true,
-    },
-    {
-      button: 1,
-      action: 'Zoom',
-      control: true,
-    },
-    {
-      button: 1,
-      action: 'Select',
-      shift: true,
-    },
-    {
-      button: 1,
-      action: 'Roll',
-      alt: true,
-      shift: true,
-    },
-  ] as ManipulatorSettings[],
-};
-
-// TODO Wrap in OpenGLRenderWindow by default
 export default forwardRef(function RenderWindow(props: Props, fwdRef) {
-  const { interactorSettings = DefaultProps.interactorSettings } = props;
-
   const openGLRenderWindow = useContext(OpenGLRenderWindowContext);
   if (!openGLRenderWindow) throw new Error('No OpenGL Render Window!');
 
@@ -109,11 +57,6 @@ export default forwardRef(function RenderWindow(props: Props, fwdRef) {
   useEffect(() => {
     getRenderWindow().setInteractor(getInteractor());
   });
-
-  const [getInteractorStyle, setInteractorStyle] =
-    useInteractorStyle(getInteractor);
-
-  useInteractorStyleManipulatorSettings(getInteractorStyle, interactorSettings);
 
   // --- rendering --- //
 
@@ -153,11 +96,9 @@ export default forwardRef(function RenderWindow(props: Props, fwdRef) {
     () => ({
       get: getRenderWindow,
       getInteractor,
-      getInteractorStyle,
-      setInteractorStyle,
       requestRender: queueRender,
     }),
-    [getRenderWindow, getInteractor, getInteractorStyle, setInteractorStyle]
+    [getRenderWindow, getInteractor]
   );
 
   useImperativeHandle(fwdRef, () => api);

@@ -1,3 +1,4 @@
+import vtkInteractorStyle from '@kitware/vtk.js/Interaction/Style/InteractorStyle';
 import { FixedVTKRenderWindowInteractor } from '@kitware/vtk.js/type-patches';
 import { Bounds } from '@kitware/vtk.js/types';
 import {
@@ -21,6 +22,11 @@ import {
   OpenGLRenderWindowContext,
   RenderWindowContext,
 } from './contexts';
+import {
+  ManipulatorSettings,
+  useInteractorStyle,
+  useInteractorStyleManipulatorSettings,
+} from './modules/useInteractorStyle';
 import OpenGLRenderWindow, {
   Props as OpenGLRenderWindowProps,
 } from './OpenGLRenderWindow';
@@ -64,7 +70,50 @@ interface Props
    * Show/Hide orientation axes.
    */
   // showOrientationAxes?: boolean;
+  /**
+   * Configure the interactions
+   */
+  interactorSettings?: ManipulatorSettings[];
 }
+
+const DefaultProps = {
+  interactorSettings: [
+    {
+      button: 1,
+      action: 'Rotate',
+    },
+    {
+      button: 2,
+      action: 'Pan',
+    },
+    {
+      button: 3,
+      action: 'Zoom',
+      scrollEnabled: true,
+    },
+    {
+      button: 1,
+      action: 'Pan',
+      alt: true,
+    },
+    {
+      button: 1,
+      action: 'Zoom',
+      control: true,
+    },
+    {
+      button: 1,
+      action: 'Select',
+      shift: true,
+    },
+    {
+      button: 1,
+      action: 'Roll',
+      alt: true,
+      shift: true,
+    },
+  ] as ManipulatorSettings[],
+};
 
 /**
  * A standalone View (not within a MultiViewRoot).
@@ -75,7 +124,6 @@ const SingleView = forwardRef(function SingleView(props: Props, fwdRef) {
   const renderWindowRef = useRef<IRenderWindow | null>(null);
   const rendererRef = useRef<IRenderer | null>(null);
 
-  const renderWindowProps = pick(props, 'interactorSettings');
   const rendererProps = pick(
     props,
     'background',
@@ -87,11 +135,23 @@ const SingleView = forwardRef(function SingleView(props: Props, fwdRef) {
 
   const openGLRenderWindowProps = omit(
     props,
-    ...([
-      ...Object.keys(renderWindowProps),
-      ...Object.keys(rendererProps),
-    ] as (keyof Props)[])
+    ...([...Object.keys(rendererProps)] as (keyof Props)[])
   );
+
+  // --- interactor style --- //
+
+  const getInteractor = useCallback(
+    () => renderWindowRef.current?.getInteractor() ?? null,
+    []
+  );
+
+  const [getInteractorStyle, setInteractorStyle] =
+    useInteractorStyle(getInteractor);
+
+  const { interactorSettings = DefaultProps.interactorSettings } = props;
+  useInteractorStyleManipulatorSettings(getInteractorStyle, interactorSettings);
+
+  // --- api --- //
 
   const api = useMemo<IView>(
     () => ({
@@ -99,12 +159,14 @@ const SingleView = forwardRef(function SingleView(props: Props, fwdRef) {
       getOpenGLRenderWindow: () => openGLRenderWindowRef.current,
       getRenderWindow: () => renderWindowRef.current,
       getRenderer: () => rendererRef.current,
+      getInteractorStyle: () => getInteractorStyle(),
+      setInteractorStyle: (style) => setInteractorStyle(style),
       requestRender: () => rendererRef.current?.requestRender(),
       getCamera: () => rendererRef.current?.get().getActiveCamera() ?? null,
       resetCamera: (boundsToUse?: Bounds) =>
         rendererRef.current?.resetCamera(boundsToUse),
     }),
-    []
+    [getInteractorStyle, setInteractorStyle]
   );
 
   useImperativeHandle(fwdRef, () => api);
@@ -114,7 +176,7 @@ const SingleView = forwardRef(function SingleView(props: Props, fwdRef) {
       {...openGLRenderWindowProps}
       ref={openGLRenderWindowRef}
     >
-      <RenderWindow {...renderWindowProps} ref={renderWindowRef}>
+      <RenderWindow ref={renderWindowRef}>
         <Renderer {...rendererProps} ref={rendererRef}>
           {props.children}
         </Renderer>
@@ -225,6 +287,12 @@ const ParentedView = forwardRef(function ParentedView(props: Props, fwdRef) {
       getOpenGLRenderWindow: () => openGLRenderWindowAPI,
       getRenderWindow: () => renderWindowAPI,
       getRenderer: () => rendererRef.current,
+      // TODO
+      getInteractorStyle: () => ({} as unknown as vtkInteractorStyle),
+      // TODO
+      setInteractorStyle: (style) => {
+        console.log(style);
+      },
       requestRender: () => rendererRef.current?.requestRender(),
       getCamera: () => rendererRef.current?.get().getActiveCamera() ?? null,
       resetCamera: (boundsToUse?: Bounds) =>
@@ -271,6 +339,8 @@ export default forwardRef(function View(props: Props, fwdRef) {
       getOpenGLRenderWindow: () => getView()?.getOpenGLRenderWindow() ?? null,
       getRenderWindow: () => getView()?.getRenderWindow() ?? null,
       getRenderer: () => getView()?.getRenderer() ?? null,
+      getInteractorStyle: () => getView()?.getInteractorStyle() ?? null,
+      setInteractorStyle: (style) => getView()?.setInteractorStyle(style),
       requestRender: () => getView()?.requestRender(),
       getCamera: () => getView()?.getCamera() ?? null,
       resetCamera: (boundsToUse?: Bounds) =>
