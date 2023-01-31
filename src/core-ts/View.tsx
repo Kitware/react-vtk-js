@@ -22,6 +22,7 @@ import {
   OpenGLRenderWindowContext,
   RenderWindowContext,
 } from './contexts';
+import useApplyCenterOfRotation from './modules/useApplyCenterOfRotation';
 import {
   ManipulatorSettings,
   useInteractorStyle,
@@ -70,10 +71,18 @@ interface Props
    * Show/Hide orientation axes.
    */
   // showOrientationAxes?: boolean;
+
   /**
    * Configure the interactions
    */
   interactorSettings?: ManipulatorSettings[];
+
+  /**
+   * Whether to automatically re-set the interactor style's center of rotation. (default: true)
+   *
+   * This is a convenience property for interactor styles that support setCenterOfRotation().
+   */
+  autoCenterOfRotation?: boolean;
 }
 
 const DefaultProps = {
@@ -113,6 +122,7 @@ const DefaultProps = {
       shift: true,
     },
   ] as ManipulatorSettings[],
+  autoCenterOfRotation: true,
 };
 
 /**
@@ -129,8 +139,7 @@ const SingleView = forwardRef(function SingleView(props: Props, fwdRef) {
     'background',
     'interactive',
     'camera',
-    'autoResetCamera',
-    'autoCenterOfRotation'
+    'autoResetCamera'
   );
 
   const openGLRenderWindowProps = omit(
@@ -150,6 +159,15 @@ const SingleView = forwardRef(function SingleView(props: Props, fwdRef) {
 
   const { interactorSettings = DefaultProps.interactorSettings } = props;
   useInteractorStyleManipulatorSettings(getInteractorStyle, interactorSettings);
+
+  // --- reset camera --- //
+
+  const { autoCenterOfRotation = DefaultProps.autoCenterOfRotation } = props;
+  useApplyCenterOfRotation(
+    rendererRef,
+    getInteractorStyle,
+    autoCenterOfRotation
+  );
 
   // --- api --- //
 

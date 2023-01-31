@@ -1,4 +1,3 @@
-import vtkInteractorStyle from '@kitware/vtk.js/Interaction/Style/InteractorStyle';
 import { ICameraInitialValues } from '@kitware/vtk.js/Rendering/Core/Camera';
 import vtkRenderer from '@kitware/vtk.js/Rendering/Core/Renderer';
 import { Bounds, Vector3, Vector4 } from '@kitware/vtk.js/types';
@@ -47,20 +46,12 @@ export interface Props extends PropsWithChildren {
    * still occur upon component mount.
    */
   autoResetCamera?: boolean;
-
-  /**
-   * Whether to automatically re-set the interactor style's center of rotation. (default: true)
-   *
-   * This is a convenience property for interactor styles that support setCenterOfRotation().
-   */
-  autoCenterOfRotation?: boolean;
 }
 
 export const DefaultProps = {
   background: [0.2, 0.3, 0.4] as Vector3,
   interactive: true,
   autoResetCamera: true,
-  autoCenterOfRotation: true,
 };
 
 export default forwardRef(function Renderer(props: Props, fwdRef) {
@@ -102,22 +93,15 @@ export default forwardRef(function Renderer(props: Props, fwdRef) {
   const {
     camera: cameraProps,
     autoResetCamera = DefaultProps.autoResetCamera,
-    autoCenterOfRotation = DefaultProps.autoCenterOfRotation,
   } = props;
-  const getCamera = useCamera(getRenderer, cameraProps, trackModified);
+
+  useCamera(getRenderer, cameraProps, trackModified);
 
   const resetCamera = useCallback(
     (boundsToUse?: Bounds) => {
-      const interactorStyle = renderWindow.getInteractorStyle();
       getRenderer().resetCamera(boundsToUse);
-      if (autoCenterOfRotation && 'setCenterOfRotation' in interactorStyle) {
-        const style = interactorStyle as vtkInteractorStyle & {
-          setCenterOfRotation(center: Vector3): boolean;
-        };
-        style.setCenterOfRotation(getCamera().getFocalPoint());
-      }
     },
-    [autoCenterOfRotation, renderWindow, getRenderer, getCamera]
+    [getRenderer]
   );
 
   // --- cleanup --- //

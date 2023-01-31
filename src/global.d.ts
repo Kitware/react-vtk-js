@@ -1,10 +1,23 @@
 declare module '@kitware/vtk.js/type-patches' {
+  import { EventHandler, vtkSubscription } from '@kitware/vtk.js/interfaces';
   import vtkRenderer from '@kitware/vtk.js/Rendering/Core/Renderer';
   import vtkRenderWindowInteractor from '@kitware/vtk.js/Rendering/Core/RenderWindowInteractor';
 
   export interface FixedVTKRenderWindowInteractor
     extends vtkRenderWindowInteractor {
     setCurrentRenderer(ren: vtkRenderer): void;
+  }
+
+  export interface VtkRendererEvent {
+    type:
+      | 'ComputeVisiblePropBoundsEvent'
+      | 'ResetCameraClippingRangeEvent'
+      | 'ResetCameraEvent';
+    renderer: vtkRenderer;
+  }
+
+  export interface FixedVTKRenderer extends vtkRenderer {
+    onEvent(cb: EventHandler, priority?: number): Readonly<vtkSubscription>;
   }
 }
 
