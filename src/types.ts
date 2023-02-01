@@ -54,6 +54,7 @@ export interface IRenderer {
 
 export interface IView {
   isInMultiViewRoot(): boolean;
+  getViewContainer(): HTMLElement | null;
   getRenderer(): IRenderer | null;
   getRenderWindow(): IRenderWindow | null;
   getOpenGLRenderWindow(): IOpenGLRenderWindow | null;
