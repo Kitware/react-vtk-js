@@ -2,10 +2,14 @@ declare module '@kitware/vtk.js/type-patches' {
   import { EventHandler, vtkSubscription } from '@kitware/vtk.js/interfaces';
   import vtkRenderer from '@kitware/vtk.js/Rendering/Core/Renderer';
   import vtkRenderWindowInteractor from '@kitware/vtk.js/Rendering/Core/RenderWindowInteractor';
-
+  import vtkOpenGLRenderWindow from '@kitware/vtk.js/Rendering/OpenGL/RenderWindow';
   export interface FixedVTKRenderWindowInteractor
     extends vtkRenderWindowInteractor {
     setCurrentRenderer(ren: vtkRenderer): void;
+  }
+
+  export interface FixedVTKOpenGLRenderWindow extends vtkOpenGLRenderWindow {
+    getCanvas(): HTMLElement | null;
   }
 
   export interface VtkRendererEvent {
