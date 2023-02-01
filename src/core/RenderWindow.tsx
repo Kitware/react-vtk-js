@@ -7,7 +7,7 @@ import {
   useEffect,
   useImperativeHandle,
   useMemo,
-  useState,
+  useRef,
 } from 'react';
 import { IRenderWindow } from '../types';
 import deletionRegistry from '../utils/DeletionRegistry';
@@ -60,16 +60,16 @@ export default forwardRef(function RenderWindow(props: Props, fwdRef) {
 
   // --- rendering --- //
 
-  const [renderRequested, setRenderRequested] = useState(false);
-  const queueRender = () => setRenderRequested(true);
-
-  useEffect(() => {
-    if (renderRequested) {
-      setRenderRequested(false);
-      const renderWindow = getRenderWindow();
-      renderWindow.render();
+  const renderTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const queueRender = useCallback(() => {
+    if (renderTimeoutRef.current == null) {
+      renderTimeoutRef.current = setTimeout(() => {
+        const renderWindow = getRenderWindow();
+        renderWindow.render();
+        renderTimeoutRef.current = null;
+      });
     }
-  }, [renderRequested, getRenderWindow]);
+  }, [getRenderWindow]);
 
   // --- resize --- //
 
@@ -98,7 +98,7 @@ export default forwardRef(function RenderWindow(props: Props, fwdRef) {
       getInteractor,
       requestRender: queueRender,
     }),
-    [getRenderWindow, getInteractor]
+    [getRenderWindow, getInteractor, queueRender]
   );
 
   useImperativeHandle(fwdRef, () => api);
