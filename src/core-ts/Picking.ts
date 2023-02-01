@@ -69,14 +69,6 @@ interface Props {
   onHover?: (selection: PickResult, event: PointerEvent) => void;
 
   /**
-   * Callback when a box select occurs.
-   *
-   * @param selection Selection info
-   * @param event the originating pointer event
-   */
-  onSelect?: (selection: FrustumPickResult, event: PointerEvent) => void;
-
-  /**
    * Callback when an actor is clicked with a mouse.
    *
    * @param selection Selection info
@@ -157,7 +149,7 @@ export default forwardRef(function ViewPicking(props: Props, fwdRef) {
   // --- API --- //
 
   const pickClosest = useCallback(
-    (xp: number, yp: number, tolerance: number) => {
+    (xp: number, yp: number, tolerance: number): PickResult[] => {
       const x1 = Math.floor(xp - tolerance);
       const y1 = Math.floor(yp - tolerance);
       const x2 = Math.ceil(xp + tolerance);
@@ -169,148 +161,166 @@ export default forwardRef(function ViewPicking(props: Props, fwdRef) {
 
       selector.setArea(x1, y1, x2, y2);
 
-      if (selector.captureBuffers()) {
-        const pos: Vector2 = [xp, yp];
-        const outSelectedPosition: Vector2 = [0, 0];
-        const info = selector.getPixelInformation(
-          pos,
-          tolerance,
-          outSelectedPosition
-        );
+      if (!selector.captureBuffers()) {
+        return [];
+      }
 
-        if (info == null || info.prop == null) return [];
+      const pos: Vector2 = [xp, yp];
+      const outSelectedPosition: Vector2 = [0, 0];
+      const info = selector.getPixelInformation(
+        pos,
+        tolerance,
+        outSelectedPosition
+      );
 
-        const startPoint = openGLRenderWindow.displayToWorld(
-          Math.round((x1 + x2) / 2),
-          Math.round((y1 + y2) / 2),
-          0,
-          renderer
-        );
+      if (info == null || info.prop == null) return [];
 
-        const endPoint = openGLRenderWindow.displayToWorld(
-          Math.round((x1 + x2) / 2),
-          Math.round((y1 + y2) / 2),
-          1,
-          renderer
-        );
+      const startPoint = openGLRenderWindow.displayToWorld(
+        Math.round((x1 + x2) / 2),
+        Math.round((y1 + y2) / 2),
+        0,
+        renderer
+      );
 
-        const ray = [Array.from(startPoint), Array.from(endPoint)];
+      const endPoint = openGLRenderWindow.displayToWorld(
+        Math.round((x1 + x2) / 2),
+        Math.round((y1 + y2) / 2),
+        1,
+        renderer
+      );
 
-        const worldPosition = Array.from(
-          openGLRenderWindow.displayToWorld(
-            info.displayPosition[0],
-            info.displayPosition[1],
-            info.zValue,
-            renderer
-          )
-        );
+      const ray = [Array.from(startPoint), Array.from(endPoint)];
 
-        const displayPosition = [
+      const worldPosition = Array.from(
+        openGLRenderWindow.displayToWorld(
           info.displayPosition[0],
           info.displayPosition[1],
           info.zValue,
-        ];
+          renderer
+        )
+      );
 
-        return [
-          {
-            worldPosition,
-            displayPosition,
-            compositeID: info.compositeID,
-            ...info.prop.get('representationID'),
-            ray,
-          },
-        ] as PickResult[];
-      }
-      return [];
+      const displayPosition = [
+        info.displayPosition[0],
+        info.displayPosition[1],
+        info.zValue,
+      ];
+
+      return [
+        {
+          worldPosition,
+          displayPosition,
+          compositeID: info.compositeID,
+          ...info.prop.get('representationID'),
+          ray,
+        },
+      ] as PickResult[];
     },
     [rendererAPI, openGLRenderWindowAPI, getSelector]
   );
 
   const pick = useCallback(
-    (
-      x1: number,
-      y1: number,
-      x2: number,
-      y2: number,
-      useFrustrum = false
-    ): PickResult[] | FrustumPickResult => {
+    (x1: number, y1: number, x2: number, y2: number): PickResult[] => {
       const selector = getSelector();
       const openGLRenderWindow = openGLRenderWindowAPI.get();
       const renderer = rendererAPI.get();
 
       selector.setArea(x1, y1, x2, y2);
 
-      if (selector.captureBuffers()) {
-        const selections = selector.generateSelection(x1, y1, x2, y2) || [];
-        if (useFrustrum) {
-          const frustum = [
-            Array.from(openGLRenderWindow.displayToWorld(x1, y1, 0, renderer)),
-            Array.from(openGLRenderWindow.displayToWorld(x2, y1, 0, renderer)),
-            Array.from(openGLRenderWindow.displayToWorld(x2, y2, 0, renderer)),
-            Array.from(openGLRenderWindow.displayToWorld(x1, y2, 0, renderer)),
-            Array.from(openGLRenderWindow.displayToWorld(x1, y1, 1, renderer)),
-            Array.from(openGLRenderWindow.displayToWorld(x2, y1, 1, renderer)),
-            Array.from(openGLRenderWindow.displayToWorld(x2, y2, 1, renderer)),
-            Array.from(openGLRenderWindow.displayToWorld(x1, y2, 1, renderer)),
-          ];
-          const representationIds: string[] = [];
-          selections.forEach((v) => {
-            const { prop } = v.getProperties();
-            const getterResult:
-              | {
-                  representationID?: string;
-                }
-              | undefined = prop?.get('representationID');
-            const representationId = getterResult?.representationID;
-            if (representationId) {
-              representationIds.push(representationId);
-            }
-          });
-          return { frustum, representationIds };
-        }
-        const ray = [
-          Array.from(
-            openGLRenderWindow.displayToWorld(
-              Math.round((x1 + x2) / 2),
-              Math.round((y1 + y2) / 2),
-              0,
-              renderer
-            )
-          ),
-          Array.from(
-            openGLRenderWindow.displayToWorld(
-              Math.round((x1 + x2) / 2),
-              Math.round((y1 + y2) / 2),
-              1,
-              renderer
-            )
-          ),
-        ];
-        return selections
-          .map((v) => {
-            const { prop, compositeID, displayPosition } = v.getProperties();
-
-            // Return false to mark this item for removal
-            if (prop == null || !displayPosition) return false;
-
-            return {
-              worldPosition: Array.from(
-                openGLRenderWindow.displayToWorld(
-                  displayPosition[0],
-                  displayPosition[1],
-                  displayPosition[2],
-                  renderer
-                )
-              ),
-              displayPosition,
-              compositeID, // Not yet useful unless GlyphRepresentation
-              ...prop.get('representationID'),
-              ray,
-            };
-          })
-          .filter(Boolean) as PickResult[];
+      if (!selector.captureBuffers()) {
+        return [];
       }
-      return [];
+
+      const ray = [
+        Array.from(
+          openGLRenderWindow.displayToWorld(
+            Math.round((x1 + x2) / 2),
+            Math.round((y1 + y2) / 2),
+            0,
+            renderer
+          )
+        ),
+        Array.from(
+          openGLRenderWindow.displayToWorld(
+            Math.round((x1 + x2) / 2),
+            Math.round((y1 + y2) / 2),
+            1,
+            renderer
+          )
+        ),
+      ];
+
+      const selections = selector.generateSelection(x1, y1, x2, y2) || [];
+      return selections
+        .map((v) => {
+          const { prop, compositeID, displayPosition } = v.getProperties();
+
+          // Return false to mark this item for removal
+          if (prop == null || !displayPosition) return false;
+
+          return {
+            worldPosition: Array.from(
+              openGLRenderWindow.displayToWorld(
+                displayPosition[0],
+                displayPosition[1],
+                displayPosition[2],
+                renderer
+              )
+            ),
+            displayPosition,
+            compositeID, // Not yet useful unless GlyphRepresentation
+            ...prop.get('representationID'),
+            ray,
+          };
+        })
+        .filter(Boolean) as PickResult[];
+    },
+    [rendererAPI, openGLRenderWindowAPI, getSelector]
+  );
+
+  const pickWithFrustum = useCallback(
+    (
+      x1: number,
+      y1: number,
+      x2: number,
+      y2: number
+    ): FrustumPickResult | null => {
+      const selector = getSelector();
+      const openGLRenderWindow = openGLRenderWindowAPI.get();
+      const renderer = rendererAPI.get();
+
+      selector.setArea(x1, y1, x2, y2);
+
+      if (!selector.captureBuffers()) {
+        return null;
+      }
+
+      const frustum = [
+        Array.from(openGLRenderWindow.displayToWorld(x1, y1, 0, renderer)),
+        Array.from(openGLRenderWindow.displayToWorld(x2, y1, 0, renderer)),
+        Array.from(openGLRenderWindow.displayToWorld(x2, y2, 0, renderer)),
+        Array.from(openGLRenderWindow.displayToWorld(x1, y2, 0, renderer)),
+        Array.from(openGLRenderWindow.displayToWorld(x1, y1, 1, renderer)),
+        Array.from(openGLRenderWindow.displayToWorld(x2, y1, 1, renderer)),
+        Array.from(openGLRenderWindow.displayToWorld(x2, y2, 1, renderer)),
+        Array.from(openGLRenderWindow.displayToWorld(x1, y2, 1, renderer)),
+      ];
+
+      const representationIds: string[] = [];
+      const selections = selector.generateSelection(x1, y1, x2, y2) || [];
+      selections.forEach((v) => {
+        const { prop } = v.getProperties();
+        const getterResult:
+          | {
+              representationID?: string;
+            }
+          | undefined = prop?.get('representationID');
+        const representationId = getterResult?.representationID;
+        if (representationId) {
+          representationIds.push(representationId);
+        }
+      });
+      return { frustum, representationIds };
     },
     [rendererAPI, openGLRenderWindowAPI, getSelector]
   );
@@ -318,9 +328,10 @@ export default forwardRef(function ViewPicking(props: Props, fwdRef) {
   const api = useMemo(
     () => ({
       pick,
+      pickWithFrustum,
       pickClosest,
     }),
-    [pick, pickClosest]
+    [pick, pickWithFrustum, pickClosest]
   );
 
   useImperativeHandle(fwdRef, () => api);
