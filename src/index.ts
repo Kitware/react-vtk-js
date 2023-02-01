@@ -10,11 +10,10 @@ export { default as Geometry2DRepresentation } from './core-ts/Geometry2DReprese
 export { default as GeometryRepresentation } from './core-ts/GeometryRepresentation';
 export { default as ImageData } from './core-ts/ImageData';
 export { default as MultiViewRoot } from './core-ts/MultiViewRoot';
-export { default as OpenGLRenderWindow } from './core-ts/OpenGLRenderWindow';
+export * from './core-ts/Picking';
+export { default as Picking } from './core-ts/Picking';
 export { default as PointData } from './core-ts/PointData';
 export { default as PolyData } from './core-ts/PolyData';
-export { default as Renderer } from './core-ts/Renderer';
-export { default as RenderWindow } from './core-ts/RenderWindow';
 export {
   RegisterDataSet,
   ShareDataSetRoot,
@@ -22,3 +21,8 @@ export {
 } from './core-ts/ShareDataSet';
 export { default as SliceRepresentation } from './core-ts/SliceRepresentation';
 export { default as View } from './core-ts/View';
+
+// TODO should we expose these?
+// export { default as OpenGLRenderWindow } from './core-ts/OpenGLRenderWindow';
+// export { default as Renderer } from './core-ts/Renderer';
+// export { default as RenderWindow } from './core-ts/RenderWindow';
