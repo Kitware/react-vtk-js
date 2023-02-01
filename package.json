@@ -6,7 +6,7 @@
   "license": "BSD-3-Clause",
   "repository": "Kitware/react-vtk-js",
   "main": "dist/umd/react-vtk.js",
-  "module": "dist/ts/index.js",
+  "module": "dist/esm/index.js",
   "source": "src/index.ts",
   "dependencies": {
     "@babel/eslint-parser": "^7.19.1",
@@ -14,7 +14,7 @@
     "deep-equal": "^2.0.5"
   },
   "scripts": {
-    "prebuild": "npm run fix",
+    "prebuild": "npm run test:lint",
     "build": "rimraf dist && rollup -c",
     "prepare": "npm run build",
     "test": "npm run test:lint && npm run test:build",

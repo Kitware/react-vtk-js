@@ -1,16 +1,12 @@
 import { babel } from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
-import eslint from '@rollup/plugin-eslint';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
+import typescript from '@rollup/plugin-typescript';
 import analyze from 'rollup-plugin-analyzer';
 import { terser } from 'rollup-plugin-terser';
 
 const plugins = [
-  !process.env.NOLINT &&
-    eslint({
-      include: 'src/**/*.[tj]sx?',
-      exclude: 'node_modules/**',
-    }),
+  typescript(),
   babel({
     include: 'src/**',
     exclude: 'node_modules/**',
@@ -20,7 +16,6 @@ const plugins = [
     plugins: ['@babel/plugin-transform-runtime'],
   }),
   commonjs(),
-  terser(),
   analyze({
     stdout: true,
     summaryOnly: true,
@@ -28,17 +23,17 @@ const plugins = [
 ];
 
 const external = [
-  '@babel/runtime',
-  '@kitware/vtk.js',
-  'prop-types',
+  /^@babel\/runtime\/?/,
+  /^@kitware\/vtk\.js/,
   'react',
+  'react/jsx-runtime',
   'regenerator-runtime',
+  'deep-equal',
 ];
 
 export default [
-  /*
   {
-    input: 'src/index.js',
+    input: 'src/index.ts',
     output: [
       {
         dir: 'dist/esm',
@@ -52,10 +47,17 @@ export default [
       },
     ],
     external,
-    plugins,
+    plugins: [
+      nodeResolve({
+        browser: true,
+        preferBuiltins: false,
+        extensions: ['.js', '.ts', '.tsx'],
+      }),
+      ...plugins,
+    ],
   },
   {
-    input: 'src/index.js',
+    input: 'src/index.ts',
     output: [
       {
         file: 'dist/umd/react-vtk.js',
@@ -73,49 +75,7 @@ export default [
         browser: true,
       }),
       ...plugins,
-    ],
-  },
-  */
-  {
-    input: 'src/index.ts',
-    output: {
-      dir: 'dist/ts',
-      format: 'es',
-      preserveModules: true,
-      preserveModulesRoot: 'src',
-    },
-    external: [
-      /^@babel\/runtime\/?/,
-      /^@kitware\/vtk\.js/,
-      'react',
-      'react/jsx-runtime',
-      'regenerator-runtime',
-      'deep-equal',
-    ],
-    plugins: [
-      nodeResolve({
-        browser: true,
-        preferBuiltins: false,
-        extensions: ['.js', '.ts', '.tsx'],
-      }),
-      commonjs(),
-      babel({
-        include: 'src/**',
-        exclude: '**/node_modules/**',
-        extensions: ['.js', '.ts', '.tsx'],
-        babelHelpers: 'runtime',
-        presets: [
-          '@babel/env',
-          [
-            '@babel/preset-react',
-            {
-              runtime: 'automatic',
-            },
-          ],
-          '@babel/preset-typescript',
-        ],
-        plugins: ['@babel/plugin-transform-runtime'],
-      }),
+      terser(),
     ],
   },
 ];

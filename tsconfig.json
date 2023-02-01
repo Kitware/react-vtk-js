@@ -7,10 +7,13 @@
       "lib": ["es2017", "DOM"],
       "strict": true,
       "esModuleInterop": false,
-      "outDir": "dist/ts",
+      "outDir": "dist/esm",
       "rootDir": "./",
       "jsx": "react-jsx",
-      "allowSyntheticDefaultImports": true
+      "allowSyntheticDefaultImports": true,
+      "declaration": true,
+      "declarationDir": "dist/esm",
+      "emitDeclarationOnly": true
     },
     "include": ["./src/**/*.ts", "./src/**/*.tsx"]
   }
