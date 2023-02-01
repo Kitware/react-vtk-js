@@ -10,34 +10,6 @@ export interface Props
     RenderWindowProps,
     RendererProps {
   /**
-   * List of picking listeners to bind. By default it is disabled (empty array).
-   */
-  // pickingModes?: 'click' | 'hover' | 'select' | 'mouseDown' | 'mouseUp';
-  /**
-   * User callback function for click
-   */
-  // onClick?: () => void;
-  /**
-   * User callback function for mouse down
-   */
-  // onMouseDown?: () => void;
-  /**
-   * User callback function for mouse up
-   */
-  // onMouseUp?: () => void;
-  /**
-   * User callback function for hover
-   */
-  // onHover?: () => void;
-  /**
-   * User callback function for box select
-   */
-  // onSelect?: () => void;
-  /**
-   * Defines the tolerance of the click and hover selection.
-   */
-  // pointerSize?: number;
-  /**
    * Show/Hide orientation axes.
    */
   // showOrientationAxes?: boolean;
