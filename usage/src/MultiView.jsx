@@ -1,10 +1,10 @@
-import React from 'react';
-import PointCloud from './Geometry/PointCloud';
 import Picking from './Geometry/Picking';
+import PolyDataViewer from './Geometry/PolyDataViewer';
 import PolyDataWithData from './Geometry/PolyDataWithData';
-import ProcessingPipeline from './Geometry/ProcessingPipeline';
-import Cutter from './Geometry/CutterExample';
-import Glyph from './Geometry/Glyph';
+import CameraTest from './Tests/CameraTest';
+import ChangeInteractorStyle from './Tests/ChangeInteractorStyle';
+import ShareGeometry from './Tests/ShareGeometry';
+import SliceRendering from './Tests/SimpleSliceRendering';
 
 import { MultiViewRoot } from 'react-vtk-js';
 
@@ -17,7 +17,7 @@ for (let i = 0; i < 1000; i++) {
   points.push(Math.random());
 }
 
-function Example(props) {
+function Example() {
   return (
     <MultiViewRoot>
       <div
@@ -25,27 +25,31 @@ function Example(props) {
           display: 'flex',
           flexFlow: 'row',
           flexWrap: 'wrap',
-          height: '100vh',
-          width: '100vw',
         }}
       >
         <div style={{ margin: '4px', width: '350px', height: '350px' }}>
           <Picking />
         </div>
         <div style={{ margin: '4px', width: '350px', height: '350px' }}>
-          <PointCloud />
+          <PolyDataWithData />
+        </div>
+        <div style={{ margin: '4px', width: '350px', height: '350px' }}>
+          <CameraTest />
+        </div>
+        <div style={{ margin: '4px', width: '350px', height: '350px' }}>
+          <ShareGeometry />
+        </div>
+        <div style={{ margin: '4px', width: '350px', height: '350px' }}>
+          <SliceRendering />
+        </div>
+        <div style={{ margin: '4px', width: '350px', height: '350px' }}>
+          <PolyDataViewer />
         </div>
         <div style={{ margin: '4px', width: '350px', height: '350px' }}>
           <PolyDataWithData />
         </div>
         <div style={{ margin: '4px', width: '350px', height: '350px' }}>
-          <ProcessingPipeline />
-        </div>
-        <div style={{ margin: '4px', width: '350px', height: '350px' }}>
-          <Cutter />
-        </div>
-        <div style={{ margin: '4px', width: '350px', height: '350px' }}>
-          <Glyph />
+          <ChangeInteractorStyle />
         </div>
       </div>
     </MultiViewRoot>
