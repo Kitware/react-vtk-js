@@ -4,58 +4,48 @@ import './styles.css';
 
 import useQueryString from './useQueryString';
 
-const Picking = lazy(() => import('./Geometry/Picking'));
-// const OBJViewer = lazy(() => import('./Geometry/OBJViewer'));
-// const PointCloud = lazy(() => import('./Geometry/PointCloud'));
-const PolyDataViewer = lazy(() => import('./Geometry/PolyDataViewer'));
-const PolyDataWithData = lazy(() => import('./Geometry/PolyDataWithData'));
-// const ProcessingPipeline = lazy(() => import('./Geometry/ProcessingPipeline'));
-const SourceViewer = lazy(() => import('./Geometry/SourceViewer'));
-const TubeExample = lazy(() => import('./Geometry/TubeExample'));
-// const Glyph = lazy(() => import('./Geometry/Glyph'));
-// const CutterExample = lazy(() => import('./Geometry/CutterExample'));
-// const SliceRendering = lazy(() => import('./Volume/SliceRendering'));
-// const ImageSeriesRendering = lazy(() => import('./Volume/ImageSeriesRendering'));
-// const SyntheticVolumeRendering = lazy(() =>
-//   import('./Volume/SyntheticVolumeRendering')
-// );
-// const VolumeRendering = lazy(() => import('./Volume/VolumeRendering'));
-// const DynamicUpdate = lazy(() => import('./Volume/DynamicUpdate'));
-const MultiView = lazy(() => import('./MultiView'));
-const PropertyUpdate = lazy(() => import('./Tests/PropertyUpdate'));
-const CameraTest = lazy(() => import('./Tests/CameraTest'));
-const ShareGeometry = lazy(() => import('./Tests/ShareGeometry'));
-const SimpleSliceRendering = lazy(() => import('./Tests/SimpleSliceRendering'));
-const ChangeInteractorStyle = lazy(() =>
-  import('./Tests/ChangeInteractorStyle')
-);
-
-const demos = [
-  'Geometry/Picking',
-  'Geometry/OBJViewer',
-  'Geometry/PointCloud',
-  'Geometry/PolyDataViewer',
-  'Geometry/PolyDataWithData',
-  'Geometry/ProcessingPipeline',
-  'Geometry/SourceViewer',
-  'Geometry/Glyph',
-  'Geometry/CutterExample',
-  'Geometry/TubeExample',
-  'Volume/SliceRendering',
-  'Volume/ImageSeriesRendering',
-  'Volume/SyntheticVolumeRendering',
-  'Volume/VolumeRendering',
-  'Volume/DynamicUpdate',
-  'Tests/PropertyUpdate',
-  'Tests/CameraTest',
-  'Tests/ShareGeometry',
-  'Tests/SimpleSliceRendering',
-  'Tests/ChangeInteractorStyle',
-  'MultiView',
-];
+const demos = new Map([
+  ['Geometry/Picking', lazy(() => import('./Geometry/Picking'))],
+  // ['Geometry/OBJViewer', lazy(() => import('./Geometry/OBJViewer'))],
+  // ['Geometry/PointCloud', lazy(() => import('./Geometry/PointCloud'))],
+  ['Geometry/PolyDataViewer', lazy(() => import('./Geometry/PolyDataViewer'))],
+  [
+    'Geometry/PolyDataWithData',
+    lazy(() => import('./Geometry/PolyDataWithData')),
+  ],
+  // [
+  //   'Geometry/ProcessingPipeline',
+  //   lazy(() => import('./Geometry/ProcessingPipeline')),
+  // ],
+  ['Geometry/SourceViewer', lazy(() => import('./Geometry/SourceViewer'))],
+  // ['Geometry/Glyph', lazy(() => import('./Geometry/Glyph'))],
+  // ['Geometry/CutterExample', lazy(() => import('./Geometry/CutterExample'))],
+  ['Geometry/TubeExample', lazy(() => import('./Geometry/TubeExample'))],
+  // ['Volume/SliceRendering', lazy(() => import('./Volume/SliceRendering'))],
+  // ['Volume/ImageSeriesRendering', lazy(() => import('./Volume/ImageSeriesRendering'))],
+  // [
+  //   'Volume/SyntheticVolumeRendering',
+  //   lazy(() => import('./Volume/SyntheticVolumeRendering')),
+  // ],
+  // ['Volume/VolumeRendering', lazy(() => import('./Volume/VolumeRendering'))],
+  // ['Volume/DynamicUpdate', lazy(() => import('./Volume/DynamicUpdate'))],
+  ['Tests/PropertyUpdate', lazy(() => import('./Tests/PropertyUpdate'))],
+  ['Tests/CameraTest', lazy(() => import('./Tests/CameraTest'))],
+  ['Tests/ShareGeometry', lazy(() => import('./Tests/ShareGeometry'))],
+  [
+    'Tests/SimpleSliceRendering',
+    lazy(() => import('./Tests/SimpleSliceRendering')),
+  ],
+  [
+    'Tests/ChangeInteractorStyle',
+    lazy(() => import('./Tests/ChangeInteractorStyle')),
+  ],
+  ['MultiView', lazy(() => import('./MultiView'))],
+]);
 
 function App() {
   const [example, setExample] = useQueryString('demo', 'Tests/PropertyUpdate');
+  const ExampleComponent = demos.get(example);
 
   return (
     <StrictMode>
@@ -68,7 +58,7 @@ function App() {
             setExample(e.target.value);
           }}
         >
-          {demos.map((option) => (
+          {[...demos.keys()].map((option) => (
             <option key={option}>{option}</option>
           ))}
         </select>
@@ -98,31 +88,7 @@ function App() {
         }}
       >
         <Suspense fallback={<div>Loading</div>}>
-          {example === 'MultiView' && <MultiView />}
-          {example === 'Geometry/Picking' && <Picking />}
-          {example === 'Geometry/PolyDataViewer' && <PolyDataViewer />}
-          {example === 'Geometry/PolyDataWithData' && <PolyDataWithData />}
-          {/* {example === 'Geometry/OBJViewer' && <OBJViewer />} */}
-          {/* {example === 'Geometry/PointCloud' && <PointCloud />} */}
-          {/* example === 'Geometry/ProcessingPipeline' && <ProcessingPipeline /> */}
-          {example === 'Geometry/SourceViewer' && <SourceViewer />}
-          {example === 'Geometry/TubeExample' && <TubeExample />}
-          {/* {example === 'Geometry/Glyph' && <Glyph />} */}
-          {/* {example === 'Geometry/CutterExample' && <CutterExample />} */}
-          {/* {example === 'Volume/SliceRendering' && <SliceRendering />} */}
-          {/* example === 'Volume/ImageSeriesRendering' && <ImageSeriesRendering /> */}
-          {/* example === 'Volume/SyntheticVolumeRendering' && (
-            <SyntheticVolumeRendering />
-          ) */}
-          {/* {example === 'Volume/VolumeRendering' && <VolumeRendering />} */}
-          {/* {example === 'Volume/DynamicUpdate' && <DynamicUpdate />} */}
-          {example === 'Tests/PropertyUpdate' && <PropertyUpdate />}
-          {example === 'Tests/CameraTest' && <CameraTest />}
-          {example === 'Tests/ShareGeometry' && <ShareGeometry />}
-          {example === 'Tests/SimpleSliceRendering' && <SimpleSliceRendering />}
-          {example === 'Tests/ChangeInteractorStyle' && (
-            <ChangeInteractorStyle />
-          )}
+          <ExampleComponent />
         </Suspense>
       </div>
     </StrictMode>
