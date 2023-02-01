@@ -15,7 +15,11 @@ import { pick } from '../../utils-ts';
 import { ResizeWatcherContext } from '../../utils-ts/ResizeWatcher';
 import { useEventListener } from '../../utils-ts/useEventListener';
 import useMount from '../../utils-ts/useMount';
-import { OpenGLRenderWindowContext, RenderWindowContext } from '../contexts';
+import {
+  OpenGLRenderWindowContext,
+  RenderWindowContext,
+  ViewContext,
+} from '../contexts';
 import useApplyCenterOfRotation from '../modules/useApplyCenterOfRotation';
 import {
   useInteractorStyle,
@@ -148,6 +152,7 @@ const ParentedView = forwardRef(function ParentedView(props: Props, fwdRef) {
   const api = useMemo<IView>(
     () => ({
       isInMultiViewRoot: () => true,
+      getViewContainer: () => containerRef.current,
       getOpenGLRenderWindow: () => openGLRenderWindowAPI,
       getRenderWindow: () => renderWindowAPI,
       getRenderer: () => rendererRef.current,
@@ -182,11 +187,13 @@ const ParentedView = forwardRef(function ParentedView(props: Props, fwdRef) {
   );
 
   return (
-    <div style={style} ref={containerRef}>
-      <Renderer {...rendererProps} ref={rendererRef}>
-        {props.children}
-      </Renderer>
-    </div>
+    <ViewContext.Provider value={api}>
+      <div style={style} ref={containerRef}>
+        <Renderer {...rendererProps} ref={rendererRef}>
+          {props.children}
+        </Renderer>
+      </div>
+    </ViewContext.Provider>
   );
 });
 

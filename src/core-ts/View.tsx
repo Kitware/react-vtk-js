@@ -23,6 +23,7 @@ export default forwardRef(function View(props: Props, fwdRef) {
       multiViewRoot ? parentedViewRef.current : singleViewRef.current;
     return {
       isInMultiViewRoot: () => multiViewRoot,
+      getViewContainer: () => getView()?.getViewContainer() ?? null,
       getOpenGLRenderWindow: () => getView()?.getOpenGLRenderWindow() ?? null,
       getRenderWindow: () => getView()?.getRenderWindow() ?? null,
       getRenderer: () => getView()?.getRenderer() ?? null,

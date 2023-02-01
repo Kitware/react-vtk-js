@@ -11,6 +11,7 @@ import {
   IRenderWindow,
   IRepresentation,
   IShareDataset,
+  IView,
 } from '../types';
 
 export const OpenGLRenderWindowContext =
@@ -33,6 +34,8 @@ export const DownstreamContext = createContext<Nullable<IDownstream>>(null);
 export const ShareDataSetContext = createContext<Nullable<IShareDataset>>(null);
 
 export const MultiViewRootContext = createContext<boolean>(false);
+
+export const ViewContext = createContext<IView | null>(null);
 
 export function useRenderWindowContext() {
   const rw = useContext(RenderWindowContext);

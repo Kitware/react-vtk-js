@@ -13,6 +13,7 @@ import {
   IView,
 } from '../../types';
 import { omit, pick } from '../../utils-ts';
+import { ViewContext } from '../contexts';
 import useApplyCenterOfRotation from '../modules/useApplyCenterOfRotation';
 import {
   useInteractorStyle,
@@ -72,6 +73,8 @@ const SingleView = forwardRef(function SingleView(props: Props, fwdRef) {
   const api = useMemo<IView>(
     () => ({
       isInMultiViewRoot: () => false,
+      getViewContainer: () =>
+        openGLRenderWindowRef.current?.getContainer() ?? null,
       getOpenGLRenderWindow: () => openGLRenderWindowRef.current,
       getRenderWindow: () => renderWindowRef.current,
       getRenderer: () => rendererRef.current,
@@ -88,16 +91,18 @@ const SingleView = forwardRef(function SingleView(props: Props, fwdRef) {
   useImperativeHandle(fwdRef, () => api);
 
   return (
-    <OpenGLRenderWindow
-      {...openGLRenderWindowProps}
-      ref={openGLRenderWindowRef}
-    >
-      <RenderWindow ref={renderWindowRef}>
-        <Renderer {...rendererProps} ref={rendererRef}>
-          {props.children}
-        </Renderer>
-      </RenderWindow>
-    </OpenGLRenderWindow>
+    <ViewContext.Provider value={api}>
+      <OpenGLRenderWindow
+        {...openGLRenderWindowProps}
+        ref={openGLRenderWindowRef}
+      >
+        <RenderWindow ref={renderWindowRef}>
+          <Renderer {...rendererProps} ref={rendererRef}>
+            {props.children}
+          </Renderer>
+        </RenderWindow>
+      </OpenGLRenderWindow>
+    </ViewContext.Provider>
   );
 });
 
