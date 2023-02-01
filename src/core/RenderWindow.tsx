@@ -10,11 +10,11 @@ import {
   useState,
 } from 'react';
 import { IRenderWindow } from '../types';
-import deletionRegistry from '../utils-ts/DeletionRegistry';
-import useGetterRef from '../utils-ts/useGetterRef';
-import useMount from '../utils-ts/useMount';
-import useResizeObserver from '../utils-ts/useResizeObserver';
-import useUnmount from '../utils-ts/useUnmount';
+import deletionRegistry from '../utils/DeletionRegistry';
+import useGetterRef from '../utils/useGetterRef';
+import useMount from '../utils/useMount';
+import useResizeObserver from '../utils/useResizeObserver';
+import useUnmount from '../utils/useUnmount';
 import { OpenGLRenderWindowContext, RenderWindowContext } from './contexts';
 import useInteractor from './modules/useInteractor';
 

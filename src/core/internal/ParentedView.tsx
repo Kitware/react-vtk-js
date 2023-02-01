@@ -11,10 +11,10 @@ import {
   useRef,
 } from 'react';
 import { IRenderer, IView } from '../../types';
-import { pick } from '../../utils-ts';
-import { ResizeWatcherContext } from '../../utils-ts/ResizeWatcher';
-import { useEventListener } from '../../utils-ts/useEventListener';
-import useMount from '../../utils-ts/useMount';
+import { pick } from '../../utils';
+import { ResizeWatcherContext } from '../../utils/ResizeWatcher';
+import { useEventListener } from '../../utils/useEventListener';
+import useMount from '../../utils/useMount';
 import {
   OpenGLRenderWindowContext,
   RenderWindowContext,

@@ -2,10 +2,10 @@ import { vtkAlgorithm, vtkObject } from '@kitware/vtk.js/interfaces';
 import vtk from '@kitware/vtk.js/vtk';
 import { PropsWithChildren, useCallback, useEffect, useMemo } from 'react';
 import { IDownstream, VtkConstructor } from '../types';
-import deletionRegistry from '../utils-ts/DeletionRegistry';
-import useGetterRef from '../utils-ts/useGetterRef';
-import { usePrevious } from '../utils-ts/usePrevious';
-import useUnmount from '../utils-ts/useUnmount';
+import deletionRegistry from '../utils/DeletionRegistry';
+import useGetterRef from '../utils/useGetterRef';
+import { usePrevious } from '../utils/usePrevious';
+import useUnmount from '../utils/useUnmount';
 import {
   DownstreamContext,
   useDownstream,

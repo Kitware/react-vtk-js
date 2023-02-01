@@ -8,9 +8,9 @@ import {
   useMemo,
 } from 'react';
 import { IDataset } from '../types';
-import deletionRegistry from '../utils-ts/DeletionRegistry';
-import useGetterRef from '../utils-ts/useGetterRef';
-import useUnmount from '../utils-ts/useUnmount';
+import deletionRegistry from '../utils/DeletionRegistry';
+import useGetterRef from '../utils/useGetterRef';
+import useUnmount from '../utils/useUnmount';
 import { DatasetContext, useDownstream, useRepresentation } from './contexts';
 
 interface Props extends PropsWithChildren {

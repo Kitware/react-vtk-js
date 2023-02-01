@@ -3,6 +3,10 @@ import { TYPED_ARRAYS } from '@kitware/vtk.js/macros';
 import { DataArrayValues, TypedArrayConstructor } from '../types';
 import { NUMPY_DTYPES } from './numpy';
 
+export const noop = Object.freeze(() => {
+  /* noop */
+});
+
 export const TypedArrayLookup: Record<TYPED_ARRAYS, TypedArrayConstructor> = {
   [TYPED_ARRAYS.Uint8Array]: Uint8Array,
   [TYPED_ARRAYS.Uint16Array]: Uint16Array,

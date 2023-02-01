@@ -12,11 +12,11 @@ import {
   NumpyEncodedArray,
   TypedArrayConstructor,
 } from '../types';
-import { dataArraySize, toTypedArray } from '../utils-ts';
-import deletionRegistry from '../utils-ts/DeletionRegistry';
-import useGetterRef from '../utils-ts/useGetterRef';
-import { usePrevious } from '../utils-ts/usePrevious';
-import useUnmount from '../utils-ts/useUnmount';
+import { dataArraySize, toTypedArray } from '../utils';
+import deletionRegistry from '../utils/DeletionRegistry';
+import useGetterRef from '../utils/useGetterRef';
+import { usePrevious } from '../utils/usePrevious';
+import useUnmount from '../utils/useUnmount';
 import { DatasetContext, useDownstream, useRepresentation } from './contexts';
 
 interface Props extends PropsWithChildren {

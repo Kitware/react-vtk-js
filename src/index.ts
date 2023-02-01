@@ -3,26 +3,26 @@ import '@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry';
 import '@kitware/vtk.js/Rendering/OpenGL/Profiles/Glyph';
 import '@kitware/vtk.js/Rendering/OpenGL/Profiles/Volume';
 
-export { default as Algorithm } from './core-ts/Algorithm';
-export * as Contexts from './core-ts/contexts';
-export { default as DataArray } from './core-ts/DataArray';
-export { default as Geometry2DRepresentation } from './core-ts/Geometry2DRepresentation';
-export { default as GeometryRepresentation } from './core-ts/GeometryRepresentation';
-export { default as ImageData } from './core-ts/ImageData';
-export { default as MultiViewRoot } from './core-ts/MultiViewRoot';
-export * from './core-ts/Picking';
-export { default as Picking } from './core-ts/Picking';
-export { default as PointData } from './core-ts/PointData';
-export { default as PolyData } from './core-ts/PolyData';
+export { default as Algorithm } from './core/Algorithm';
+export * as Contexts from './core/contexts';
+export { default as DataArray } from './core/DataArray';
+export { default as Geometry2DRepresentation } from './core/Geometry2DRepresentation';
+export { default as GeometryRepresentation } from './core/GeometryRepresentation';
+export { default as ImageData } from './core/ImageData';
+export { default as MultiViewRoot } from './core/MultiViewRoot';
+export * from './core/Picking';
+export { default as Picking } from './core/Picking';
+export { default as PointData } from './core/PointData';
+export { default as PolyData } from './core/PolyData';
 export {
   RegisterDataSet,
   ShareDataSetRoot,
   UseDataSet,
-} from './core-ts/ShareDataSet';
-export { default as SliceRepresentation } from './core-ts/SliceRepresentation';
-export { default as View } from './core-ts/View';
+} from './core/ShareDataSet';
+export { default as SliceRepresentation } from './core/SliceRepresentation';
+export { default as View } from './core/View';
 
 // TODO should we expose these?
-// export { default as OpenGLRenderWindow } from './core-ts/OpenGLRenderWindow';
-// export { default as Renderer } from './core-ts/Renderer';
-// export { default as RenderWindow } from './core-ts/RenderWindow';
+// export { default as OpenGLRenderWindow } from './core/OpenGLRenderWindow';
+// export { default as Renderer } from './core/Renderer';
+// export { default as RenderWindow } from './core/RenderWindow';

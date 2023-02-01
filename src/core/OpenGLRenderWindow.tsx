@@ -10,9 +10,9 @@ import {
   useRef,
 } from 'react';
 import { IOpenGLRenderWindow } from '../types';
-import deletionRegistry from '../utils-ts/DeletionRegistry';
-import useGetterRef from '../utils-ts/useGetterRef';
-import useUnmount from '../utils-ts/useUnmount';
+import deletionRegistry from '../utils/DeletionRegistry';
+import useGetterRef from '../utils/useGetterRef';
+import useUnmount from '../utils/useUnmount';
 import { OpenGLRenderWindowContext } from './contexts';
 
 const RENDERWINDOW_STYLE: CSSProperties = {

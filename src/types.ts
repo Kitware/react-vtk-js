@@ -10,7 +10,7 @@ import {
   TypedArray,
   vtkPipelineConnection,
 } from '@kitware/vtk.js/types';
-import { NUMPY_DTYPES } from './utils-ts/numpy';
+import { NUMPY_DTYPES } from './utils/numpy';
 
 export type NumpyEncodedArray = {
   bvals: string;

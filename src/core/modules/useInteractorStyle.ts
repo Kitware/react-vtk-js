@@ -25,10 +25,10 @@ import vtkInteractorStyleManipulator from '@kitware/vtk.js/Interaction/Style/Int
 import vtkRenderWindowInteractor from '@kitware/vtk.js/Rendering/Core/RenderWindowInteractor';
 import deepEqual from 'deep-equal';
 import { useCallback, useEffect, useState } from 'react';
-import deletionRegistry from '../../utils-ts/DeletionRegistry';
-import useComparableEffect from '../../utils-ts/useComparableEffect';
-import useGetterRef from '../../utils-ts/useGetterRef';
-import useUnmount from '../../utils-ts/useUnmount';
+import deletionRegistry from '../../utils/DeletionRegistry';
+import useComparableEffect from '../../utils/useComparableEffect';
+import useGetterRef from '../../utils/useGetterRef';
+import useUnmount from '../../utils/useUnmount';
 
 interface PanSettings extends IMouseCameraTrackballPanManipulatorInitialValues {
   action: 'Pan';

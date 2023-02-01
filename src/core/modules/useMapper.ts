@@ -1,10 +1,10 @@
 import vtkAbstractMapper from '@kitware/vtk.js/Rendering/Core/AbstractMapper';
-import { compareShallowObject } from '../../utils-ts/comparators';
-import deletionRegistry from '../../utils-ts/DeletionRegistry';
-import { BooleanAccumulator } from '../../utils-ts/useBooleanAccumulator';
-import useComparableEffect from '../../utils-ts/useComparableEffect';
-import useGetterRef from '../../utils-ts/useGetterRef';
-import useUnmount from '../../utils-ts/useUnmount';
+import { compareShallowObject } from '../../utils/comparators';
+import deletionRegistry from '../../utils/DeletionRegistry';
+import { BooleanAccumulator } from '../../utils/useBooleanAccumulator';
+import useComparableEffect from '../../utils/useComparableEffect';
+import useGetterRef from '../../utils/useGetterRef';
+import useUnmount from '../../utils/useUnmount';
 
 /**
  * Returns a mapper getter.

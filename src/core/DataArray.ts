@@ -3,11 +3,11 @@ import { vtkRange } from '@kitware/vtk.js/interfaces';
 import { TYPED_ARRAYS } from '@kitware/vtk.js/macros';
 import { useEffect } from 'react';
 import { DataArrayValues } from '../types';
-import { toTypedArray, TypedArrayLookup } from '../utils-ts';
-import deletionRegistry from '../utils-ts/DeletionRegistry';
-import useGetterRef from '../utils-ts/useGetterRef';
-import { usePrevious } from '../utils-ts/usePrevious';
-import useUnmount from '../utils-ts/useUnmount';
+import { toTypedArray, TypedArrayLookup } from '../utils';
+import deletionRegistry from '../utils/DeletionRegistry';
+import useGetterRef from '../utils/useGetterRef';
+import { usePrevious } from '../utils/usePrevious';
+import useUnmount from '../utils/useUnmount';
 import { useDataset, useFieldData } from './contexts';
 
 interface Props {

@@ -1,10 +1,10 @@
-import vtkActor, {
-  IActorInitialValues,
-} from '@kitware/vtk.js/Rendering/Core/Actor';
-import vtkMapper, {
-  IMapperInitialValues,
-} from '@kitware/vtk.js/Rendering/Core/Mapper';
-import { IPropertyInitialValues } from '@kitware/vtk.js/Rendering/Core/Property';
+import vtkImageMapper, {
+  IImageMapperInitialValues,
+} from '@kitware/vtk.js/Rendering/Core/ImageMapper';
+import { IImagePropertyInitialValues } from '@kitware/vtk.js/Rendering/Core/ImageProperty';
+import vtkImageSlice, {
+  IImageSliceInitialValues,
+} from '@kitware/vtk.js/Rendering/Core/ImageSlice';
 import { Vector2 } from '@kitware/vtk.js/types';
 import {
   forwardRef,
@@ -15,9 +15,9 @@ import {
   useState,
 } from 'react';
 import { IDownstream, IRepresentation } from '../types';
-import { compareShallowObject } from '../utils-ts/comparators';
-import useBooleanAccumulator from '../utils-ts/useBooleanAccumulator';
-import useComparableEffect from '../utils-ts/useComparableEffect';
+import { compareShallowObject } from '../utils/comparators';
+import useBooleanAccumulator from '../utils/useBooleanAccumulator';
+import useComparableEffect from '../utils/useComparableEffect';
 import {
   DownstreamContext,
   RepresentationContext,
@@ -34,19 +34,19 @@ interface Props extends PropsWithChildren {
   id?: string;
 
   /**
-   * Properties to set to the actor
+   * Properties to set to the mapper
    */
-  actor?: IActorInitialValues;
+  mapper?: IImageMapperInitialValues;
 
   /**
-   * Properties to set to the actor
+   * Properties to set to the slice/actor
    */
-  mapper?: IMapperInitialValues;
+  actor?: IImageSliceInitialValues;
 
   /**
-   * Properties to set to the actor.property
+   * Properties to set to the volume.property
    */
-  property?: IPropertyInitialValues;
+  property?: IImagePropertyInitialValues;
 
   /**
    * Preset name for the lookup table color map
@@ -56,75 +56,69 @@ interface Props extends PropsWithChildren {
   /**
    * Data range use for the colorMap
    */
-  colorDataRange?: [number, number];
+  colorDataRange?: 'auto' | Vector2;
 
   /**
-   * Show/Hide Cube Axes for the given representation
+   * index of the slice along i
    */
-  showCubeAxes?: boolean;
+  iSlice?: number;
 
   /**
-   * Configure cube Axes style by overriding the set of properties defined
-   * https://github.com/Kitware/vtk-js/blob/HEAD/Sources/Rendering/Core/CubeAxesActor/index.js#L703-L719
-   *
-   * TODO fix type
+   * index of the slice along j
    */
-  cubeAxesStyle?: Record<string, unknown>;
+  jSlice?: number;
 
   /**
-   * Show hide scalar bar for that representation
+   * index of the slice along k
    */
-  showScalarBar?: boolean;
+  kSlice?: number;
 
   /**
-   * Use given string as title for scalar bar. By default it is empty (no title).
+   * index of the slice along x
    */
-  scalarBarTitle?: boolean;
+  xSlice?: number;
 
   /**
-   * Configure scalar bar style by overriding the set of properties defined
-   * https://github.com/Kitware/vtk-js/blob/master/Sources/Rendering/Core/ScalarBarActor/index.js#L776-L796
-   *
-   * TODO fix type
+   * index of the slice along y
    */
-  scalarBarStyle?: Record<string, unknown>;
+  ySlice?: number;
+
+  /**
+   * index of the slice along z
+   */
+  zSlice?: number;
 }
 
 const DefaultProps = {
-  colorMapPreset: 'erdc_rainbow_bright',
-  colorDataRange: [0, 1] as Vector2,
+  colorMapPreset: 'Grayscale',
+  colorDataRange: 'auto' as const,
 };
 
-export default forwardRef(function GeometryRepresentation(
-  props: Props,
-  fwdRef
-) {
+export default forwardRef(function SliceRepresentation(props: Props, fwdRef) {
   const [modifiedRef, trackModified, resetModified] = useBooleanAccumulator();
   const [dataAvailable, setDataAvailable] = useState(false);
+
+  const rangeFromProps = props.colorDataRange ?? DefaultProps.colorDataRange;
+  const colorDataRange =
+    rangeFromProps === 'auto' ? ([0, 1] as Vector2) : rangeFromProps;
 
   // --- LUT --- //
 
   const getLookupTable = useColorTransferFunction(
     props.colorMapPreset ?? DefaultProps.colorMapPreset,
-    props.colorDataRange ?? DefaultProps.colorDataRange,
+    colorDataRange,
     trackModified
   );
+
+  // --- PWF --- //
 
   // --- mapper --- //
 
-  const getMapper = useMapper<vtkMapper, IMapperInitialValues>(
-    () =>
-      vtkMapper.newInstance({
-        lookupTable: getLookupTable(),
-        useLookupTableScalarRange: true,
-      } as IMapperInitialValues),
+  const getMapper = useMapper(
+    () => vtkImageMapper.newInstance(),
     props.mapper,
     trackModified
   );
-
-  useEffect(() => {
-    getMapper().setLookupTable(getLookupTable());
-  }, [getMapper, getLookupTable]);
 
   // --- actor --- //
 
@@ -132,8 +126,8 @@ export default forwardRef(function GeometryRepresentation(
     ...props.actor,
     visibility: dataAvailable && (props.actor?.visibility ?? true),
   };
-  const getActor = useProp<vtkActor, IActorInitialValues>({
-    constructor: () => vtkActor.newInstance({ visibility: false }),
+  const getActor = useProp({
+    constructor: () => vtkImageSlice.newInstance(),
     id: props.id,
     props: actorProps,
     trackModified,
@@ -142,6 +136,11 @@ export default forwardRef(function GeometryRepresentation(
   useEffect(() => {
     getActor().setMapper(getMapper());
   }, [getActor, getMapper]);
+
+  useEffect(() => {
+    getActor().getProperty().setRGBTransferFunction(0, getLookupTable());
+    getActor().getProperty().setInterpolationTypeToLinear();
+  }, [getActor, getLookupTable]);
 
   // set actor property props
   const { property: propertyProps } = props;
@@ -153,6 +152,34 @@ export default forwardRef(function GeometryRepresentation(
     [propertyProps],
     ([cur], [prev]) => compareShallowObject(cur, prev)
   );
+
+  // --- Slice changes --- //
+
+  const { iSlice, jSlice, kSlice, xSlice, ySlice, zSlice } = props;
+
+  useEffect(() => {
+    if (iSlice != null) trackModified(getMapper().setISlice(iSlice));
+  }, [iSlice, getMapper, trackModified]);
+
+  useEffect(() => {
+    if (jSlice != null) trackModified(getMapper().setISlice(jSlice));
+  }, [jSlice, getMapper, trackModified]);
+
+  useEffect(() => {
+    if (kSlice != null) trackModified(getMapper().setISlice(kSlice));
+  }, [kSlice, getMapper, trackModified]);
+
+  useEffect(() => {
+    if (xSlice != null) trackModified(getMapper().setISlice(xSlice));
+  }, [xSlice, getMapper, trackModified]);
+
+  useEffect(() => {
+    if (ySlice != null) trackModified(getMapper().setISlice(ySlice));
+  }, [ySlice, getMapper, trackModified]);
+
+  useEffect(() => {
+    if (zSlice != null) trackModified(getMapper().setISlice(zSlice));
+  }, [zSlice, getMapper, trackModified]);
 
   // --- //
 

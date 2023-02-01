@@ -1,12 +1,12 @@
 import vtkColorTransferFunction from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction';
 import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps';
 import { Vector2 } from '@kitware/vtk.js/types';
-import { compareVector2 } from '../../utils-ts/comparators';
-import deletionRegistry from '../../utils-ts/DeletionRegistry';
-import { BooleanAccumulator } from '../../utils-ts/useBooleanAccumulator';
-import useComparableEffect from '../../utils-ts/useComparableEffect';
-import useGetterRef from '../../utils-ts/useGetterRef';
-import useUnmount from '../../utils-ts/useUnmount';
+import { compareVector2 } from '../../utils/comparators';
+import deletionRegistry from '../../utils/DeletionRegistry';
+import { BooleanAccumulator } from '../../utils/useBooleanAccumulator';
+import useComparableEffect from '../../utils/useComparableEffect';
+import useGetterRef from '../../utils/useGetterRef';
+import useUnmount from '../../utils/useUnmount';
 
 export default function useColorTransferFunction(
   presetName: string,

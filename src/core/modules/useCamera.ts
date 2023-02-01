@@ -2,9 +2,9 @@ import { ICameraInitialValues } from '@kitware/vtk.js/Rendering/Core/Camera';
 import vtkRenderer from '@kitware/vtk.js/Rendering/Core/Renderer';
 import { Vector3 } from '@kitware/vtk.js/types';
 import { useCallback } from 'react';
-import { compareShallowObject } from '../../utils-ts/comparators';
-import { BooleanAccumulator } from '../../utils-ts/useBooleanAccumulator';
-import useComparableEffect from '../../utils-ts/useComparableEffect';
+import { compareShallowObject } from '../../utils/comparators';
+import { BooleanAccumulator } from '../../utils/useBooleanAccumulator';
+import useComparableEffect from '../../utils/useComparableEffect';
 
 export default function useCamera(
   getRenderer: () => vtkRenderer,

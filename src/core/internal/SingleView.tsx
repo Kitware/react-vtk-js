@@ -12,7 +12,7 @@ import {
   IRenderWindow,
   IView,
 } from '../../types';
-import { omit, pick } from '../../utils-ts';
+import { omit, pick } from '../../utils';
 import { ViewContext } from '../contexts';
 import useApplyCenterOfRotation from '../modules/useApplyCenterOfRotation';
 import {

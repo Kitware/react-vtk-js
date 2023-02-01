@@ -10,10 +10,10 @@ import {
   useMemo,
 } from 'react';
 import { IRenderer } from '../types';
-import deletionRegistry from '../utils-ts/DeletionRegistry';
-import useBooleanAccumulator from '../utils-ts/useBooleanAccumulator';
-import useGetterRef from '../utils-ts/useGetterRef';
-import useUnmount from '../utils-ts/useUnmount';
+import deletionRegistry from '../utils/DeletionRegistry';
+import useBooleanAccumulator from '../utils/useBooleanAccumulator';
+import useGetterRef from '../utils/useGetterRef';
+import useUnmount from '../utils/useUnmount';
 import { RendererContext, useRenderWindowContext } from './contexts';
 import useCamera from './modules/useCamera';
 

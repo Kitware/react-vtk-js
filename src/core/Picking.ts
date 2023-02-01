@@ -8,12 +8,12 @@ import {
   useImperativeHandle,
   useMemo,
 } from 'react';
-import deletionRegistry from '../utils-ts/DeletionRegistry';
-import useDebounce from '../utils-ts/useDebounce';
-import { useEventListener } from '../utils-ts/useEventListener';
-import useGetterRef from '../utils-ts/useGetterRef';
-import useMount from '../utils-ts/useMount';
-import useUnmount from '../utils-ts/useUnmount';
+import deletionRegistry from '../utils/DeletionRegistry';
+import useDebounce from '../utils/useDebounce';
+import { useEventListener } from '../utils/useEventListener';
+import useGetterRef from '../utils/useGetterRef';
+import useMount from '../utils/useMount';
+import useUnmount from '../utils/useUnmount';
 import {
   OpenGLRenderWindowContext,
   RendererContext,

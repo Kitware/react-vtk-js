@@ -22,7 +22,7 @@ import {
   IRepresentation,
   IShareDataset,
 } from '../types';
-import useUnmount from '../utils-ts/useUnmount';
+import useUnmount from '../utils/useUnmount';
 import {
   DownstreamContext,
   RepresentationContext,

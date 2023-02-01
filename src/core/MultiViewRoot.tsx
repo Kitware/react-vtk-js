@@ -10,7 +10,7 @@ import {
   IResizeWatcher,
   ResizeWatcher,
   ResizeWatcherContext,
-} from '../utils-ts/ResizeWatcher';
+} from '../utils/ResizeWatcher';
 import { MultiViewRootContext } from './contexts';
 import OpenGLRenderWindow, {
   Props as OpenGLRenderWindowProps,
