@@ -161,8 +161,10 @@ export default forwardRef(function Geometry2DRepresentation(
         setDataAvailable(true);
         representation.dataChanged();
       },
+      getActor,
+      getMapper,
     }),
-    [renderer]
+    [renderer, getActor, getMapper]
   );
 
   const downstream = useMemo<IDownstream>(

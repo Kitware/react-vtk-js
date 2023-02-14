@@ -1,6 +1,8 @@
 import vtkInteractorStyle from '@kitware/vtk.js/Interaction/Style/InteractorStyle';
 import { vtkObject } from '@kitware/vtk.js/interfaces';
+import vtkAbstractMapper from '@kitware/vtk.js/Rendering/Core/AbstractMapper';
 import vtkCamera from '@kitware/vtk.js/Rendering/Core/Camera';
+import vtkProp from '@kitware/vtk.js/Rendering/Core/Prop';
 import vtkRenderer from '@kitware/vtk.js/Rendering/Core/Renderer';
 import vtkRenderWindow from '@kitware/vtk.js/Rendering/Core/RenderWindow';
 import vtkRenderWindowInteractor from '@kitware/vtk.js/Rendering/Core/RenderWindowInteractor';
@@ -70,6 +72,8 @@ export interface IView {
 export interface IRepresentation {
   dataAvailable(): void;
   dataChanged(): void;
+  getActor(): vtkProp | null;
+  getMapper(): vtkAbstractMapper | null;
 }
 
 // There is no sufficient type that overlaps classes like

@@ -201,8 +201,10 @@ export default forwardRef(function SliceRepresentation(props: Props, fwdRef) {
         setDataAvailable(true);
         representation.dataChanged();
       },
+      getActor,
+      getMapper,
     }),
-    [renderer]
+    [renderer, getActor, getMapper]
   );
 
   const downstream = useMemo<IDownstream>(

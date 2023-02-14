@@ -175,6 +175,8 @@ export function RegisterDataSet(props: RegisterDataSetProps) {
       dataAvailable() {
         share.dispatchDataAvailable(id);
       },
+      getActor: () => null,
+      getMapper: () => null,
     }),
     [id, share]
   );
