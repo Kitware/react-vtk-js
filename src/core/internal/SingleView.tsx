@@ -13,6 +13,7 @@ import {
   IView,
 } from '../../types';
 import { omit, pick } from '../../utils';
+import useMount from '../../utils/useMount';
 import { ViewContext } from '../contexts';
 import useApplyCenterOfRotation from '../modules/useApplyCenterOfRotation';
 import {
@@ -55,6 +56,10 @@ const SingleView = forwardRef(function SingleView(props: Props, fwdRef) {
 
   const [getInteractorStyle, setInteractorStyle] =
     useInteractorStyle(getInteractor);
+
+  useMount(() => {
+    getInteractor()?.setInteractorStyle(getInteractorStyle());
+  });
 
   const {
     interactorSettings = DefaultProps.interactorSettings,

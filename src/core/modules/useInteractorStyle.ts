@@ -24,7 +24,7 @@ import vtkInteractorStyle from '@kitware/vtk.js/Interaction/Style/InteractorStyl
 import vtkInteractorStyleManipulator from '@kitware/vtk.js/Interaction/Style/InteractorStyleManipulator';
 import vtkRenderWindowInteractor from '@kitware/vtk.js/Rendering/Core/RenderWindowInteractor';
 import deepEqual from 'deep-equal';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import deletionRegistry from '../../utils/DeletionRegistry';
 import useComparableEffect from '../../utils/useComparableEffect';
 import useGetterRef from '../../utils/useGetterRef';
@@ -116,19 +116,50 @@ export function useInteractorStyleManipulatorSettings(
 export function useInteractorStyle(
   getInteractor: () => vtkRenderWindowInteractor | null
 ) {
-  const [styleRef, getStyle] = useGetterRef<vtkInteractorStyle>(() => {
-    const style = vtkInteractorStyleManipulator.newInstance();
-    deletionRegistry.register(style, () => style.delete());
-    return style;
-  });
+  /**
+   * internalStyle: self-managed InteractorStyleManipulator
+   * externalStyle: user-set style
+   *   - The external style takes precedence over the internal style in getStyle().
+   *
+   * In a parented view, the style gets set on the interactor whenever
+   *   the user hovers over the view.
+   * In a single view, the style gets set unconditionally.
+   *
+   * If the external style is updated:
+   *   Single view: set it on the interactor unconditionally
+   *   Parented view: set it on the interactor if the previous style
+   *     is currently registered to the interactor.
+   */
+  const [internalStyleRef, getInternalStyle] = useGetterRef<vtkInteractorStyle>(
+    () => {
+      const style = vtkInteractorStyleManipulator.newInstance();
+      deletionRegistry.register(style, () => style.delete());
+      return style;
+    }
+  );
+
+  const externalStyleRef = useRef<vtkInteractorStyle | null>(null);
+
+  const getStyle = useCallback(() => {
+    return externalStyleRef.current ?? getInternalStyle();
+  }, [getInternalStyle]);
 
   const setStyle = useCallback(
     (style: vtkInteractorStyle) => {
+      const currentStyle = getStyle();
       const interactor = getInteractor();
       if (!interactor) return;
-      interactor.setInteractorStyle(style ?? styleRef.current);
+
+      // Single view: always true
+      // Parented view: true if we've hovered over the View
+      const isCurrentlySet = interactor.getInteractorStyle() === currentStyle;
+      if (isCurrentlySet) {
+        interactor.setInteractorStyle(style);
+      }
+
+      externalStyleRef.current = style;
     },
-    [getInteractor, styleRef]
+    [getInteractor, getStyle]
   );
 
   useEffect(() => {
@@ -136,23 +167,15 @@ export function useInteractorStyle(
     if (!interactor) return;
 
     deletionRegistry.incRefCount(interactor);
-    if (styleRef.current) {
-      setStyle(styleRef.current);
-    }
-
     return () => {
-      if (styleRef.current) {
-        if (interactor.getInteractorStyle() === styleRef.current) {
-          interactor.setInteractorStyle(null);
-        }
-
-        deletionRegistry.markForDeletion(styleRef.current);
-        styleRef.current = null;
+      if (interactor.getInteractorStyle() === getStyle()) {
+        interactor.setInteractorStyle(null);
       }
-
       deletionRegistry.decRefCount(interactor);
+      deletionRegistry.markForDeletion(internalStyleRef.current);
+      internalStyleRef.current = null;
     };
-  }, [getInteractor, styleRef, setStyle]);
+  }, [getInteractor, getStyle, internalStyleRef]);
 
   return [getStyle, setStyle] as const;
 }
