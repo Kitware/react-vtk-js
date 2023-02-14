@@ -162,23 +162,23 @@ export default forwardRef(function SliceRepresentation(props: Props, fwdRef) {
   }, [iSlice, getMapper, trackModified]);
 
   useEffect(() => {
-    if (jSlice != null) trackModified(getMapper().setISlice(jSlice));
+    if (jSlice != null) trackModified(getMapper().setJSlice(jSlice));
   }, [jSlice, getMapper, trackModified]);
 
   useEffect(() => {
-    if (kSlice != null) trackModified(getMapper().setISlice(kSlice));
+    if (kSlice != null) trackModified(getMapper().setKSlice(kSlice));
   }, [kSlice, getMapper, trackModified]);
 
   useEffect(() => {
-    if (xSlice != null) trackModified(getMapper().setISlice(xSlice));
+    if (xSlice != null) trackModified(getMapper().setXSlice(xSlice));
   }, [xSlice, getMapper, trackModified]);
 
   useEffect(() => {
-    if (ySlice != null) trackModified(getMapper().setISlice(ySlice));
+    if (ySlice != null) trackModified(getMapper().setYSlice(ySlice));
   }, [ySlice, getMapper, trackModified]);
 
   useEffect(() => {
-    if (zSlice != null) trackModified(getMapper().setISlice(zSlice));
+    if (zSlice != null) trackModified(getMapper().setZSlice(zSlice));
   }, [zSlice, getMapper, trackModified]);
 
   // --- //
