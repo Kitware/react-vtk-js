@@ -6,7 +6,7 @@ import useQueryString from './useQueryString';
 
 const demos = new Map([
   ['Geometry/Picking', lazy(() => import('./Geometry/Picking'))],
-  // ['Geometry/OBJViewer', lazy(() => import('./Geometry/OBJViewer'))],
+  ['Geometry/OBJViewer', lazy(() => import('./Geometry/OBJViewer'))],
   // ['Geometry/PointCloud', lazy(() => import('./Geometry/PointCloud'))],
   ['Geometry/PolyDataViewer', lazy(() => import('./Geometry/PolyDataViewer'))],
   [
@@ -19,7 +19,7 @@ const demos = new Map([
   // ],
   ['Geometry/SourceViewer', lazy(() => import('./Geometry/SourceViewer'))],
   // ['Geometry/Glyph', lazy(() => import('./Geometry/Glyph'))],
-  // ['Geometry/CutterExample', lazy(() => import('./Geometry/CutterExample'))],
+  ['Geometry/CutterExample', lazy(() => import('./Geometry/CutterExample'))],
   ['Geometry/TubeExample', lazy(() => import('./Geometry/TubeExample'))],
   // ['Volume/SliceRendering', lazy(() => import('./Volume/SliceRendering'))],
   // ['Volume/ImageSeriesRendering', lazy(() => import('./Volume/ImageSeriesRendering'))],

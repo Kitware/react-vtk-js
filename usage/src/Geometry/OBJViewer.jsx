@@ -1,6 +1,6 @@
-import React from 'react';
-
-import { View, GeometryRepresentation, Reader } from 'react-vtk-js';
+// imports vtkOBJReader
+import '@kitware/vtk.js/IO/Misc/OBJReader';
+import { GeometryRepresentation, Reader, View } from 'react-vtk-js';
 
 // React complains about unique key prop but I don't see why
 function Example(props) {
