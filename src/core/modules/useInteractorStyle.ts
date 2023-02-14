@@ -24,11 +24,10 @@ import vtkInteractorStyle from '@kitware/vtk.js/Interaction/Style/InteractorStyl
 import vtkInteractorStyleManipulator from '@kitware/vtk.js/Interaction/Style/InteractorStyleManipulator';
 import vtkRenderWindowInteractor from '@kitware/vtk.js/Rendering/Core/RenderWindowInteractor';
 import deepEqual from 'deep-equal';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import deletionRegistry from '../../utils/DeletionRegistry';
 import useComparableEffect from '../../utils/useComparableEffect';
 import useGetterRef from '../../utils/useGetterRef';
-import useUnmount from '../../utils/useUnmount';
 
 interface PanSettings extends IMouseCameraTrackballPanManipulatorInitialValues {
   action: 'Pan';
@@ -117,53 +116,43 @@ export function useInteractorStyleManipulatorSettings(
 export function useInteractorStyle(
   getInteractor: () => vtkRenderWindowInteractor | null
 ) {
-  const [externalStyle, setExternalStyle] = useState<vtkInteractorStyle | null>(
-    null
-  );
-
   const [styleRef, getStyle] = useGetterRef<vtkInteractorStyle>(() => {
-    setExternalStyle(null);
     const style = vtkInteractorStyleManipulator.newInstance();
     deletionRegistry.register(style, () => style.delete());
     return style;
   });
 
+  const setStyle = useCallback(
+    (style: vtkInteractorStyle) => {
+      const interactor = getInteractor();
+      if (!interactor) return;
+      interactor.setInteractorStyle(style ?? styleRef.current);
+    },
+    [getInteractor, styleRef]
+  );
+
   useEffect(() => {
     const interactor = getInteractor();
     if (!interactor) return;
 
-    const style = externalStyle ?? getStyle();
-    interactor.setInteractorStyle(style);
-
     deletionRegistry.incRefCount(interactor);
-    deletionRegistry.incRefCount(style);
+    if (styleRef.current) {
+      setStyle(styleRef.current);
+    }
 
     return () => {
-      if (interactor.getInteractorStyle() === style) {
-        interactor.setInteractorStyle(null);
-      }
-      deletionRegistry.decRefCount(interactor);
-      deletionRegistry.incRefCount(style);
-    };
-  });
+      if (styleRef.current) {
+        if (interactor.getInteractorStyle() === styleRef.current) {
+          interactor.setInteractorStyle(null);
+        }
 
-  useUnmount(() => {
-    if (styleRef.current && !externalStyle) {
-      deletionRegistry.markForDeletion(styleRef.current);
-      styleRef.current = null;
-    }
-  });
-
-  const setStyle = useCallback(
-    (style: vtkInteractorStyle) => {
-      if (!externalStyle && styleRef.current) {
         deletionRegistry.markForDeletion(styleRef.current);
+        styleRef.current = null;
       }
-      styleRef.current = style;
-      setExternalStyle(style);
-    },
-    [externalStyle, styleRef]
-  );
+
+      deletionRegistry.decRefCount(interactor);
+    };
+  }, [getInteractor, styleRef, setStyle]);
 
   return [getStyle, setStyle] as const;
 }
