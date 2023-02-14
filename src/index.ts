@@ -14,6 +14,7 @@ export * from './core/Picking';
 export { default as Picking } from './core/Picking';
 export { default as PointData } from './core/PointData';
 export { default as PolyData } from './core/PolyData';
+export { default as Reader } from './core/Reader';
 export {
   RegisterDataSet,
   ShareDataSetRoot,
