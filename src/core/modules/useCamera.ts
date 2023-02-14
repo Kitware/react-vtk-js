@@ -22,6 +22,14 @@ export default function useCamera(
       const camera = getCamera();
       const mtime = camera.getMTime();
 
+      // filter out any null props
+      Object.keys(cameraProps).forEach((key) => {
+        const name = key as keyof ICameraInitialValues;
+        if (!cameraProps[name]) {
+          delete cameraProps[name];
+        }
+      });
+
       camera.set(cameraProps);
 
       // force-set focal point and direction of projection,
