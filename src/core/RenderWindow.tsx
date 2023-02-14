@@ -64,9 +64,9 @@ export default forwardRef(function RenderWindow(props: Props, fwdRef) {
   const queueRender = useCallback(() => {
     if (renderTimeoutRef.current == null) {
       renderTimeoutRef.current = setTimeout(() => {
+        renderTimeoutRef.current = null;
         const renderWindow = getRenderWindow();
         renderWindow.render();
-        renderTimeoutRef.current = null;
       });
     }
   }, [getRenderWindow]);
@@ -78,14 +78,13 @@ export default forwardRef(function RenderWindow(props: Props, fwdRef) {
     if (!container) return;
 
     const renderWindowView = openGLRenderWindow.get();
-    const renderWindow = getRenderWindow();
     const devicePixelRatio = window.devicePixelRatio || 1;
     const { width, height } = container.getBoundingClientRect();
     const w = Math.floor(width * devicePixelRatio);
     const h = Math.floor(height * devicePixelRatio);
     renderWindowView.setSize(Math.max(w, 10), Math.max(h, 10));
-    renderWindow.render();
-  }, [openGLRenderWindow, getRenderWindow]);
+    queueRender();
+  }, [openGLRenderWindow, queueRender]);
 
   useResizeObserver(openGLRenderWindow.get().getContainer(), updateViewSize);
   useMount(() => updateViewSize());
