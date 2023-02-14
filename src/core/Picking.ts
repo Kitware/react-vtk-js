@@ -22,7 +22,7 @@ import {
 } from './contexts';
 
 export interface PickResult {
-  representationID?: string;
+  representationId?: string;
   worldPosition: Vector3;
   displayPosition: Vector3;
   compositeID: number;
@@ -212,7 +212,7 @@ export default forwardRef(function ViewPicking(props: Props, fwdRef) {
           worldPosition,
           displayPosition,
           compositeID: info.compositeID,
-          ...info.prop.get('representationID'),
+          ...info.prop.get('representationId'),
           ray,
         },
       ] as PickResult[];
@@ -270,7 +270,7 @@ export default forwardRef(function ViewPicking(props: Props, fwdRef) {
             ),
             displayPosition,
             compositeID, // Not yet useful unless GlyphRepresentation
-            ...prop.get('representationID'),
+            ...prop.get('representationId'),
             ray,
           };
         })
@@ -313,10 +313,10 @@ export default forwardRef(function ViewPicking(props: Props, fwdRef) {
         const { prop } = v.getProperties();
         const getterResult:
           | {
-              representationID?: string;
+              representationId?: string;
             }
-          | undefined = prop?.get('representationID');
-        const representationId = getterResult?.representationID;
+          | undefined = prop?.get('representationId');
+        const representationId = getterResult?.representationId;
         if (representationId) {
           representationIds.push(representationId);
         }

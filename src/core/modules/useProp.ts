@@ -38,7 +38,7 @@ export default function useProp<
   });
 
   useEffect(() => {
-    getActor().set({ representationID: id }, true /* noWarning */);
+    getActor().set({ representationId: id }, true /* noWarning */);
   }, [id, getActor]);
 
   // add to renderer
