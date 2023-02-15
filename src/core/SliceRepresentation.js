@@ -33,9 +33,9 @@ export default class SliceRepresentation extends Component {
     this.lookupTable.applyColorMap(preset);
     this.piecewiseFunction = vtkPiecewiseFunction.newInstance();
     this.actor = vtkImageSlice.newInstance({ visibility: false });
-    this.mapper = vtkImageMapper.newInstance();
+    // use the mapper instance if provided, otherwise create default instance.
+    this.mapper = props.mapperInstance ?? vtkImageMapper.newInstance();
     this.actor.setMapper(this.mapper);
-
     this.actor.getProperty().setRGBTransferFunction(0, this.lookupTable);
     // this.actor.getProperty().setScalarOpacity(0, this.piecewiseFunction);
     this.actor.getProperty().setInterpolationTypeToLinear();
@@ -105,7 +105,11 @@ export default class SliceRepresentation extends Component {
     if (property && (!previous || property !== previous.property)) {
       changed = this.actor.getProperty().set(property) || changed;
     }
-    if (mapper && (!previous || mapper !== previous.mapper)) {
+    if (
+      mapper &&
+      (!previous || mapper !== previous.mapper) &&
+      mapper !== this.mapper
+    ) {
       changed = this.mapper.set(mapper) || changed;
     }
     if (
@@ -146,25 +150,35 @@ export default class SliceRepresentation extends Component {
       }
     }
 
-    // ijk
-    if (iSlice != null && (!previous || iSlice !== previous.iSlice)) {
-      changed = this.mapper.setISlice(iSlice) || changed;
-    }
-    if (jSlice != null && (!previous || jSlice !== previous.jSlice)) {
-      changed = this.mapper.setJSlice(jSlice) || changed;
-    }
-    if (kSlice != null && (!previous || kSlice !== previous.kSlice)) {
-      changed = this.mapper.setKSlice(kSlice) || changed;
-    }
-    // xyz
-    if (xSlice != null && (!previous || xSlice !== previous.xSlice)) {
-      changed = this.mapper.setXSlice(xSlice) || changed;
-    }
-    if (ySlice != null && (!previous || ySlice !== previous.ySlice)) {
-      changed = this.mapper.setYSlice(ySlice) || changed;
-    }
-    if (zSlice != null && (!previous || zSlice !== previous.zSlice)) {
-      changed = this.mapper.setZSlice(zSlice) || changed;
+    // check if we have valid input
+    if (this.validData) {
+      if (this.mapper.isA('vtkImageMapper')) {
+        // ijk
+        if (iSlice != null && (!previous || iSlice !== previous.iSlice)) {
+          changed = this.mapper.setISlice(iSlice) || changed;
+        }
+        if (jSlice != null && (!previous || jSlice !== previous.jSlice)) {
+          changed = this.mapper.setJSlice(jSlice) || changed;
+        }
+        if (kSlice != null && (!previous || kSlice !== previous.kSlice)) {
+          changed = this.mapper.setKSlice(kSlice) || changed;
+        }
+        // xyz
+        if (xSlice != null && (!previous || xSlice !== previous.xSlice)) {
+          changed = this.mapper.setXSlice(xSlice) || changed;
+        }
+        if (ySlice != null && (!previous || ySlice !== previous.ySlice)) {
+          changed = this.mapper.setYSlice(ySlice) || changed;
+        }
+        if (zSlice != null && (!previous || zSlice !== previous.zSlice)) {
+          changed = this.mapper.setZSlice(zSlice) || changed;
+        }
+      } else if (this.mapper.isA('vtkImageArrayMapper')) {
+        // vtkImageArrayMapper only supports k-slicing
+        if (kSlice != null && (!previous || kSlice !== previous.kSlice)) {
+          changed = this.mapper.setSlice(kSlice) || changed;
+        }
+      }
     }
 
     // actor visibility
@@ -186,6 +200,11 @@ export default class SliceRepresentation extends Component {
       this.validData = true;
       this.actor.setVisibility(this.currentVisibility);
 
+      // reset camera after input data is lazy-loaded
+      if (this.view && this.view.props.autoResetCamera) {
+        this.view.resetCamera();
+      }
+
       // trigger render
       this.dataChanged();
     }
@@ -194,16 +213,18 @@ export default class SliceRepresentation extends Component {
   dataChanged() {
     if (this.props.colorDataRange === 'auto') {
       this.mapper.update();
-      const input = this.mapper.getInputData();
-      const array = input && input.getPointData()?.getScalars();
-      const dataRange = array && array.getRange();
-      if (dataRange) {
-        this.lookupTable.setMappingRange(...dataRange);
-        this.lookupTable.updateRange();
-        this.piecewiseFunction.setNodes([
-          { x: dataRange[0], y: 0, midpoint: 0.5, sharpness: 0 },
-          { x: dataRange[1], y: 1, midpoint: 0.5, sharpness: 0 },
-        ]);
+      if (this.mapper.getInputData()) {
+        const input = this.mapper.getCurrentImage();
+        const array = input && input.getPointData()?.getScalars();
+        const dataRange = array && array.getRange();
+        if (dataRange) {
+          this.lookupTable.setMappingRange(...dataRange);
+          this.lookupTable.updateRange();
+          this.piecewiseFunction.setNodes([
+            { x: dataRange[0], y: 0, midpoint: 0.5, sharpness: 0 },
+            { x: dataRange[1], y: 1, midpoint: 0.5, sharpness: 0 },
+          ]);
+        }
       }
 
       if (this.view) {
@@ -228,6 +249,12 @@ SliceRepresentation.propTypes = {
    * Properties to set to the mapper
    */
   mapper: PropTypes.object,
+
+  /**
+   * Optional parameter to set vtk mapper instance from outside.
+   * Allows to control which mapper class {vtkImageMapper, vtkImageArrayMapper} to use.
+   */
+  mapperInstance: PropTypes.object,
 
   /**
    * Properties to set to the slice/actor

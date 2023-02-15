@@ -18,6 +18,7 @@ export const PointData = Core.PointData;
 export const PolyData = Core.PolyData;
 export const Reader = Core.Reader;
 export const ShareDataSet = Core.ShareDataSet;
+export const Dataset = Core.Dataset;
 export const View = Core.View;
 export const GeometryRepresentation = Core.GeometryRepresentation;
 export const Geometry2DRepresentation = Core.Geometry2DRepresentation;
