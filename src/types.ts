@@ -1,7 +1,7 @@
-import vtkInteractorStyle from '@kitware/vtk.js/Interaction/Style/InteractorStyle';
 import { vtkObject } from '@kitware/vtk.js/interfaces';
 import vtkAbstractMapper from '@kitware/vtk.js/Rendering/Core/AbstractMapper';
 import vtkCamera from '@kitware/vtk.js/Rendering/Core/Camera';
+import vtkInteractorStyle from '@kitware/vtk.js/Rendering/Core/InteractorStyle';
 import vtkProp from '@kitware/vtk.js/Rendering/Core/Prop';
 import vtkRenderer from '@kitware/vtk.js/Rendering/Core/Renderer';
 import vtkRenderWindow from '@kitware/vtk.js/Rendering/Core/RenderWindow';
