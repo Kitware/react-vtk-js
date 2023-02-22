@@ -1,11 +1,12 @@
-import React, { useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import {
-  View,
-  GeometryRepresentation,
-  PolyData,
-  PointData,
   DataArray,
+  GeometryRepresentation,
+  Picking,
+  PointData,
+  PolyData,
+  View,
 } from 'react-vtk-js';
 
 const points = [];
@@ -17,14 +18,61 @@ for (let i = 0; i < 1000; i++) {
   points.push(Math.random() - 0.5);
 }
 
-let isSelecting = 0;
-
 // React complains about unique key prop but I don't see why
-function Example(props) {
+function Example() {
   const tooltip = useRef(null);
+  const viewRef = useRef(null);
+  const pickRef = useRef(null);
+  const isSelecting = useRef(0);
+
   const toTooltip = (txt) => {
     tooltip.current.innerHTML = txt;
   };
+
+  const onHover = useCallback(
+    (e) => {
+      if (isSelecting.current) return;
+      toTooltip(`Hover: ${JSON.stringify(e, null, 2)}`);
+    },
+    [isSelecting]
+  );
+
+  const onClick = useCallback(
+    (e) => {
+      if (isSelecting.current) {
+        isSelecting.current--;
+      } else {
+        toTooltip(`Click: ${JSON.stringify(e, null, 2)}`);
+      }
+    },
+    [isSelecting]
+  );
+
+  const onSelect = useCallback((e) => {
+    // releasing the selection box triggers onClick
+    isSelecting.current = 2;
+    toTooltip(`Select: ${JSON.stringify(e, null, 2)}`);
+  }, []);
+
+  // This is the alternative to onSelect from older versions of react-vtk-js.
+  useEffect(() => {
+    const style = viewRef.current.getInteractorStyle();
+    // assumption: style is a vtkInteractorStyleManipulator
+    const mouseSelect = style
+      .getMouseManipulators()
+      .find((m) => m.isA('vtkMouseBoxSelectionManipulator'));
+
+    if (mouseSelect) {
+      const sub = mouseSelect.onBoxSelectChange((ev) => {
+        const [x1, x2, y1, y2] = ev.selection;
+        onSelect(pickRef.current.pickWithFrustum(x1, y1, x2, y2));
+      });
+      return () => {
+        sub.unsubscribe();
+      };
+    }
+  });
+
   return (
     <div style={{ width: '100%', height: '100%' }}>
       <pre
@@ -37,26 +85,8 @@ function Example(props) {
         }}
         ref={tooltip}
       />
-      <View
-        pickingModes={['hover', 'click', 'select']}
-        onClick={(e) => {
-          if (isSelecting) {
-            isSelecting--;
-            return;
-          }
-          toTooltip(`Click: ${JSON.stringify(e, null, 2)}`);
-        }}
-        onHover={(e) => {
-          if (isSelecting) {
-            return;
-          }
-          toTooltip(`Hover: ${JSON.stringify(e, null, 2)}`);
-        }}
-        onSelect={(e) => {
-          isSelecting = 2;
-          toTooltip(`Select: ${JSON.stringify(e, null, 2)}`);
-        }}
-      >
+      <View ref={viewRef}>
+        <Picking ref={pickRef} onHover={onHover} onClick={onClick} />
         <GeometryRepresentation
           id='plan'
           mapper={{

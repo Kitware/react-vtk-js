@@ -1,12 +1,12 @@
-import React from 'react';
+import vtkTubeFilter from '@kitware/vtk.js/Filters/General/TubeFilter';
 import {
-  View,
+  Algorithm,
   GeometryRepresentation,
   PolyData,
-  Algorithm,
+  View,
 } from 'react-vtk-js';
 
-function Example(props) {
+function Example() {
   return (
     <div style={{ width: '100%', height: '100%' }}>
       <View background={[0.0, 0.0, 0.0]}>
@@ -16,7 +16,7 @@ function Example(props) {
           }}
         >
           <Algorithm
-            vtkClass='vtkTubeFilter'
+            vtkClass={vtkTubeFilter}
             state={{
               radius: 0.05,
               numberOfSides: 40,
