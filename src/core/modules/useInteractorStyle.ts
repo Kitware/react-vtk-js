@@ -20,8 +20,8 @@ import vtkMouseCameraTrackballZoomManipulator, {
 import vtkMouseCameraTrackballZoomToMouseManipulator, {
   IMouseCameraTrackballZoomToMouseManipulatorInitialValues,
 } from '@kitware/vtk.js/Interaction/Manipulators/MouseCameraTrackballZoomToMouseManipulator';
-import vtkInteractorStyle from '@kitware/vtk.js/Interaction/Style/InteractorStyle';
 import vtkInteractorStyleManipulator from '@kitware/vtk.js/Interaction/Style/InteractorStyleManipulator';
+import vtkInteractorStyle from '@kitware/vtk.js/Rendering/Core/InteractorStyle';
 import vtkRenderWindowInteractor from '@kitware/vtk.js/Rendering/Core/RenderWindowInteractor';
 import deepEqual from 'deep-equal';
 import { useCallback, useEffect, useRef } from 'react';

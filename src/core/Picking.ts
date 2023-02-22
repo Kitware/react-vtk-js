@@ -1,6 +1,5 @@
 import { FieldAssociations } from '@kitware/vtk.js/Common/DataModel/DataSet/Constants.js';
 import vtkOpenGLHardwareSelector from '@kitware/vtk.js/Rendering/OpenGL/HardwareSelector';
-import { FixedVTKOpenGLRenderWindow } from '@kitware/vtk.js/type-patches';
 import { Vector2, Vector3 } from '@kitware/vtk.js/types';
 import {
   forwardRef,
@@ -342,7 +341,7 @@ export default forwardRef(function ViewPicking(props: Props, fwdRef) {
   const getScreenEventPositionFor = useCallback(
     (source: MouseEvent) => {
       const rw = openGLRenderWindowAPI.get();
-      const canvas = (rw as FixedVTKOpenGLRenderWindow).getCanvas();
+      const canvas = rw.getCanvas();
       if (!canvas) return { x: 0, y: 0, z: 0 };
 
       const bounds = canvas.getBoundingClientRect();

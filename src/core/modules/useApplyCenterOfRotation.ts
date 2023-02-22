@@ -1,4 +1,4 @@
-import vtkInteractorStyle from '@kitware/vtk.js/Interaction/Style/InteractorStyle';
+import vtkInteractorStyle from '@kitware/vtk.js/Rendering/Core/InteractorStyle';
 import {
   FixedVTKRenderer,
   VtkRendererEvent,
