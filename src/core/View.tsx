@@ -10,9 +10,10 @@ import { IView } from '../types';
 import { MultiViewRootContext } from './contexts';
 import ParentedView from './internal/ParentedView';
 import SingleView from './internal/SingleView';
-import { Props } from './internal/view-shared';
+import { ViewProps } from './internal/view-shared';
+export type { ViewProps } from './internal/view-shared';
 
-export default forwardRef(function View(props: Props, fwdRef) {
+export default forwardRef(function View(props: ViewProps, fwdRef) {
   const singleViewRef = useRef<IView | null>(null);
   const parentedViewRef = useRef<IView | null>(null);
 

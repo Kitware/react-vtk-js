@@ -1,10 +1,10 @@
 import { PropsWithChildren } from 'react';
 import { ManipulatorSettings } from '../modules/useInteractorStyle';
-import { Props as OpenGLRenderWindowProps } from '../OpenGLRenderWindow';
-import { Props as RendererProps } from '../Renderer';
-import { Props as RenderWindowProps } from '../RenderWindow';
+import { OpenGLRenderWindowProps } from '../OpenGLRenderWindow';
+import { RendererProps } from '../Renderer';
+import { RenderWindowProps } from '../RenderWindow';
 
-export interface Props
+export interface ViewProps
   extends PropsWithChildren,
     OpenGLRenderWindowProps,
     RenderWindowProps,

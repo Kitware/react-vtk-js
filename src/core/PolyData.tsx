@@ -19,7 +19,7 @@ import { usePrevious } from '../utils/usePrevious';
 import useUnmount from '../utils/useUnmount';
 import { DatasetContext, useDownstream, useRepresentation } from './contexts';
 
-interface Props extends PropsWithChildren {
+export interface PolyDataProps extends PropsWithChildren {
   /**
    * downstream connection port
    */
@@ -86,7 +86,7 @@ const DefaultProps = {
   connectivity: 'manual',
 };
 
-export default forwardRef(function PolyData(props: Props, fwdRef) {
+export default forwardRef(function PolyData(props: PolyDataProps, fwdRef) {
   const {
     port = DefaultProps.port,
     points = DefaultProps.points,

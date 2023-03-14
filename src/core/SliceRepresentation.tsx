@@ -27,7 +27,7 @@ import useColorTransferFunction from './modules/useColorTransferFunction';
 import useMapper from './modules/useMapper';
 import useProp from './modules/useProp';
 
-interface Props extends PropsWithChildren {
+export interface SliceRepresentationProps extends PropsWithChildren {
   /**
    * The ID used to identify this component.
    */
@@ -94,7 +94,10 @@ const DefaultProps = {
   colorDataRange: 'auto' as const,
 };
 
-export default forwardRef(function SliceRepresentation(props: Props, fwdRef) {
+export default forwardRef(function SliceRepresentation(
+  props: SliceRepresentationProps,
+  fwdRef
+) {
   const [modifiedRef, trackModified, resetModified] = useBooleanAccumulator();
   const [dataAvailable, setDataAvailable] = useState(false);
 

@@ -23,12 +23,12 @@ import {
 import OpenGLRenderWindow from '../OpenGLRenderWindow';
 import Renderer from '../Renderer';
 import RenderWindow from '../RenderWindow';
-import { DefaultProps, Props } from './view-shared';
+import { DefaultProps, ViewProps } from './view-shared';
 
 /**
  * A standalone View (not within a MultiViewRoot).
  */
-const SingleView = forwardRef(function SingleView(props: Props, fwdRef) {
+const SingleView = forwardRef(function SingleView(props: ViewProps, fwdRef) {
   // view API just exposes the render window + renderer
   const openGLRenderWindowRef = useRef<IOpenGLRenderWindow | null>(null);
   const renderWindowRef = useRef<IRenderWindow | null>(null);
@@ -44,7 +44,7 @@ const SingleView = forwardRef(function SingleView(props: Props, fwdRef) {
 
   const openGLRenderWindowProps = omit(
     props,
-    ...([...Object.keys(rendererProps)] as (keyof Props)[])
+    ...([...Object.keys(rendererProps)] as (keyof ViewProps)[])
   );
 
   // --- interactor style --- //

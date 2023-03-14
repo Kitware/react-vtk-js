@@ -22,11 +22,16 @@ const RENDERWINDOW_STYLE: CSSProperties = {
   overflow: 'hidden',
 };
 
-export interface Props extends PropsWithChildren, HTMLProps<HTMLDivElement> {
+export interface OpenGLRenderWindowProps
+  extends PropsWithChildren,
+    HTMLProps<HTMLDivElement> {
   renderWindowStyle?: CSSProperties;
 }
 
-export default forwardRef(function OpenGLRenderWindow(props: Props, fwdRef) {
+export default forwardRef(function OpenGLRenderWindow(
+  props: OpenGLRenderWindowProps,
+  fwdRef
+) {
   const rwContainerRef = useRef<HTMLDivElement | null>(null);
 
   const [viewRef, getRWView] = useGetterRef(() => {

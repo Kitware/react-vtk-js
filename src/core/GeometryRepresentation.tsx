@@ -27,7 +27,7 @@ import useColorTransferFunction from './modules/useColorTransferFunction';
 import useMapper from './modules/useMapper';
 import useProp from './modules/useProp';
 
-interface Props extends PropsWithChildren {
+export interface GeometryRepresentationProps extends PropsWithChildren {
   /**
    * The ID used to identify this component.
    */
@@ -96,7 +96,7 @@ const DefaultProps = {
 };
 
 export default forwardRef(function GeometryRepresentation(
-  props: Props,
+  props: GeometryRepresentationProps,
   fwdRef
 ) {
   const [modifiedRef, trackModified, resetModified] = useBooleanAccumulator();

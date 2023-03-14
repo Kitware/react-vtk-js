@@ -52,7 +52,7 @@ function useOpenGLHardwareSelector() {
   return getSelector;
 }
 
-interface Props {
+export interface PickingProps {
   /**
    * Whether to enable picking and callbacks.
    *
@@ -112,7 +112,7 @@ const DefaultProps = {
   onHoverDebounceWait: 4,
 };
 
-export default forwardRef(function ViewPicking(props: Props, fwdRef) {
+export default forwardRef(function ViewPicking(props: PickingProps, fwdRef) {
   const openGLRenderWindowAPI = useContext(OpenGLRenderWindowContext);
   const rendererAPI = useContext(RendererContext);
   const viewAPI = useContext(ViewContext);

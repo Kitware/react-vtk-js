@@ -8,6 +8,7 @@
   "type": "module",
   "main": "dist/umd/react-vtk.js",
   "module": "dist/esm/index.js",
+  "types": "dist/esm/src/index.d.ts",
   "source": "src/index.ts",
   "dependencies": {
     "@babel/eslint-parser": "^7.19.1",
