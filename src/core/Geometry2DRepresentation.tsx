@@ -30,7 +30,7 @@ import useCoordinate from './modules/useCoordinate';
 import useMapper from './modules/useMapper';
 import useProp from './modules/useProp';
 
-interface Props extends PropsWithChildren {
+export interface Geometry2DRepresentationProps extends PropsWithChildren {
   /**
    * The ID used to identify this component.
    */
@@ -76,7 +76,7 @@ const DefaultProps = {
 };
 
 export default forwardRef(function Geometry2DRepresentation(
-  props: Props,
+  props: Geometry2DRepresentationProps,
   fwdRef
 ) {
   const [modifiedRef, trackModified, resetModified] = useBooleanAccumulator();

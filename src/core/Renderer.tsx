@@ -17,7 +17,7 @@ import useUnmount from '../utils/useUnmount';
 import { RendererContext, useRenderWindowContext } from './contexts';
 import useCamera from './modules/useCamera';
 
-export interface Props extends PropsWithChildren {
+export interface RendererProps extends PropsWithChildren {
   /**
    * The color of the view background using 3 floating numbers
    * between 0-1 of Red, Green, Blue component.
@@ -54,7 +54,7 @@ export const DefaultProps = {
   autoResetCamera: true,
 };
 
-export default forwardRef(function Renderer(props: Props, fwdRef) {
+export default forwardRef(function Renderer(props: RendererProps, fwdRef) {
   const renderWindow = useRenderWindowContext();
   const [modifiedRef, trackModified, resetModified] = useBooleanAccumulator();
 

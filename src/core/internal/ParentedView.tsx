@@ -26,12 +26,15 @@ import {
   useInteractorStyleManipulatorSettings,
 } from '../modules/useInteractorStyle';
 import Renderer from '../Renderer';
-import { DefaultProps, Props } from './view-shared';
+import { DefaultProps, ViewProps } from './view-shared';
 
 /**
  * A View that is within a MultiViewRoot.
  */
-const ParentedView = forwardRef(function ParentedView(props: Props, fwdRef) {
+const ParentedView = forwardRef(function ParentedView(
+  props: ViewProps,
+  fwdRef
+) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const rendererRef = useRef<IRenderer | null>(null);
 

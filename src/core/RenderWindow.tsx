@@ -18,9 +18,12 @@ import useUnmount from '../utils/useUnmount';
 import { OpenGLRenderWindowContext, RenderWindowContext } from './contexts';
 import useInteractor from './modules/useInteractor';
 
-export type Props = PropsWithChildren;
+export type RenderWindowProps = PropsWithChildren;
 
-export default forwardRef(function RenderWindow(props: Props, fwdRef) {
+export default forwardRef(function RenderWindow(
+  props: RenderWindowProps,
+  fwdRef
+) {
   const openGLRenderWindow = useContext(OpenGLRenderWindowContext);
   if (!openGLRenderWindow) throw new Error('No OpenGL Render Window!');
 

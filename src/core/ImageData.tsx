@@ -13,7 +13,7 @@ import useGetterRef from '../utils/useGetterRef';
 import useUnmount from '../utils/useUnmount';
 import { DatasetContext, useDownstream, useRepresentation } from './contexts';
 
-interface Props extends PropsWithChildren {
+export interface ImageDataProps extends PropsWithChildren {
   /**
    * downstream connection port
    */
@@ -48,7 +48,7 @@ const DefaultProps = {
   direction: [1, 0, 0, 0, 1, 0, 0, 0, 1] as Matrix3x3,
 };
 
-export default forwardRef(function PolyData(props: Props, fwdRef) {
+export default forwardRef(function PolyData(props: ImageDataProps, fwdRef) {
   const {
     port = DefaultProps.port,
     dimensions = DefaultProps.dimensions,

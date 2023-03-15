@@ -10,7 +10,7 @@ import { usePrevious } from '../utils/usePrevious';
 import useUnmount from '../utils/useUnmount';
 import { useDataset, useFieldData } from './contexts';
 
-interface Props {
+export interface DataArrayProps {
   /**
    * The ID used to identify this component.
    */
@@ -49,7 +49,7 @@ const DefaultProps = {
   numberOfComponents: 1,
 };
 
-export default function DataArray(props: Props) {
+export default function DataArray(props: DataArrayProps) {
   const prev = usePrevious({ ...DefaultProps, ...props });
 
   const [daRef, getDataArray] = useGetterRef(() => {

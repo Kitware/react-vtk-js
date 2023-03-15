@@ -12,7 +12,7 @@ import {
   useRepresentation,
 } from './contexts';
 
-interface Props extends PropsWithChildren {
+export interface AlgorithmProps extends PropsWithChildren {
   /**
    * Can either be a string containing the name of the vtkClass or a vtk object constructor.
    *
@@ -29,7 +29,7 @@ interface Props extends PropsWithChildren {
   port?: number;
 }
 
-export default function Algorithm(props: Props) {
+export default function Algorithm(props: AlgorithmProps) {
   const prev = usePrevious(props);
   const { vtkClass, state, port = 0 } = props;
 

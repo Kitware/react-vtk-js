@@ -13,17 +13,19 @@ import {
 } from '../utils/ResizeWatcher';
 import { MultiViewRootContext } from './contexts';
 import OpenGLRenderWindow, {
-  Props as OpenGLRenderWindowProps,
+  OpenGLRenderWindowProps,
 } from './OpenGLRenderWindow';
 import RenderWindow from './RenderWindow';
 
-interface Props extends PropsWithChildren, OpenGLRenderWindowProps {}
+export interface MultiViewRootProps
+  extends PropsWithChildren,
+    OpenGLRenderWindowProps {}
 
 const RW_STYLE: CSSProperties = {
   pointerEvents: 'none',
 };
 
-export default function MultiViewRoot(props: Props) {
+export default function MultiViewRoot(props: MultiViewRootProps) {
   const openGLRenderWindowRef = useRef<IOpenGLRenderWindow | null>(null);
   const renderWindowRef = useRef<IRenderWindow | null>(null);
   const resizeWatcherRef = useRef<IResizeWatcher>(new ResizeWatcher());

@@ -132,7 +132,7 @@ export function ShareDataSetRoot(props: PropsWithChildren) {
   );
 }
 
-interface RegisterDataSetProps extends PropsWithChildren {
+export interface RegisterDataSetProps extends PropsWithChildren {
   id: string;
 }
 
@@ -190,7 +190,7 @@ export function RegisterDataSet(props: RegisterDataSetProps) {
   );
 }
 
-interface UseDataSetProps extends PropsWithChildren {
+export interface UseDataSetProps extends PropsWithChildren {
   id: string;
   port?: number;
 }
