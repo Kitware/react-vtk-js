@@ -29,6 +29,10 @@ const demos = new Map([
   // ],
   // ['Volume/VolumeRendering', lazy(() => import('./Volume/VolumeRendering'))],
   // ['Volume/DynamicUpdate', lazy(() => import('./Volume/DynamicUpdate'))],
+  [
+    'Volume/ImageSeriesRendering',
+    lazy(() => import('./Volume/ImageSeriesRendering')),
+  ],
   ['Tests/PropertyUpdate', lazy(() => import('./Tests/PropertyUpdate'))],
   ['Tests/CameraTest', lazy(() => import('./Tests/CameraTest'))],
   ['Tests/ShareGeometry', lazy(() => import('./Tests/ShareGeometry'))],
