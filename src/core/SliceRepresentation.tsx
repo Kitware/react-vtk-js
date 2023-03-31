@@ -1,3 +1,7 @@
+import AbstractImageMapper, {
+  vtkAbstractImageMapper,
+} from '@kitware/vtk.js/Rendering/Core/AbstractImageMapper';
+import vtkImageArrayMapper from '@kitware/vtk.js/Rendering/Core/ImageArrayMapper';
 import vtkImageMapper, {
   IImageMapperInitialValues,
 } from '@kitware/vtk.js/Rendering/Core/ImageMapper';
@@ -9,6 +13,7 @@ import { Vector2 } from '@kitware/vtk.js/types';
 import {
   forwardRef,
   PropsWithChildren,
+  useCallback,
   useEffect,
   useImperativeHandle,
   useMemo,
@@ -37,6 +42,11 @@ export interface SliceRepresentationProps extends PropsWithChildren {
    * Properties to set to the mapper
    */
   mapper?: IImageMapperInitialValues;
+
+  /**
+   * An opational mapper instanc
+   */
+  mapperInstance?: AbstractImageMapper;
 
   /**
    * Properties to set to the slice/actor
@@ -94,6 +104,18 @@ const DefaultProps = {
   colorDataRange: 'auto' as const,
 };
 
+function isVtkImageMapper(
+  mapper: vtkAbstractImageMapper
+): mapper is vtkImageMapper {
+  return mapper.isA('vtkImageMapper');
+}
+
+function isVtkImageArrayMapper(
+  mapper: vtkAbstractImageMapper
+): mapper is vtkImageArrayMapper {
+  return mapper.isA('vtkImageArrayMapper');
+}
+
 export default forwardRef(function SliceRepresentation(
   props: SliceRepresentationProps,
   fwdRef
@@ -117,11 +139,19 @@ export default forwardRef(function SliceRepresentation(
 
   // --- mapper --- //
 
-  const getMapper = useMapper(
+  const getInternalMapper = useMapper(
     () => vtkImageMapper.newInstance(),
     props.mapper,
     trackModified
   );
+
+  const { mapperInstance } = props;
+  const getMapper = useCallback<() => vtkAbstractImageMapper>(() => {
+    if (mapperInstance) {
+      return mapperInstance;
+    }
+    return getInternalMapper();
+  }, [mapperInstance, getInternalMapper]);
 
   // --- actor --- //
 
@@ -137,7 +167,8 @@ export default forwardRef(function SliceRepresentation(
   });
 
   useEffect(() => {
-    getActor().setMapper(getMapper());
+    // workaround for vtkImageSlice.setMapper only taking vtkImageMapper
+    getActor().setMapper(getMapper() as vtkImageMapper);
   }, [getActor, getMapper]);
 
   useEffect(() => {
@@ -160,29 +191,57 @@ export default forwardRef(function SliceRepresentation(
 
   const { iSlice, jSlice, kSlice, xSlice, ySlice, zSlice } = props;
 
+  // --- vtkImageMapper setSlice --- //
+
   useEffect(() => {
-    if (iSlice != null) trackModified(getMapper().setISlice(iSlice));
+    const mapper = getMapper();
+    if (isVtkImageMapper(mapper) && iSlice != null)
+      trackModified(mapper.setISlice(iSlice));
   }, [iSlice, getMapper, trackModified]);
 
   useEffect(() => {
-    if (jSlice != null) trackModified(getMapper().setJSlice(jSlice));
+    const mapper = getMapper();
+    if (isVtkImageMapper(mapper) && jSlice != null)
+      trackModified(mapper.setJSlice(jSlice));
   }, [jSlice, getMapper, trackModified]);
 
   useEffect(() => {
-    if (kSlice != null) trackModified(getMapper().setKSlice(kSlice));
+    const mapper = getMapper();
+    if (isVtkImageMapper(mapper) && kSlice != null)
+      trackModified(mapper.setKSlice(kSlice));
   }, [kSlice, getMapper, trackModified]);
 
   useEffect(() => {
-    if (xSlice != null) trackModified(getMapper().setXSlice(xSlice));
+    const mapper = getMapper();
+    if (isVtkImageMapper(mapper) && xSlice != null)
+      trackModified(mapper.setXSlice(xSlice));
   }, [xSlice, getMapper, trackModified]);
 
   useEffect(() => {
-    if (ySlice != null) trackModified(getMapper().setYSlice(ySlice));
+    const mapper = getMapper();
+    if (isVtkImageMapper(mapper) && ySlice != null)
+      trackModified(mapper.setYSlice(ySlice));
   }, [ySlice, getMapper, trackModified]);
 
   useEffect(() => {
-    if (zSlice != null) trackModified(getMapper().setZSlice(zSlice));
+    const mapper = getMapper();
+    if (isVtkImageMapper(mapper) && zSlice != null)
+      trackModified(mapper.setZSlice(zSlice));
   }, [zSlice, getMapper, trackModified]);
+
+  // --- vtkImageArrayMapper setSlice --- //
+
+  useEffect(() => {
+    const mapper = getMapper();
+    if (
+      isVtkImageArrayMapper(mapper) &&
+      kSlice != null &&
+      kSlice !== mapper.getSlice()
+    ) {
+      trackModified(true);
+      mapper.setSlice(kSlice);
+    }
+  }, [kSlice, getMapper, trackModified]);
 
   // --- //
 
