@@ -112,8 +112,8 @@ export function useInteractorStyleManipulatorSettings(
         style.addMouseManipulator(manip);
       });
     },
-    [settings],
-    ([cur], [prev]) => deepEqual(cur, prev)
+    [settings, isExternalStyle],
+    (cur, prev) => deepEqual(cur, prev)
   );
 }
 
