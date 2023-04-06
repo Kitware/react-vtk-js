@@ -92,13 +92,13 @@ const settingToManipulator = (setting: ManipulatorSettings) => {
 
 export function useInteractorStyleManipulatorSettings(
   getStyle: () => vtkInteractorStyle,
-  isExternalStyle: boolean,
+  isExternalStyle: () => boolean,
   settings: ManipulatorSettings[]
 ) {
   useComparableEffect(
     () => {
       // Assumes external styles are externally controlled
-      if (isExternalStyle) return;
+      if (isExternalStyle()) return;
       if (!getStyle().isA('vtkInteractorStyleManipulator')) return;
 
       const style = getStyle() as vtkInteractorStyleManipulator;
@@ -112,8 +112,8 @@ export function useInteractorStyleManipulatorSettings(
         style.addMouseManipulator(manip);
       });
     },
-    [settings],
-    ([cur], [prev]) => deepEqual(cur, prev)
+    [settings, isExternalStyle],
+    (cur, prev) => deepEqual(cur, prev)
   );
 }
 
@@ -143,7 +143,7 @@ export function useInteractorStyle(
   );
 
   const externalStyleRef = useRef<vtkInteractorStyle | null>(null);
-  const isExternalStyle = !!externalStyleRef.current;
+  const isExternalStyle = useCallback(() => !!externalStyleRef.current, []);
 
   const getStyle = useCallback(() => {
     return externalStyleRef.current ?? getInternalStyle();
