@@ -63,14 +63,18 @@ const ParentedView = forwardRef(function ParentedView(
     [renderWindowAPI]
   );
 
-  const [getInteractorStyle, setInteractorStyle] =
+  const [getInteractorStyle, setInteractorStyle, isExternalStyle] =
     useInteractorStyle(getInteractor);
 
   const {
     interactorSettings = DefaultProps.interactorSettings,
     autoCenterOfRotation = DefaultProps.autoCenterOfRotation,
   } = props;
-  useInteractorStyleManipulatorSettings(getInteractorStyle, interactorSettings);
+  useInteractorStyleManipulatorSettings(
+    getInteractorStyle,
+    isExternalStyle,
+    interactorSettings
+  );
 
   useApplyCenterOfRotation(
     rendererRef,

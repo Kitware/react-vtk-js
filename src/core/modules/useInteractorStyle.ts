@@ -92,11 +92,15 @@ const settingToManipulator = (setting: ManipulatorSettings) => {
 
 export function useInteractorStyleManipulatorSettings(
   getStyle: () => vtkInteractorStyle,
+  isExternalStyle: boolean,
   settings: ManipulatorSettings[]
 ) {
   useComparableEffect(
     () => {
+      // Assumes external styles are externally controlled
+      if (isExternalStyle) return;
       if (!getStyle().isA('vtkInteractorStyleManipulator')) return;
+
       const style = getStyle() as vtkInteractorStyleManipulator;
       style.removeAllManipulators();
       // always add gestures
@@ -139,6 +143,7 @@ export function useInteractorStyle(
   );
 
   const externalStyleRef = useRef<vtkInteractorStyle | null>(null);
+  const isExternalStyle = !!externalStyleRef.current;
 
   const getStyle = useCallback(() => {
     return externalStyleRef.current ?? getInternalStyle();
@@ -177,5 +182,5 @@ export function useInteractorStyle(
     };
   }, [getInteractor, getStyle, internalStyleRef]);
 
-  return [getStyle, setStyle] as const;
+  return [getStyle, setStyle, isExternalStyle] as const;
 }

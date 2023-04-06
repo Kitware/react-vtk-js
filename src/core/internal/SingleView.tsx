@@ -54,7 +54,7 @@ const SingleView = forwardRef(function SingleView(props: ViewProps, fwdRef) {
     []
   );
 
-  const [getInteractorStyle, setInteractorStyle] =
+  const [getInteractorStyle, setInteractorStyle, isExternalStyle] =
     useInteractorStyle(getInteractor);
 
   useMount(() => {
@@ -65,7 +65,11 @@ const SingleView = forwardRef(function SingleView(props: ViewProps, fwdRef) {
     interactorSettings = DefaultProps.interactorSettings,
     autoCenterOfRotation = DefaultProps.autoCenterOfRotation,
   } = props;
-  useInteractorStyleManipulatorSettings(getInteractorStyle, interactorSettings);
+  useInteractorStyleManipulatorSettings(
+    getInteractorStyle,
+    isExternalStyle,
+    interactorSettings
+  );
 
   useApplyCenterOfRotation(
     rendererRef,
