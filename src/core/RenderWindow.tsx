@@ -15,10 +15,14 @@ import useGetterRef from '../utils/useGetterRef';
 import useMount from '../utils/useMount';
 import useResizeObserver from '../utils/useResizeObserver';
 import useUnmount from '../utils/useUnmount';
-import { OpenGLRenderWindowContext, RenderWindowContext } from './contexts';
+import {
+  IPicking,
+  OpenGLRenderWindowContext,
+  RenderWindowContext,
+} from './contexts';
 import useInteractor from './modules/useInteractor';
 
-export type RenderWindowProps = PropsWithChildren;
+export type RenderWindowProps = PropsWithChildren & Partial<IPicking>;
 
 export default forwardRef(function RenderWindow(
   props: RenderWindowProps,

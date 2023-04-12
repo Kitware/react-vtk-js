@@ -2,6 +2,7 @@ import { Bounds } from '@kitware/vtk.js/types';
 import {
   forwardRef,
   useCallback,
+  useContext,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -14,7 +15,7 @@ import {
 } from '../../types';
 import { omit, pick } from '../../utils';
 import useMount from '../../utils/useMount';
-import { ViewContext } from '../contexts';
+import { PickingContext, ViewContext } from '../contexts';
 import useApplyCenterOfRotation from '../modules/useApplyCenterOfRotation';
 import {
   useInteractorStyle,
@@ -98,11 +99,13 @@ const SingleView = forwardRef(function SingleView(props: ViewProps, fwdRef) {
   );
 
   useImperativeHandle(fwdRef, () => api);
+  const pickingEventHandlers = useContext(PickingContext);
 
   return (
     <ViewContext.Provider value={api}>
       <OpenGLRenderWindow
         {...openGLRenderWindowProps}
+        {...pickingEventHandlers}
         ref={openGLRenderWindowRef}
       >
         <RenderWindow ref={renderWindowRef}>

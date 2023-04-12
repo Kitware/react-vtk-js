@@ -13,7 +13,7 @@ import { IOpenGLRenderWindow } from '../types';
 import deletionRegistry from '../utils/DeletionRegistry';
 import useGetterRef from '../utils/useGetterRef';
 import useUnmount from '../utils/useUnmount';
-import { OpenGLRenderWindowContext } from './contexts';
+import { IPicking, OpenGLRenderWindowContext } from './contexts';
 
 const RENDERWINDOW_STYLE: CSSProperties = {
   position: 'absolute',
@@ -24,7 +24,7 @@ const RENDERWINDOW_STYLE: CSSProperties = {
 
 export interface OpenGLRenderWindowProps
   extends PropsWithChildren,
-    HTMLProps<HTMLDivElement> {
+    Omit<HTMLProps<HTMLDivElement>, keyof IPicking> {
   renderWindowStyle?: CSSProperties;
 }
 

@@ -13,6 +13,7 @@ import {
   IShareDataset,
   IView,
 } from '../types';
+import { PickResultHandler } from './Picking';
 
 export const OpenGLRenderWindowContext =
   createContext<IOpenGLRenderWindow | null>(null);
@@ -36,6 +37,18 @@ export const ShareDataSetContext = createContext<Nullable<IShareDataset>>(null);
 export const MultiViewRootContext = createContext<boolean>(false);
 
 export const ViewContext = createContext<IView | null>(null);
+
+export interface IPicking {
+  onPointerMove?: PickResultHandler<React.PointerEvent<HTMLElement>>;
+  onClick?: PickResultHandler<React.MouseEvent<HTMLElement>>;
+  onPointerDown?: PickResultHandler<React.PointerEvent<HTMLElement>>;
+  onPointerUp?: PickResultHandler<React.PointerEvent<HTMLElement>>;
+  setEventHandlers: React.Dispatch<
+    React.SetStateAction<Omit<IPicking, 'setEventHandlers'>>
+  >;
+}
+
+export const PickingContext = createContext<IPicking | null>(null);
 
 export function useRenderWindowContext() {
   const rw = useContext(RenderWindowContext);

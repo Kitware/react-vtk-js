@@ -193,9 +193,21 @@ const ParentedView = forwardRef(function ParentedView(
     []
   );
 
+  const { onClick, onPointerMove, onPointerDown, onPointerUp } = props;
+
   return (
     <ViewContext.Provider value={api}>
-      <div style={style} ref={containerRef}>
+      <div
+        style={style}
+        ref={containerRef}
+        onClick={(ev) => onClick?.(ev)}
+        // eslint-disable-next-line
+        onPointerMove={(ev) => onPointerMove?.(ev)}
+        // eslint-disable-next-line
+        onPointerDown={(ev) => onPointerDown?.(ev)}
+        // eslint-disable-next-line
+        onPointerUp={(ev) => onPointerUp?.(ev)}
+      >
         <Renderer {...rendererProps} ref={rendererRef}>
           {props.children}
         </Renderer>

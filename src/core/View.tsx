@@ -11,6 +11,7 @@ import { MultiViewRootContext } from './contexts';
 import ParentedView from './internal/ParentedView';
 import SingleView from './internal/SingleView';
 import { ViewProps } from './internal/view-shared';
+import { PickingContextProvider } from './Picking';
 export type { ViewProps } from './internal/view-shared';
 
 export default forwardRef(function View(props: ViewProps, fwdRef) {
@@ -39,9 +40,25 @@ export default forwardRef(function View(props: ViewProps, fwdRef) {
 
   useImperativeHandle(fwdRef, () => api);
 
-  if (multiViewRoot) {
-    return <ParentedView {...props} ref={parentedViewRef} />;
-  } else {
-    return <SingleView {...props} ref={singleViewRef} />;
-  }
+  return (
+    <PickingContextProvider>
+      {(pickingEventHandlers) => (
+        <>
+          {multiViewRoot ? (
+            <ParentedView
+              {...props}
+              {...pickingEventHandlers}
+              ref={parentedViewRef}
+            />
+          ) : (
+            <SingleView
+              {...props}
+              {...pickingEventHandlers}
+              ref={singleViewRef}
+            />
+          )}
+        </>
+      )}
+    </PickingContextProvider>
+  );
 });

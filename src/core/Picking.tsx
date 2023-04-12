@@ -3,19 +3,23 @@ import vtkOpenGLHardwareSelector from '@kitware/vtk.js/Rendering/OpenGL/Hardware
 import { Vector2, Vector3 } from '@kitware/vtk.js/types';
 import {
   forwardRef,
+  PropsWithChildren,
   useCallback,
   useContext,
+  useEffect,
   useImperativeHandle,
   useMemo,
+  useState,
 } from 'react';
 import deletionRegistry from '../utils/DeletionRegistry';
 import useDebounce from '../utils/useDebounce';
-import { useEventListener } from '../utils/useEventListener';
 import useGetterRef from '../utils/useGetterRef';
 import useMount from '../utils/useMount';
 import useUnmount from '../utils/useUnmount';
 import {
+  IPicking,
   OpenGLRenderWindowContext,
+  PickingContext,
   RendererContext,
   ViewContext,
 } from './contexts';
@@ -27,6 +31,9 @@ export interface PickResult {
   compositeID: number;
   ray: [Vector3, Vector3];
 }
+
+export type PickResultHandler<T extends React.MouseEvent | React.PointerEvent> =
+  (event: T) => void;
 
 export interface FrustumPickResult {
   frustum: number[][];
@@ -52,7 +59,7 @@ function useOpenGLHardwareSelector() {
   return getSelector;
 }
 
-export interface PickingProps {
+export interface PickingProps extends PropsWithChildren {
   /**
    * Whether to enable picking and callbacks.
    *
@@ -66,7 +73,10 @@ export interface PickingProps {
    * @param selection Selection info
    * @param event the originating pointer event
    */
-  onHover?: (selection: PickResult, event: PointerEvent) => void;
+  onHover?: (
+    selection: PickResult,
+    event: React.PointerEvent<HTMLElement>
+  ) => void;
 
   /**
    * Callback when an actor is clicked with a mouse.
@@ -74,7 +84,10 @@ export interface PickingProps {
    * @param selection Selection info
    * @param event the originating mouse event
    */
-  onClick?: (selection: PickResult, event: MouseEvent) => void;
+  onClick?: (
+    selection: PickResult,
+    event: React.MouseEvent<HTMLElement>
+  ) => void;
 
   /**
    * Callback when the pointer is pressed down on an actor.
@@ -82,7 +95,10 @@ export interface PickingProps {
    * @param selection Selection info
    * @param event the originating pointer event
    */
-  onPointerDown?: (selection: PickResult, event: PointerEvent) => void;
+  onPointerDown?: (
+    selection: PickResult,
+    event: React.PointerEvent<HTMLElement>
+  ) => void;
 
   /**
    * Callback when the pointer is pressed up on an actor.
@@ -90,7 +106,10 @@ export interface PickingProps {
    * @param selection Selection info
    * @param event the originating pointer event
    */
-  onPointerUp?: (selection: PickResult, event: PointerEvent) => void;
+  onPointerUp?: (
+    selection: PickResult,
+    event: React.PointerEvent<HTMLElement>
+  ) => void;
 
   /**
    * Defines the tolerance of the click and hover selection.
@@ -339,7 +358,7 @@ export default forwardRef(function ViewPicking(props: PickingProps, fwdRef) {
   // --- Pointer event handling --- //
 
   const getScreenEventPositionFor = useCallback(
-    (source: MouseEvent) => {
+    (source: React.MouseEvent<HTMLElement>) => {
       const rw = openGLRenderWindowAPI.get();
       const canvas = rw.getCanvas();
       if (!canvas) return { x: 0, y: 0, z: 0 };
@@ -361,7 +380,7 @@ export default forwardRef(function ViewPicking(props: PickingProps, fwdRef) {
   const { onHover, onPointerDown, onPointerUp, onClick } = props;
 
   const makeSelection = useCallback(
-    <T extends MouseEvent>(ev: T) => {
+    (ev: React.MouseEvent<HTMLElement>) => {
       const { x, y } = getScreenEventPositionFor(ev);
       const tolerance = getPointerSizeTolerance();
       const selections = pickClosest(Math.floor(x), Math.floor(y), tolerance);
@@ -375,56 +394,82 @@ export default forwardRef(function ViewPicking(props: PickingProps, fwdRef) {
   const { onHoverDebounceWait = DefaultProps.onHoverDebounceWait } = props;
 
   // TODO last selection? (see View.js)
-  useEventListener(
-    viewAPI.getViewContainer,
-    'pointermove',
-    useDebounce(
-      useCallback(
-        (ev: PointerEvent) => {
-          if (!enabled || !onHover) return;
-          onHover(makeSelection(ev), ev);
-        },
-        [makeSelection, onHover, enabled]
-      ),
-      onHoverDebounceWait
-    )
+  const handlePointerMove = useDebounce(
+    useCallback(
+      (ev: React.PointerEvent<HTMLElement>) => {
+        if (!enabled || !onHover) return;
+        onHover(makeSelection(ev), ev);
+      },
+      [makeSelection, onHover, enabled]
+    ),
+    onHoverDebounceWait
   );
 
-  useEventListener(
-    viewAPI.getViewContainer,
-    'pointerdown',
-    useCallback(
-      (ev: PointerEvent) => {
-        if (!enabled || !onPointerDown) return;
-        onPointerDown(makeSelection(ev), ev);
-      },
-      [makeSelection, onPointerDown, enabled]
-    )
+  const handlePointerDown = useCallback(
+    (ev: React.PointerEvent<HTMLElement>) => {
+      if (!enabled || !onPointerDown) return;
+      onPointerDown(makeSelection(ev), ev);
+    },
+    [makeSelection, onPointerDown, enabled]
   );
 
-  useEventListener(
-    viewAPI.getViewContainer,
-    'pointerup',
-    useCallback(
-      (ev: PointerEvent) => {
-        if (!enabled || !onPointerUp) return;
-        onPointerUp(makeSelection(ev), ev);
-      },
-      [makeSelection, onPointerUp, enabled]
-    )
+  const handlePointerUp = useCallback(
+    (ev: React.PointerEvent<HTMLElement>) => {
+      if (!enabled || !onPointerUp) return;
+      onPointerUp(makeSelection(ev), ev);
+    },
+    [makeSelection, onPointerUp, enabled]
   );
 
-  useEventListener(
-    viewAPI.getViewContainer,
-    'click',
-    useCallback(
-      (ev: MouseEvent) => {
-        if (!enabled || !onClick) return;
-        onClick(makeSelection(ev), ev);
-      },
-      [makeSelection, onClick, enabled]
-    )
+  const handleClick = useCallback(
+    (ev: React.MouseEvent<HTMLElement>) => {
+      if (!enabled || !onClick) return;
+      onClick(makeSelection(ev), ev);
+    },
+    [makeSelection, onClick, enabled]
   );
+
+  const eventHandlers = useMemo(
+    () => ({
+      onPointerMove: handlePointerMove,
+      onPointerDown: handlePointerDown,
+      onPointerUp: handlePointerUp,
+      onClick: handleClick,
+    }),
+    [handleClick, handlePointerDown, handlePointerMove, handlePointerUp]
+  );
+
+  const pickingContext = useContext(PickingContext);
+  const setEventHandlers = pickingContext?.setEventHandlers;
+  useEffect(() => {
+    setEventHandlers?.(eventHandlers);
+  }, [eventHandlers, setEventHandlers]);
 
   return null;
 });
+
+type PickingProviderRenderProp = (
+  context: Omit<IPicking, 'setEventHandlers'>
+) => React.ReactNode;
+
+export function PickingContextProvider(props: {
+  children: PickingProviderRenderProp;
+}) {
+  const [eventHandlers, setEventHandlers] = useState<
+    Omit<IPicking, 'setEventHandlers'>
+  >({});
+
+  const contextValue = useMemo(
+    () => ({
+      ...eventHandlers,
+      setEventHandlers,
+    }),
+    [eventHandlers]
+  );
+
+  return (
+    <PickingContext.Provider value={contextValue}>
+      {props.children(eventHandlers)}
+    </PickingContext.Provider>
+  );
+}
