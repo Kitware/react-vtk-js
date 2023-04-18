@@ -3,6 +3,8 @@ import vtkOpenGLHardwareSelector from '@kitware/vtk.js/Rendering/OpenGL/Hardware
 import { Vector2, Vector3 } from '@kitware/vtk.js/types';
 import {
   forwardRef,
+  MouseEvent,
+  PointerEvent,
   useCallback,
   useContext,
   useImperativeHandle,
@@ -10,7 +12,6 @@ import {
 } from 'react';
 import deletionRegistry from '../utils/DeletionRegistry';
 import useDebounce from '../utils/useDebounce';
-import { useEventListener } from '../utils/useEventListener';
 import useGetterRef from '../utils/useGetterRef';
 import useMount from '../utils/useMount';
 import useUnmount from '../utils/useUnmount';
@@ -19,6 +20,7 @@ import {
   RendererContext,
   ViewContext,
 } from './contexts';
+import { useViewEventListener } from './modules/useViewEvents';
 
 export interface PickResult {
   representationId?: string;
@@ -118,7 +120,7 @@ export default forwardRef(function ViewPicking(props: PickingProps, fwdRef) {
   const viewAPI = useContext(ViewContext);
 
   if (!openGLRenderWindowAPI || !rendererAPI || !viewAPI) {
-    throw new Error('<ViewPicking> must have a <View> ancestor');
+    throw new Error('<Picking> must have a <View> ancestor');
   }
 
   const getSelector = useOpenGLHardwareSelector();
@@ -375,8 +377,7 @@ export default forwardRef(function ViewPicking(props: PickingProps, fwdRef) {
   const { onHoverDebounceWait = DefaultProps.onHoverDebounceWait } = props;
 
   // TODO last selection? (see View.js)
-  useEventListener(
-    viewAPI.getViewContainer,
+  useViewEventListener(
     'pointermove',
     useDebounce(
       useCallback(
@@ -390,8 +391,7 @@ export default forwardRef(function ViewPicking(props: PickingProps, fwdRef) {
     )
   );
 
-  useEventListener(
-    viewAPI.getViewContainer,
+  useViewEventListener(
     'pointerdown',
     useCallback(
       (ev: PointerEvent) => {
@@ -402,8 +402,7 @@ export default forwardRef(function ViewPicking(props: PickingProps, fwdRef) {
     )
   );
 
-  useEventListener(
-    viewAPI.getViewContainer,
+  useViewEventListener(
     'pointerup',
     useCallback(
       (ev: PointerEvent) => {
@@ -414,8 +413,7 @@ export default forwardRef(function ViewPicking(props: PickingProps, fwdRef) {
     )
   );
 
-  useEventListener(
-    viewAPI.getViewContainer,
+  useViewEventListener(
     'click',
     useCallback(
       (ev: MouseEvent) => {

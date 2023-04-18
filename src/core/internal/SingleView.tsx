@@ -20,6 +20,7 @@ import {
   useInteractorStyle,
   useInteractorStyleManipulatorSettings,
 } from '../modules/useInteractorStyle';
+import useViewEvents, { ViewEvents } from '../modules/useViewEvents';
 import OpenGLRenderWindow from '../OpenGLRenderWindow';
 import Renderer from '../Renderer';
 import RenderWindow from '../RenderWindow';
@@ -77,6 +78,10 @@ const SingleView = forwardRef(function SingleView(props: ViewProps, fwdRef) {
     autoCenterOfRotation
   );
 
+  // --- events --- //
+
+  const { rootListeners, registerEventListener } = useViewEvents();
+
   // --- api --- //
 
   const api = useMemo<IView>(
@@ -101,16 +106,19 @@ const SingleView = forwardRef(function SingleView(props: ViewProps, fwdRef) {
 
   return (
     <ViewContext.Provider value={api}>
-      <OpenGLRenderWindow
-        {...openGLRenderWindowProps}
-        ref={openGLRenderWindowRef}
-      >
-        <RenderWindow ref={renderWindowRef}>
-          <Renderer {...rendererProps} ref={rendererRef}>
-            {props.children}
-          </Renderer>
-        </RenderWindow>
-      </OpenGLRenderWindow>
+      <ViewEvents.Provider value={registerEventListener}>
+        <OpenGLRenderWindow
+          {...openGLRenderWindowProps}
+          {...rootListeners}
+          ref={openGLRenderWindowRef}
+        >
+          <RenderWindow ref={renderWindowRef}>
+            <Renderer {...rendererProps} ref={rendererRef}>
+              {props.children}
+            </Renderer>
+          </RenderWindow>
+        </OpenGLRenderWindow>
+      </ViewEvents.Provider>
     </ViewContext.Provider>
   );
 });

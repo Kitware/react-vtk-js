@@ -25,6 +25,7 @@ import {
   useInteractorStyle,
   useInteractorStyleManipulatorSettings,
 } from '../modules/useInteractorStyle';
+import useViewEvents, { ViewEvents } from '../modules/useViewEvents';
 import Renderer from '../Renderer';
 import { DefaultProps, ViewProps } from './view-shared';
 
@@ -154,6 +155,10 @@ const ParentedView = forwardRef(function ParentedView(
     }
   }, [onResize, openGLRenderWindowAPI, resizeWatcher]);
 
+  // --- events --- //
+
+  const { rootListeners, registerEventListener } = useViewEvents();
+
   // --- api --- //
 
   const api = useMemo<IView>(
@@ -195,11 +200,13 @@ const ParentedView = forwardRef(function ParentedView(
 
   return (
     <ViewContext.Provider value={api}>
-      <div style={style} ref={containerRef}>
-        <Renderer {...rendererProps} ref={rendererRef}>
-          {props.children}
-        </Renderer>
-      </div>
+      <ViewEvents.Provider value={registerEventListener}>
+        <div style={style} ref={containerRef} {...rootListeners}>
+          <Renderer {...rendererProps} ref={rendererRef}>
+            {props.children}
+          </Renderer>
+        </div>
+      </ViewEvents.Provider>
     </ViewContext.Provider>
   );
 });
