@@ -9,6 +9,8 @@ export { default as CellData } from './core/CellData';
 export * as Contexts from './core/contexts';
 export { default as DataArray } from './core/DataArray';
 export type { DataArrayProps } from './core/DataArray';
+export { default as Dataset } from './core/Dataset';
+export type { DatasetProps } from './core/Dataset';
 export { default as FieldData } from './core/FieldData';
 export { default as Geometry2DRepresentation } from './core/Geometry2DRepresentation';
 export type { Geometry2DRepresentationProps } from './core/Geometry2DRepresentation';

@@ -1,18 +1,20 @@
-import React, { useState, useContext, useEffect } from 'react';
-import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps.js';
 import vtkCollection from '@kitware/vtk.js/Common/DataModel/Collection';
-import vtkImageArrayMapper from '@kitware/vtk.js/Rendering/Core/ImageArrayMapper.js';
-import vtkResourceLoader from '@kitware/vtk.js/IO/Core/ResourceLoader';
-import vtkLiteHttpDataAccessHelper from '@kitware/vtk.js/IO/Core/DataAccessHelper/LiteHttpDataAccessHelper';
-import { unzipSync } from 'fflate';
 import vtkITKHelper from '@kitware/vtk.js/Common/DataModel/ITKHelper';
+import vtkLiteHttpDataAccessHelper from '@kitware/vtk.js/IO/Core/DataAccessHelper/LiteHttpDataAccessHelper';
+import vtkResourceLoader from '@kitware/vtk.js/IO/Core/ResourceLoader';
+import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps.js';
+import vtkImageArrayMapper from '@kitware/vtk.js/Rendering/Core/ImageArrayMapper.js';
+import { unzipSync } from 'fflate';
+import { useContext, useEffect, useMemo, useState } from 'react';
 
 import {
-  View,
-  Dataset,
-  ShareDataSet,
-  SliceRepresentation,
   Contexts,
+  Dataset,
+  RegisterDataSet,
+  ShareDataSetRoot,
+  SliceRepresentation,
+  UseDataSet,
+  View,
 } from 'react-vtk-js';
 
 function Slider(props) {
@@ -110,13 +112,11 @@ function CheckBox(props) {
   );
 }
 
-
 const loadData = async () => {
   console.log('Loading itk module...');
   loadData.setStatusText('Loading itk module...');
-  if(!window.itk) {
-    await vtkResourceLoader
-    .loadScript(
+  if (!window.itk) {
+    await vtkResourceLoader.loadScript(
       'https://cdn.jsdelivr.net/npm/itk-wasm@1.0.0-b.8/dist/umd/itk-wasm.js'
     );
   }
@@ -144,7 +144,7 @@ const loadData = async () => {
 
   // Read individual dcm files into an array of vtkImageData.
   const imageArray = [];
-  if(window.itk) {
+  if (window.itk) {
     await Promise.all(
       dcmFiles.map(async (filename, index) => {
         const { image: itkImage, webWorker } =
@@ -167,12 +167,13 @@ const loadData = async () => {
     collection.addItem(img);
   }
   const totalSlices = imageArray.reduce(
-    (accumulator, currImage) => currImage.getDimensions()[2] + accumulator, 0
+    (accumulator, currImage) => currImage.getDimensions()[2] + accumulator,
+    0
   );
   loadData.setMaxSlicingValue(totalSlices - 1);
   loadData.setStatusText('');
   return collection;
-}
+};
 
 function Example(props) {
   const [statusText, setStatusText] = useState('Loading data, please wait ...');
@@ -187,34 +188,50 @@ function Example(props) {
   loadData.setMaxSlicingValue = setMaxKSlice;
   loadData.setStatusText = setStatusText;
 
-  useEffect(
-    () => {
-      const img = mapper.getImage(kSlice);
-      const range = img?.getPointData()?.getScalars()?.getRange();
-      if(range && range.length == 2) {
-        const maxWidth = range[1] - range[0];
-        setColorWindow(maxWidth);
-        const center = Math.round((range[0] + range[1]) / 2);
-        setColorLevel(center);
-      }
-    },
-    [kSlice]
+  const [imageCollection, setImageCollection] = useState(null);
+
+  useEffect(() => {
+    loadData().then((ds) => {
+      window.ds = ds;
+      setImageCollection(ds);
+    });
+  }, []);
+
+  useEffect(() => {
+    const img = mapper.getImage(kSlice);
+    const range = img?.getPointData()?.getScalars()?.getRange();
+    if (range && range.length == 2) {
+      const maxWidth = range[1] - range[0];
+      setColorWindow(maxWidth);
+      const center = Math.round((range[0] + range[1]) / 2);
+      setColorLevel(center);
+    }
+  }, [kSlice, mapper]);
+
+  const cameraParams = useMemo(
+    () => ({
+      position: [400, 400, -1000],
+      viewUp: [0, -1, 0],
+      viewAngle: 75,
+      directionOfProjection: [0, 0, 1],
+      clippingRange: [-100, 100],
+      parallelProjection: false,
+    }),
+    []
   );
 
   return (
     <div style={{ width: '100%', height: '100%' }}>
+      <ShareDataSetRoot>
+        <RegisterDataSet id='mixedImages'>
+          <Dataset dataset={imageCollection} />
+        </RegisterDataSet>
         <View
           id='0'
-          cameraPosition={[0, 0, -1]}
-          cameraViewUp={[0, -1, 0]}
-          cameraParallelProjection={false}
+          autoResetCamera={false}
+          camera={cameraParams}
           background={[65 / 255, 86 / 255, 122 / 255]}
         >
-          <ShareDataSet
-            name='mixedImages'
-          >
-            <Dataset fetchData={loadData} />
-          </ShareDataSet>
           <label
             style={{
               position: 'absolute',
@@ -269,11 +286,10 @@ function Example(props) {
             }}
             colorMapPreset={colorPreset}
           >
-            <ShareDataSet
-              name='mixedImages'
-             />
+            <UseDataSet id='mixedImages' />
           </SliceRepresentation>
         </View>
+      </ShareDataSetRoot>
     </div>
   );
 }

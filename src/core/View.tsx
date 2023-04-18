@@ -19,7 +19,7 @@ export default forwardRef(function View(props: ViewProps, fwdRef) {
 
   const multiViewRoot = useContext(MultiViewRootContext);
 
-  const api = useMemo<IView | null>(() => {
+  const api = useMemo<IView>(() => {
     const getView = () =>
       multiViewRoot ? parentedViewRef.current : singleViewRef.current;
     return {
