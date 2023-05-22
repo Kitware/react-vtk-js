@@ -97,6 +97,16 @@ export interface SliceRepresentationProps extends PropsWithChildren {
    * index of the slice along z
    */
   zSlice?: number;
+
+  /**
+   * Event callback for when data is made available.
+   *
+   * By the time this callback is invoked, you can be sure that:
+   * - the mapper has the input data
+   * - the actor is visible (unless explicitly marked as not visible)
+   * - initial properties are set
+   */
+  onDataAvailable?: () => void;
 }
 
 const DefaultProps = {
@@ -134,8 +144,6 @@ export default forwardRef(function SliceRepresentation(
     colorDataRange,
     trackModified
   );
-
-  // --- PWF --- //
 
   // --- mapper --- //
 
@@ -242,6 +250,16 @@ export default forwardRef(function SliceRepresentation(
       mapper.setSlice(kSlice);
     }
   }, [kSlice, getMapper, trackModified]);
+
+  // --- events --- //
+
+  const { onDataAvailable } = props;
+  useEffect(() => {
+    if (dataAvailable) {
+      // trigger onDataAvailable after making updates to the actor and mapper
+      onDataAvailable?.();
+    }
+  }, [dataAvailable, onDataAvailable]);
 
   // --- //
 
