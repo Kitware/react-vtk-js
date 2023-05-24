@@ -1,10 +1,11 @@
 import React, { useState, useContext } from 'react';
 import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps.js';
+import { SlabTypes } from '@kitware/vtk.js/Rendering/Core/ImageResliceMapper/Constants.js';
 
 import {
   View,
   ShareDataSet,
-  SliceRepresentation,
+  ResliceRepresentation,
   Reader,
   Contexts,
   VolumeController,
@@ -49,6 +50,7 @@ function Slider(props) {
 
 function DropDown(props) {
   const view = useContext(Contexts.ViewContext);
+  console.log(props.options);
   function onChange(e) {
     const value = e.currentTarget.value;
     props.setValue(value);
@@ -72,6 +74,49 @@ function DropDown(props) {
         </option>
       ))}
     </select>
+  );
+}
+
+function EnumDropDown(props) {
+  const view = useContext(Contexts.ViewContext);
+  function onChange(e) {
+    const value = e.currentTarget.value;
+    props.setValue(value);
+    setTimeout(view.renderView, 0);
+  }
+  return (
+    <label
+      style={{
+        position: 'absolute',
+        zIndex: 100,
+        left: '5px',
+        top: '55px',
+        ...props.style,
+      }}
+    >
+      {props.label}
+      <select
+        value={props.value}
+        label={props.label}
+        id={props.label}
+        onChange={onChange}
+        style={{
+          position: 'sticky',
+          zIndex: 100,
+          // left: '15px',
+          // top: '5px',
+          ...props.style,
+        }}
+      >
+        {Object.entries(props.options).map((opt) => {
+          return (
+            <option key={opt[0]} value={opt[1]}>
+              {opt[0]}
+            </option>
+          );
+        })}
+      </select>
+    </label>
   );
 }
 
@@ -112,6 +157,9 @@ function Example(props) {
   const [iSlice, setISlice] = useState(128);
   const [jSlice, setJSlice] = useState(128);
   const [kSlice, setKSlice] = useState(47);
+  const [slabThickness, setSlabThickness] = useState(0);
+  const [slabType, setSlabType] = useState(SlabTypes.MAX);
+  const [slabTrapezoidIntegration, setSlabTrapezoidIntegration] = useState(false);
   const [colorWindow, setColorWindow] = useState(2095);
   const [colorLevel, setColorLevel] = useState(1000);
   const [colorPreset, setColorPreset] = useState('Grayscale');
@@ -174,24 +222,41 @@ function Example(props) {
             setValue={setColorPreset}
             style={{ top: '60px', left: '505px' }}
           />
+          <Slider
+            label='slabThickness'
+            max={10}
+            value={slabThickness}
+            setValue={setSlabThickness}
+            style={{ top: '90px', left: '5px' }}
+          />
+          <EnumDropDown
+            options={{
+              MIN: SlabTypes.MIN,
+              MAX: SlabTypes.MAX,
+              MEAN: SlabTypes.MEAN,
+              SUM: SlabTypes.SUM,
+            }}
+            label='slabMode'
+            value={slabType}
+            setValue={setSlabType}
+            style={{ top: '90px', left: '255px' }}
+          />
+          <CheckBox
+            label='slabTrapezoidIntegration'
+            value={slabTrapezoidIntegration}
+            setValue={setSlabTrapezoidIntegration}
+            style={{ top: '60px', left: '5px' }}
+          />
           <CheckBox
             label='useLookupTableScalarRange'
             value={useLookupTableScalarRange}
             setValue={setUseLookupTableScalarRange}
             style={{ top: '60px', left: '5px' }}
           />
-          <SliceRepresentation
-            iSlice={iSlice}
-            property={{
-              colorWindow,
-              colorLevel,
-              useLookupTableScalarRange,
-            }}
-            colorMapPreset={colorPreset}
-          >
-            <ShareDataSet />
-          </SliceRepresentation>
-          <SliceRepresentation
+          <ResliceRepresentation
+            slabThickness={slabThickness}
+            slabType={slabType}
+            slabTrapezoidIntegration={slabTrapezoidIntegration}
             jSlice={jSlice}
             property={{
               colorWindow,
@@ -201,18 +266,7 @@ function Example(props) {
             colorMapPreset={colorPreset}
           >
             <ShareDataSet />
-          </SliceRepresentation>
-          <SliceRepresentation
-            kSlice={kSlice}
-            property={{
-              colorWindow,
-              colorLevel,
-              useLookupTableScalarRange,
-            }}
-            colorMapPreset={colorPreset}
-          >
-            <ShareDataSet />
-          </SliceRepresentation>
+          </ResliceRepresentation>
         </View>
       </div>
       <div style={{ width: '50vw', height: '100%', display: 'inline-block' }}>
