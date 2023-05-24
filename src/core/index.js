@@ -1,5 +1,6 @@
 import vtkVolumeRepresentation from './VolumeRepresentation';
 import vtkSliceRepresentation from './SliceRepresentation';
+import vtkResliceRepresentation from './ResliceRepresentation';
 import vtkVolumeController from './VolumeController';
 import vtkPointData from './PointData';
 import vtkPolyData from './PolyData';
@@ -20,6 +21,7 @@ import vtkMultiViewRoot from './MultiViewRoot';
 
 export const VolumeRepresentation = vtkVolumeRepresentation;
 export const SliceRepresentation = vtkSliceRepresentation;
+export const ResliceRepresentation = vtkResliceRepresentation;
 export const VolumeController = vtkVolumeController;
 export const PointData = vtkPointData;
 export const PolyData = vtkPolyData;
@@ -41,6 +43,7 @@ export const MultiViewRoot = vtkMultiViewRoot;
 export default {
   VolumeRepresentation: vtkVolumeRepresentation,
   SliceRepresentation: vtkSliceRepresentation,
+  ResliceRepresentation: vtkResliceRepresentation,
   VolumeController: vtkVolumeController,
   PointData: vtkPointData,
   PolyData: vtkPolyData,

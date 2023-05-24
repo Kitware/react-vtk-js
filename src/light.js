@@ -13,6 +13,7 @@ import {
 // Core
 export const VolumeRepresentation = Core.VolumeRepresentation;
 export const SliceRepresentation = Core.SliceRepresentation;
+export const ResliceRepresentation = Core.ResliceRepresentation;
 export const VolumeController = Core.VolumeController;
 export const PointData = Core.PointData;
 export const PolyData = Core.PolyData;
