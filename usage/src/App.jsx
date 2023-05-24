@@ -22,6 +22,7 @@ const demos = new Map([
   ['Geometry/CutterExample', lazy(() => import('./Geometry/CutterExample'))],
   ['Geometry/TubeExample', lazy(() => import('./Geometry/TubeExample'))],
   ['Volume/SliceRendering', lazy(() => import('./Volume/SliceRendering'))],
+  ['Volume/ResliceRendering', lazy(() => import('./Volume/ResliceRendering'))],
   // [
   //   'Volume/SyntheticVolumeRendering',
   //   lazy(() => import('./Volume/SyntheticVolumeRendering')),
