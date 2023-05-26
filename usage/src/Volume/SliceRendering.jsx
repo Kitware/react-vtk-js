@@ -67,7 +67,9 @@ function DropDown(props) {
       }}
     >
       {props.options.map((opt) => (
-        <option value={opt}>{opt}</option>
+        <option key={opt} value={opt}>
+          {opt}
+        </option>
       ))}
     </select>
   );
