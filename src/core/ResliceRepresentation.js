@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { ViewContext, RepresentationContext, DownstreamContext } from './View';
 import vtkSliceRepresentation from './SliceRepresentation';
+import { ViewContext, RepresentationContext, DownstreamContext } from './View';
+
 import vtkImageResliceMapper from '@kitware/vtk.js/Rendering/Core/ImageResliceMapper.js';
 import { SlabTypes } from '@kitware/vtk.js/Rendering/Core/ImageResliceMapper/Constants.js';
 
@@ -70,17 +71,19 @@ export default class ResliceRepresentation extends vtkSliceRepresentation {
       slabTrapezoidIntegration,
     } = props;
     let changed = false;
-    if (slicePlane && (!previous || slicePlane !== previous.slicePlane)) {
-      changed = this.slicePlane.set(slicePlane) || changed;
+    if (!previous || slicePlane !== previous.slicePlane) {
+      changed = this.mapper.setSlicePlane(slicePlane);
     }
-    if (
-      slicePolyData &&
-      (!previous || slicePolyData !== previous.slicePolyData)
-    ) {
-      changed = this.slicePolyData.set(slicePolyData) || changed;
+    if (!previous || slicePolyData !== previous.slicePolyData) {
+      changed = this.mapper.setSlicePolyData(slicePolyData);
     }
     if (this.validData) {
-      if (slabType != null && (!previous || slabType !== previous.slabType)) {
+      if (
+        slabType != null &&
+        (!previous || slabType !== previous.slabType) &&
+        slabType >= SlabTypes.MIN &&
+        slabType <= SlabTypes.SUM
+      ) {
         changed = this.mapper.setSlabType(slabType);
       }
       if (
@@ -108,6 +111,12 @@ export default class ResliceRepresentation extends vtkSliceRepresentation {
   }
 }
 
+ResliceRepresentation.defaultProps = {
+  sliceThickness: 0.0,
+  slabType: SlabTypes.MEAN,
+  slabTrapezoidIntegration: false,
+};
+
 ResliceRepresentation.propTypes = {
   /**
    * Slice plane
@@ -122,7 +131,7 @@ ResliceRepresentation.propTypes = {
   /**
    * Slab type
    */
-  slabType: PropTypes.arrayOf(PropTypes.oneOf(SlabTypes)),
+  slabType: PropTypes.number,
 
   /**
    * Slab thickness
