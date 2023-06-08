@@ -98,6 +98,7 @@ export default forwardRef(function PolyData(props: ImageDataProps, fwdRef) {
 
   useUnmount(() => {
     if (imRef.current) {
+      representation.dataAvailable(false);
       deletionRegistry.markForDeletion(imRef.current);
       imRef.current = null;
     }

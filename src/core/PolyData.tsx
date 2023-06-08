@@ -220,6 +220,7 @@ export default forwardRef(function PolyData(props: PolyDataProps, fwdRef) {
 
   useUnmount(() => {
     if (pdRef.current) {
+      representation.dataAvailable(false);
       deletionRegistry.markForDeletion(pdRef.current);
       pdRef.current = null;
     }

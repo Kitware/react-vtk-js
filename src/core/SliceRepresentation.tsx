@@ -277,8 +277,8 @@ export default forwardRef(function SliceRepresentation(
       dataChanged: () => {
         renderer.requestRender();
       },
-      dataAvailable: () => {
-        setDataAvailable(true);
+      dataAvailable: (available = true) => {
+        setDataAvailable(available);
         representation.dataChanged();
       },
       getActor,

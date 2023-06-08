@@ -100,6 +100,7 @@ export default function Algorithm(props: AlgorithmProps) {
 
   useUnmount(() => {
     if (algoRef.current) {
+      representation.dataAvailable(false);
       deletionRegistry.markForDeletion(algoRef.current);
       algoRef.current = null;
     }

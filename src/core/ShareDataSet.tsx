@@ -205,7 +205,7 @@ export function UseDataSet(props: UseDataSetProps) {
   useEffect(() => {
     return share.onDataAvailable(id, (ds) => {
       downstream.setInputData(ds as vtkObject, port);
-      representation.dataAvailable();
+      representation.dataAvailable(!!ds);
     });
   }, [id, port, representation, downstream, share]);
 

@@ -177,8 +177,8 @@ export default forwardRef(function Geometry2DRepresentation(
       dataChanged: () => {
         renderer.requestRender();
       },
-      dataAvailable: () => {
-        setDataAvailable(true);
+      dataAvailable: (available = true) => {
+        setDataAvailable(available);
         representation.dataChanged();
       },
       getActor,
