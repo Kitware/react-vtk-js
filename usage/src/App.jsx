@@ -40,6 +40,7 @@ const demos = new Map([
     'Tests/SimpleSliceRendering',
     lazy(() => import('./Tests/SimpleSliceRendering')),
   ],
+  ['Tests/RemoveImageData', lazy(() => import('./Tests/RemoveImageData'))],
   [
     'Tests/ChangeInteractorStyle',
     lazy(() => import('./Tests/ChangeInteractorStyle')),

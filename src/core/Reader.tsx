@@ -89,9 +89,10 @@ export default function Reader(props: ReaderProps) {
     deletionRegistry.register(reader, () => reader.delete());
     readerRef.current = reader;
     return () => {
+      representation.dataAvailable(false);
       deletionRegistry.markForDeletion(reader);
     };
-  }, [createReader]);
+  }, [createReader, representation]);
 
   // --- url handling --- //
 

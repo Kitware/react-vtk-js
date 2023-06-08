@@ -70,7 +70,7 @@ export interface IView {
 }
 
 export interface IRepresentation {
-  dataAvailable(): void;
+  dataAvailable(available?: boolean): void;
   dataChanged(): void;
   getActor(): vtkProp | null;
   getMapper(): vtkAbstractMapper | null;

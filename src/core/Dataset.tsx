@@ -14,11 +14,12 @@ export default function Dataset(props: DatasetProps) {
 
   useEffect(() => {
     if (!dataset) {
+      representation.dataAvailable(false);
       return;
     }
 
     downstream.setInputData(dataset);
-    representation.dataAvailable();
+    representation.dataAvailable(true);
     representation.dataChanged();
   }, [dataset, downstream, representation]);
 
