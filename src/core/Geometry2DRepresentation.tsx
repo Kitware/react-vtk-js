@@ -20,6 +20,7 @@ import { IDownstream, IRepresentation } from '../types';
 import { compareShallowObject } from '../utils/comparators';
 import useBooleanAccumulator from '../utils/useBooleanAccumulator';
 import useComparableEffect from '../utils/useComparableEffect';
+import useLatest from '../utils/useLatest';
 import {
   DownstreamContext,
   RepresentationContext,
@@ -153,13 +154,15 @@ export default forwardRef(function Geometry2DRepresentation(
 
   // --- events --- //
 
-  const { onDataAvailable } = props;
+  const onDataAvailable = useLatest(props.onDataAvailable);
   useEffect(() => {
     if (dataAvailable) {
       // trigger onDataAvailable after making updates to the actor and mapper
-      onDataAvailable?.();
+      onDataAvailable.current?.();
     }
-  }, [dataAvailable, onDataAvailable]);
+    // onDataAvailable is a ref
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataAvailable]);
 
   // --- //
 
