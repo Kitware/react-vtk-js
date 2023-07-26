@@ -110,7 +110,11 @@ export default function DataArray(props: DataArrayProps) {
       const typedArrayClass = TypedArrayLookup[TYPED_ARRAYS[type]];
       array.setData(toTypedArray(values, typedArrayClass), numberOfComponents);
       if (range) {
-        array.setRange(range, numberOfComponents);
+        if (numberOfComponents === 1) {
+          array.setRange(range, 0);
+        } else {
+          array.setRange(range, numberOfComponents);
+        }
       }
     }
 
