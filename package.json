@@ -32,7 +32,7 @@
     "dev": "rollup -c --watch"
   },
   "peerDependencies": {
-    "@kitware/vtk.js": "^26.9.9",
+    "@kitware/vtk.js": "^28.13.0",
     "react": "^16.0.0"
   },
   "devDependencies": {
