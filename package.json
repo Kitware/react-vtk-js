@@ -33,7 +33,7 @@
   },
   "peerDependencies": {
     "@kitware/vtk.js": "^28.13.0",
-    "react": "^16.0.0"
+    "react": "^18.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.19.1",
