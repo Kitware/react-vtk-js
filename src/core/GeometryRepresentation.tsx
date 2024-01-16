@@ -1,3 +1,4 @@
+import vtkPolyData from '@kitware/vtk.js/Common/DataModel/PolyData';
 import vtkActor, {
   IActorInitialValues,
 } from '@kitware/vtk.js/Rendering/Core/Actor';
@@ -9,6 +10,7 @@ import { Vector2 } from '@kitware/vtk.js/types';
 import {
   forwardRef,
   PropsWithChildren,
+  useCallback,
   useEffect,
   useImperativeHandle,
   useMemo,
@@ -18,13 +20,13 @@ import { IDownstream, IRepresentation } from '../types';
 import { compareShallowObject } from '../utils/comparators';
 import useBooleanAccumulator from '../utils/useBooleanAccumulator';
 import useComparableEffect from '../utils/useComparableEffect';
-import useLatest from '../utils/useLatest';
 import {
   DownstreamContext,
   RepresentationContext,
   useRendererContext,
 } from './contexts';
 import useColorTransferFunction from './modules/useColorTransferFunction';
+import useDataEvents from './modules/useDataEvents';
 import useMapper from './modules/useMapper';
 import useProp from './modules/useProp';
 
@@ -137,6 +139,11 @@ export default forwardRef(function GeometryRepresentation(
     getMapper().setLookupTable(getLookupTable());
   }, [getMapper, getLookupTable]);
 
+  const getInputData = useCallback(
+    () => getMapper().getInputData(),
+    [getMapper]
+  );
+
   // --- actor --- //
 
   const actorProps = {
@@ -167,15 +174,15 @@ export default forwardRef(function GeometryRepresentation(
 
   // --- events --- //
 
-  const onDataAvailable = useLatest(props.onDataAvailable);
+  const { dataChangedEvent, dataAvailableEvent } =
+    useDataEvents<vtkPolyData>(props);
+
+  // trigger data available event
   useEffect(() => {
     if (dataAvailable) {
-      // trigger onDataAvailable after making updates to the actor and mapper
-      onDataAvailable.current?.();
+      dataAvailableEvent.current.dispatchEvent(getInputData());
     }
-    // onDataAvailable is a ref
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dataAvailable]);
+  }, [dataAvailable, dataAvailableEvent, getInputData]);
 
   // --- //
 
@@ -191,6 +198,7 @@ export default forwardRef(function GeometryRepresentation(
   const representation = useMemo<IRepresentation>(
     () => ({
       dataChanged: () => {
+        dataChangedEvent.current.dispatchEvent(getInputData());
         renderer.requestRender();
       },
       dataAvailable: () => {
@@ -199,8 +207,17 @@ export default forwardRef(function GeometryRepresentation(
       },
       getActor,
       getMapper,
+      onDataAvailable: (cb) => dataAvailableEvent.current.addEventListener(cb),
+      onDataChanged: (cb) => dataChangedEvent.current.addEventListener(cb),
     }),
-    [renderer, getActor, getMapper]
+    [
+      renderer,
+      getActor,
+      getMapper,
+      getInputData,
+      dataAvailableEvent,
+      dataChangedEvent,
+    ]
   );
 
   const downstream = useMemo<IDownstream>(

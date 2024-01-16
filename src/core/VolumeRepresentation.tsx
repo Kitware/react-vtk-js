@@ -1,4 +1,5 @@
 import vtkDataArray from '@kitware/vtk.js/Common/Core/DataArray';
+import vtkImageData from '@kitware/vtk.js/Common/DataModel/ImageData';
 import vtkVolume, {
   IVolumeInitialValues,
 } from '@kitware/vtk.js/Rendering/Core/Volume';
@@ -20,13 +21,13 @@ import { IDownstream, IRepresentation } from '../types';
 import { compareShallowObject } from '../utils/comparators';
 import useBooleanAccumulator from '../utils/useBooleanAccumulator';
 import useComparableEffect from '../utils/useComparableEffect';
-import useLatest from '../utils/useLatest';
 import {
   DownstreamContext,
   RepresentationContext,
   useRendererContext,
 } from './contexts';
 import useColorTransferFunction from './modules/useColorTransferFunction';
+import useDataEvents from './modules/useDataEvents';
 import useDataRange from './modules/useDataRange';
 import useMapper from './modules/useMapper';
 import usePiecewiseFunction from './modules/usePiecewiseFunction';
@@ -76,7 +77,15 @@ export interface VolumeRepresentationProps extends PropsWithChildren {
    * - the actor is visible (unless explicitly marked as not visible)
    * - initial properties are set
    */
-  onDataAvailable?: () => void;
+  onDataAvailable?: (obj?: vtkImageData) => void;
+
+  /**
+   * Event callback for when data has changed.
+   *
+   * When called:
+   * - Mapper has input data
+   */
+  onDataChanged?: (obj?: vtkImageData) => void;
 }
 
 const DefaultProps = {
@@ -106,6 +115,11 @@ export default forwardRef(function VolumeRepresentation(
     }
     return getInternalMapper();
   }, [mapperInstance, getInternalMapper]);
+
+  const getInputData = useCallback(
+    () => getMapper().getInputData(),
+    [getMapper]
+  );
 
   // --- data range --- //
 
@@ -173,15 +187,15 @@ export default forwardRef(function VolumeRepresentation(
 
   // --- events --- //
 
-  const onDataAvailable = useLatest(props.onDataAvailable);
+  const { dataChangedEvent, dataAvailableEvent } =
+    useDataEvents<vtkImageData>(props);
+
+  // trigger data available event
   useEffect(() => {
     if (dataAvailable) {
-      // trigger onDataAvailable after making updates to the actor and mapper
-      onDataAvailable.current?.();
+      dataAvailableEvent.current.dispatchEvent(getInputData());
     }
-    // onDataAvailable is a ref
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dataAvailable]);
+  }, [dataAvailable, dataAvailableEvent, getInputData]);
 
   // --- //
 
@@ -198,6 +212,7 @@ export default forwardRef(function VolumeRepresentation(
     () => ({
       dataChanged: () => {
         updateDataRange();
+        dataChangedEvent.current.dispatchEvent(getInputData());
         renderer.requestRender();
       },
       dataAvailable: (available = true) => {
@@ -206,11 +221,18 @@ export default forwardRef(function VolumeRepresentation(
       },
       getActor,
       getMapper,
-      getData: () => {
-        return getMapper().getInputData();
-      },
+      onDataAvailable: (cb) => dataAvailableEvent.current.addEventListener(cb),
+      onDataChanged: (cb) => dataChangedEvent.current.addEventListener(cb),
     }),
-    [renderer, updateDataRange, getActor, getMapper]
+    [
+      renderer,
+      updateDataRange,
+      getActor,
+      getMapper,
+      getInputData,
+      dataAvailableEvent,
+      dataChangedEvent,
+    ]
   );
 
   const downstream = useMemo<IDownstream>(
