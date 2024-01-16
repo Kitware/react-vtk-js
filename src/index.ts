@@ -44,3 +44,4 @@ export { default as SliceRepresentation } from './core/SliceRepresentation';
 export type { SliceRepresentationProps } from './core/SliceRepresentation';
 export { default as View } from './core/View';
 export type { ViewProps } from './core/View';
+export { default as VolumeRepresentation } from './core/VolumeRepresentation';
