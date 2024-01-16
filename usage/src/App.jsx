@@ -21,14 +21,13 @@ const demos = new Map([
   // ['Geometry/Glyph', lazy(() => import('./Geometry/Glyph'))],
   ['Geometry/CutterExample', lazy(() => import('./Geometry/CutterExample'))],
   ['Geometry/TubeExample', lazy(() => import('./Geometry/TubeExample'))],
-  // ['Volume/SliceRendering', lazy(() => import('./Volume/SliceRendering'))],
-  // ['Volume/ImageSeriesRendering', lazy(() => import('./Volume/ImageSeriesRendering'))],
+  ['Volume/SliceRendering', lazy(() => import('./Volume/SliceRendering'))],
   // [
   //   'Volume/SyntheticVolumeRendering',
   //   lazy(() => import('./Volume/SyntheticVolumeRendering')),
   // ],
-  // ['Volume/VolumeRendering', lazy(() => import('./Volume/VolumeRendering'))],
-  // ['Volume/DynamicUpdate', lazy(() => import('./Volume/DynamicUpdate'))],
+  ['Volume/VolumeRendering', lazy(() => import('./Volume/VolumeRendering'))],
+  ['Volume/DynamicUpdate', lazy(() => import('./Volume/DynamicUpdate'))],
   [
     'Volume/ImageSeriesRendering',
     lazy(() => import('./Volume/ImageSeriesRendering')),

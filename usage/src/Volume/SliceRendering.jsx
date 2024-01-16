@@ -1,12 +1,14 @@
-import React, { useState, useContext } from 'react';
 import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps.js';
+import { useContext, useState } from 'react';
 
 import {
-  View,
-  ShareDataSet,
-  SliceRepresentation,
-  Reader,
   Contexts,
+  Reader,
+  RegisterDataSet,
+  ShareDataSetRoot,
+  SliceRepresentation,
+  UseDataSet,
+  View,
   VolumeController,
   VolumeRepresentation,
 } from 'react-vtk-js';
@@ -66,8 +68,10 @@ function DropDown(props) {
         ...props.style,
       }}
     >
-      {props.options.map((opt) => (
-        <option value={opt}>{opt}</option>
+      {props.options.map((opt, idx) => (
+        <option key={idx} value={opt}>
+          {opt}
+        </option>
       ))}
     </select>
   );
@@ -106,7 +110,7 @@ function CheckBox(props) {
   );
 }
 
-function Example(props) {
+function Example() {
   const [iSlice, setISlice] = useState(128);
   const [jSlice, setJSlice] = useState(128);
   const [kSlice, setKSlice] = useState(47);
@@ -116,120 +120,122 @@ function Example(props) {
   const [useLookupTableScalarRange, setUseLookupTableScalarRange] =
     useState(false);
   return (
-    <div style={{ width: '100%', height: '100%' }}>
-      <div style={{ width: '50vw', height: '100%', display: 'inline-block' }}>
-        <View
-          id='0'
-          cameraPosition={[1, 0, 0]}
-          cameraViewUp={[0, 0, -1]}
-          cameraParallelProjection={false}
-          background={[1, 1, 1]}
-        >
-          <ShareDataSet>
-            <Reader
-              vtkClass='vtkXMLImageDataReader'
-              url='https://data.kitware.com/api/v1/item/59e12e988d777f31ac6455c5/download'
+    <ShareDataSetRoot>
+      <RegisterDataSet id='image'>
+        <Reader
+          vtkClass='vtkXMLImageDataReader'
+          url='https://data.kitware.com/api/v1/item/59e12e988d777f31ac6455c5/download'
+        />
+      </RegisterDataSet>
+      <div style={{ width: '100%', height: '100%' }}>
+        <div style={{ width: '50vw', height: '100%', display: 'inline-block' }}>
+          <View
+            id='0'
+            cameraPosition={[1, 0, 0]}
+            cameraViewUp={[0, 0, -1]}
+            cameraParallelProjection={false}
+            background={[1, 1, 1]}
+          >
+            <Slider
+              label='iSlice'
+              max={256}
+              value={iSlice}
+              setValue={setISlice}
+              style={{ left: '5px' }}
             />
-          </ShareDataSet>
-          <Slider
-            label='iSlice'
-            max={256}
-            value={iSlice}
-            setValue={setISlice}
-            style={{ left: '5px' }}
-          />
-          <Slider
-            label='jSlice'
-            max={256}
-            value={jSlice}
-            setValue={setJSlice}
-            style={{ left: '255px' }}
-          />
-          <Slider
-            label='kSlice'
-            max={95}
-            value={kSlice}
-            setValue={setKSlice}
-            style={{ left: '505px' }}
-          />
-          <Slider
-            label='colorLevel'
-            max={4095}
-            value={colorLevel}
-            setValue={setColorLevel}
-            style={{ top: '30px', left: '5px' }}
-          />
-          <Slider
-            label='colorWindow'
-            max={4095}
-            value={colorWindow}
-            setValue={setColorWindow}
-            style={{ top: '30px', left: '505px' }}
-          />
-          <DropDown
-            options={vtkColorMaps.rgbPresetNames}
-            value={colorPreset}
-            setValue={setColorPreset}
-            style={{ top: '60px', left: '505px' }}
-          />
-          <CheckBox
-            label='useLookupTableScalarRange'
-            value={useLookupTableScalarRange}
-            setValue={setUseLookupTableScalarRange}
-            style={{ top: '60px', left: '5px' }}
-          />
-          <SliceRepresentation
-            iSlice={iSlice}
-            property={{
-              colorWindow,
-              colorLevel,
-              useLookupTableScalarRange,
-            }}
-            colorMapPreset={colorPreset}
+            <Slider
+              label='jSlice'
+              max={256}
+              value={jSlice}
+              setValue={setJSlice}
+              style={{ left: '255px' }}
+            />
+            <Slider
+              label='kSlice'
+              max={95}
+              value={kSlice}
+              setValue={setKSlice}
+              style={{ left: '505px' }}
+            />
+            <Slider
+              label='colorLevel'
+              max={4095}
+              value={colorLevel}
+              setValue={setColorLevel}
+              style={{ top: '30px', left: '5px' }}
+            />
+            <Slider
+              label='colorWindow'
+              max={4095}
+              value={colorWindow}
+              setValue={setColorWindow}
+              style={{ top: '30px', left: '505px' }}
+            />
+            <DropDown
+              options={vtkColorMaps.rgbPresetNames}
+              value={colorPreset}
+              setValue={setColorPreset}
+              style={{ top: '60px', left: '505px' }}
+            />
+            <CheckBox
+              label='useLookupTableScalarRange'
+              value={useLookupTableScalarRange}
+              setValue={setUseLookupTableScalarRange}
+              style={{ top: '60px', left: '5px' }}
+            />
+            <SliceRepresentation
+              iSlice={iSlice}
+              property={{
+                colorWindow,
+                colorLevel,
+                useLookupTableScalarRange,
+              }}
+              colorMapPreset={colorPreset}
+            >
+              <UseDataSet id='image' />
+            </SliceRepresentation>
+            <SliceRepresentation
+              jSlice={jSlice}
+              property={{
+                colorWindow,
+                colorLevel,
+                useLookupTableScalarRange,
+              }}
+              colorMapPreset={colorPreset}
+            >
+              <UseDataSet id='image' />
+            </SliceRepresentation>
+            <SliceRepresentation
+              kSlice={kSlice}
+              property={{
+                colorWindow,
+                colorLevel,
+                useLookupTableScalarRange,
+              }}
+              colorMapPreset={colorPreset}
+            >
+              <UseDataSet id='image' />
+            </SliceRepresentation>
+          </View>
+        </div>
+        <div style={{ width: '50vw', height: '100%', display: 'inline-block' }}>
+          <View
+            id='0'
+            background={[0, 0, 0]}
+            cameraPosition={[1, 0, 0]}
+            cameraViewUp={[0, 0, -1]}
+            cameraParallelProjection={false}
           >
-            <ShareDataSet />
-          </SliceRepresentation>
-          <SliceRepresentation
-            jSlice={jSlice}
-            property={{
-              colorWindow,
-              colorLevel,
-              useLookupTableScalarRange,
-            }}
-            colorMapPreset={colorPreset}
-          >
-            <ShareDataSet />
-          </SliceRepresentation>
-          <SliceRepresentation
-            kSlice={kSlice}
-            property={{
-              colorWindow,
-              colorLevel,
-              useLookupTableScalarRange,
-            }}
-            colorMapPreset={colorPreset}
-          >
-            <ShareDataSet />
-          </SliceRepresentation>
-        </View>
+            <VolumeRepresentation>
+              <div style={{ display: 'none' }}>
+                <VolumeController />
+              </div>
+              <UseDataSet id='image' />
+            </VolumeRepresentation>
+          </View>
+        </div>
       </div>
-      <div style={{ width: '50vw', height: '100%', display: 'inline-block' }}>
-        <View
-          id='0'
-          background={[0, 0, 0]}
-          cameraPosition={[1, 0, 0]}
-          cameraViewUp={[0, 0, -1]}
-          cameraParallelProjection={false}
-        >
-          <VolumeRepresentation>
-            <div style={{ display: 'none' }}>
-              <VolumeController />
-            </div>
-            <ShareDataSet />
-          </VolumeRepresentation>
-        </View>
-      </div>
-    </div>
+    </ShareDataSetRoot>
   );
 }
 

@@ -1,11 +1,12 @@
-import vtkPolyData from '@kitware/vtk.js/Common/DataModel/PolyData';
-import vtkActor, {
-  IActorInitialValues,
-} from '@kitware/vtk.js/Rendering/Core/Actor';
-import vtkMapper, {
-  IMapperInitialValues,
-} from '@kitware/vtk.js/Rendering/Core/Mapper';
-import { IPropertyInitialValues } from '@kitware/vtk.js/Rendering/Core/Property';
+import vtkDataArray from '@kitware/vtk.js/Common/Core/DataArray';
+import vtkImageData from '@kitware/vtk.js/Common/DataModel/ImageData';
+import vtkVolume, {
+  IVolumeInitialValues,
+} from '@kitware/vtk.js/Rendering/Core/Volume';
+import vtkVolumeMapper, {
+  IVolumeMapperInitialValues,
+} from '@kitware/vtk.js/Rendering/Core/VolumeMapper';
+import { IVolumePropertyInitialValues } from '@kitware/vtk.js/Rendering/Core/VolumeProperty';
 import { Vector2 } from '@kitware/vtk.js/types';
 import {
   forwardRef,
@@ -27,29 +28,36 @@ import {
 } from './contexts';
 import useColorTransferFunction from './modules/useColorTransferFunction';
 import useDataEvents from './modules/useDataEvents';
+import useDataRange from './modules/useDataRange';
 import useMapper from './modules/useMapper';
+import usePiecewiseFunction from './modules/usePiecewiseFunction';
 import useProp from './modules/useProp';
 
-export interface GeometryRepresentationProps extends PropsWithChildren {
+export interface VolumeRepresentationProps extends PropsWithChildren {
   /**
    * The ID used to identify this component.
    */
   id?: string;
 
   /**
-   * Properties to set to the actor
+   * Properties to set to the mapper
    */
-  actor?: IActorInitialValues;
+  mapper?: IVolumeMapperInitialValues;
 
   /**
-   * Properties to set to the actor
+   * An opational mapper instanc
    */
-  mapper?: IMapperInitialValues;
+  mapperInstance?: vtkVolumeMapper;
 
   /**
-   * Properties to set to the actor.property
+   * Properties to set to the volume actor
    */
-  property?: IPropertyInitialValues;
+  actor?: IVolumeInitialValues;
+
+  /**
+   * Properties to set to the volume.property
+   */
+  property?: IVolumePropertyInitialValues;
 
   /**
    * Preset name for the lookup table color map
@@ -59,38 +67,7 @@ export interface GeometryRepresentationProps extends PropsWithChildren {
   /**
    * Data range use for the colorMap
    */
-  colorDataRange?: [number, number];
-
-  /**
-   * Show/Hide Cube Axes for the given representation
-   */
-  showCubeAxes?: boolean;
-
-  /**
-   * Configure cube Axes style by overriding the set of properties defined
-   * https://github.com/Kitware/vtk-js/blob/HEAD/Sources/Rendering/Core/CubeAxesActor/index.js#L703-L719
-   *
-   * TODO fix type
-   */
-  cubeAxesStyle?: Record<string, unknown>;
-
-  /**
-   * Show hide scalar bar for that representation
-   */
-  showScalarBar?: boolean;
-
-  /**
-   * Use given string as title for scalar bar. By default it is empty (no title).
-   */
-  scalarBarTitle?: boolean;
-
-  /**
-   * Configure scalar bar style by overriding the set of properties defined
-   * https://github.com/Kitware/vtk-js/blob/master/Sources/Rendering/Core/ScalarBarActor/index.js#L776-L796
-   *
-   * TODO fix type
-   */
-  scalarBarStyle?: Record<string, unknown>;
+  colorDataRange?: 'auto' | Vector2;
 
   /**
    * Event callback for when data is made available.
@@ -100,48 +77,78 @@ export interface GeometryRepresentationProps extends PropsWithChildren {
    * - the actor is visible (unless explicitly marked as not visible)
    * - initial properties are set
    */
-  onDataAvailable?: () => void;
+  onDataAvailable?: (obj?: vtkImageData) => void;
+
+  /**
+   * Event callback for when data has changed.
+   *
+   * When called:
+   * - Mapper has input data
+   */
+  onDataChanged?: (obj?: vtkImageData) => void;
 }
 
 const DefaultProps = {
   colorMapPreset: 'erdc_rainbow_bright',
-  colorDataRange: [0, 1] as Vector2,
+  colorDataRange: 'auto' as const,
 };
 
-export default forwardRef(function GeometryRepresentation(
-  props: GeometryRepresentationProps,
+export default forwardRef(function VolumeRepresentation(
+  props: VolumeRepresentationProps,
   fwdRef
 ) {
   const [modifiedRef, trackModified, resetModified] = useBooleanAccumulator();
   const [dataAvailable, setDataAvailable] = useState(false);
 
-  // --- LUT --- //
-
-  const getLookupTable = useColorTransferFunction(
-    props.colorMapPreset ?? DefaultProps.colorMapPreset,
-    props.colorDataRange ?? DefaultProps.colorDataRange,
-    trackModified
-  );
-
   // --- mapper --- //
 
-  const getMapper = useMapper<vtkMapper, IMapperInitialValues>(
-    () =>
-      vtkMapper.newInstance({
-        lookupTable: getLookupTable(),
-        useLookupTableScalarRange: true,
-      } as IMapperInitialValues),
+  const getInternalMapper = useMapper(
+    () => vtkVolumeMapper.newInstance(),
     props.mapper,
     trackModified
   );
 
-  useEffect(() => {
-    getMapper().setLookupTable(getLookupTable());
-  }, [getMapper, getLookupTable]);
+  const { mapperInstance } = props;
+  const getMapper = useCallback(() => {
+    if (mapperInstance) {
+      return mapperInstance;
+    }
+    return getInternalMapper();
+  }, [mapperInstance, getInternalMapper]);
 
   const getInputData = useCallback(
     () => getMapper().getInputData(),
     [getMapper]
+  );
+
+  // --- data range --- //
+
+  const getDataArray = useCallback(
+    () =>
+      getMapper()?.getInputData()?.getPointData().getScalars() as
+        | vtkDataArray
+        | undefined,
+    [getMapper]
+  );
+
+  const { dataRange, updateDataRange } = useDataRange(getDataArray);
+
+  const rangeFromProps = props.colorDataRange ?? DefaultProps.colorDataRange;
+  const colorDataRange = rangeFromProps === 'auto' ? dataRange : rangeFromProps;
+
+  // --- LUT --- //
+
+  const getLookupTable = useColorTransferFunction(
+    props.colorMapPreset ?? DefaultProps.colorMapPreset,
+    colorDataRange,
+    trackModified
+  );
+
+  // --- PWF --- //
+
+  const getPiecewiseFunction = usePiecewiseFunction(
+    colorDataRange,
+    trackModified
   );
 
   // --- actor --- //
@@ -150,8 +157,8 @@ export default forwardRef(function GeometryRepresentation(
     ...props.actor,
     visibility: dataAvailable && (props.actor?.visibility ?? true),
   };
-  const getActor = useProp<vtkActor, IActorInitialValues>({
-    constructor: () => vtkActor.newInstance({ visibility: false }),
+  const getActor = useProp({
+    constructor: () => vtkVolume.newInstance(),
     id: props.id,
     props: actorProps,
     trackModified,
@@ -160,6 +167,12 @@ export default forwardRef(function GeometryRepresentation(
   useEffect(() => {
     getActor().setMapper(getMapper());
   }, [getActor, getMapper]);
+
+  useEffect(() => {
+    getActor().getProperty().setRGBTransferFunction(0, getLookupTable());
+    getActor().getProperty().setScalarOpacity(0, getPiecewiseFunction());
+    getActor().getProperty().setInterpolationTypeToLinear();
+  }, [getActor, getLookupTable, getPiecewiseFunction]);
 
   // set actor property props
   const { property: propertyProps } = props;
@@ -175,7 +188,7 @@ export default forwardRef(function GeometryRepresentation(
   // --- events --- //
 
   const { dataChangedEvent, dataAvailableEvent } =
-    useDataEvents<vtkPolyData>(props);
+    useDataEvents<vtkImageData>(props);
 
   // trigger data available event
   useEffect(() => {
@@ -198,11 +211,12 @@ export default forwardRef(function GeometryRepresentation(
   const representation = useMemo<IRepresentation>(
     () => ({
       dataChanged: () => {
+        updateDataRange();
         dataChangedEvent.current.dispatchEvent(getInputData());
         renderer.requestRender();
       },
-      dataAvailable: () => {
-        setDataAvailable(true);
+      dataAvailable: (available = true) => {
+        setDataAvailable(available);
         representation.dataChanged();
       },
       getActor,
@@ -212,6 +226,7 @@ export default forwardRef(function GeometryRepresentation(
     }),
     [
       renderer,
+      updateDataRange,
       getActor,
       getMapper,
       getInputData,

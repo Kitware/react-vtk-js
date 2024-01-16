@@ -485,3 +485,8 @@ declare module '@kitware/vtk.js/Rendering/OpenGL/HardwareSelector' {
 
   export default vtkOpenGLHardwareSelector;
 }
+
+declare module '@kitware/vtk.js/Interaction/UI/VolumeController' {
+  const VolumeController: any;
+  export default VolumeController;
+}

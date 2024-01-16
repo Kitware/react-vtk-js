@@ -74,6 +74,8 @@ export interface IRepresentation {
   dataChanged(): void;
   getActor(): vtkProp | null;
   getMapper(): vtkAbstractMapper | null;
+  onDataAvailable(cb: (obj?: any) => void): () => void;
+  onDataChanged(cb: (obj?: any) => void): () => void;
 }
 
 // There is no sufficient type that overlaps classes like

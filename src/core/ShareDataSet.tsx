@@ -31,6 +31,7 @@ import {
   useRepresentation,
   useShareDataSet,
 } from './contexts';
+import useDataEvents from './modules/useDataEvents';
 
 const DATA_AVAILABLE_EVENT = 'dataAvailable';
 const DATA_CHANGED_EVENT = 'dataChanged';
@@ -63,7 +64,7 @@ export function ShareDataSetRoot(props: PropsWithChildren) {
         };
 
         const handler = (ev: Event) => {
-          if (!(ev instanceof CustomEvent<DataEventDetails>)) return;
+          if (!(ev instanceof CustomEvent)) return;
           if (name === ev.detail?.name) {
             invoke();
           }
@@ -153,6 +154,10 @@ export function RegisterDataSet(props: RegisterDataSetProps) {
     share.unregister(id);
   });
 
+  // --- events --- //
+
+  const { dataChangedEvent, dataAvailableEvent } = useDataEvents({});
+
   // --- //
 
   const downstream = useMemo<IDownstream>(
@@ -171,14 +176,18 @@ export function RegisterDataSet(props: RegisterDataSetProps) {
     () => ({
       dataChanged() {
         share.dispatchDataChanged(id);
+        dataChangedEvent.current.dispatchEvent();
       },
       dataAvailable() {
         share.dispatchDataAvailable(id);
+        dataAvailableEvent.current.dispatchEvent();
       },
       getActor: () => null,
       getMapper: () => null,
+      onDataAvailable: (cb) => share.onDataAvailable(id, cb),
+      onDataChanged: (cb) => share.onDataChanged(id, cb),
     }),
-    [id, share]
+    [id, share, dataAvailableEvent, dataChangedEvent]
   );
 
   return (

@@ -1,15 +1,17 @@
-import React, { useState, useContext } from 'react';
+import { useContext, useState } from 'react';
 
 import {
   Contexts,
-  View,
-  VolumeRepresentation,
-  SliceRepresentation,
-  VolumeController,
-  ShareDataSet,
+  DataArray,
   ImageData,
   PointData,
-  DataArray,
+  RegisterDataSet,
+  ShareDataSetRoot,
+  SliceRepresentation,
+  UseDataSet,
+  View,
+  VolumeController,
+  VolumeRepresentation,
 } from 'react-vtk-js';
 
 function generateRandomVolumeField(iMax, jMax, kMax) {
@@ -70,57 +72,61 @@ function Slider(props) {
   );
 }
 
-function Example(props) {
+function Example() {
   const [fieldIdx, setFieldIdx] = useState(0);
   const colorWindow = fieldIdx ? 10 : 1;
   const colorLevel = fieldIdx ? 5 : 0.5;
 
   return (
-    <div style={{ width: '100%', height: '100%' }}>
-      <View id='0'>
-        <Slider
-          max={FIELDS.length - 1}
-          value={fieldIdx}
-          setValue={setFieldIdx}
-        />
-        <VolumeRepresentation>
-          <VolumeController rescaleColorMap={false} />
-          <ShareDataSet>
-            <ImageData
-              spacing={[1, 1, 1]}
-              dimensions={[10, 10, 10]}
-              origin={[0, 0, 0]}
-            >
-              <PointData>
-                <DataArray
-                  registration='setScalars'
-                  type='Float32Array'
-                  values={FIELDS[fieldIdx]}
-                />
-              </PointData>
-            </ImageData>
-          </ShareDataSet>
-        </VolumeRepresentation>
-      </View>
-      <div
-        style={{
-          position: 'absolute',
-          width: '20%',
-          height: '20%',
-          bottom: 0,
-          right: 0,
-        }}
-      >
-        <View background={[1, 1, 1]} triggerRender={fieldIdx}>
-          <SliceRepresentation
-            kSlice={5}
-            property={{ colorWindow, colorLevel }}
-          >
-            <ShareDataSet />
-          </SliceRepresentation>
+    <ShareDataSetRoot>
+      <RegisterDataSet id='image'>
+        <ImageData
+          spacing={[1, 1, 1]}
+          dimensions={[10, 10, 10]}
+          origin={[0, 0, 0]}
+        >
+          <PointData>
+            <DataArray
+              registration='setScalars'
+              type='Float32Array'
+              values={FIELDS[fieldIdx]}
+            />
+          </PointData>
+        </ImageData>
+      </RegisterDataSet>
+      <div style={{ width: '100%', height: '100%' }}>
+        <View id='0'>
+          <Slider
+            max={FIELDS.length - 1}
+            value={fieldIdx}
+            setValue={setFieldIdx}
+          />
+          <VolumeRepresentation>
+            <VolumeController rescaleColorMap={false} />
+            <UseDataSet id='image' />
+          </VolumeRepresentation>
         </View>
+
+        <div
+          style={{
+            position: 'absolute',
+            width: '20%',
+            height: '20%',
+            bottom: 0,
+            right: 0,
+          }}
+        >
+          <View background={[1, 1, 1]}>
+            <SliceRepresentation
+              kSlice={5}
+              property={{ colorWindow, colorLevel }}
+            >
+              <UseDataSet id='image' />
+            </SliceRepresentation>
+          </View>
+        </div>
       </div>
-    </div>
+    </ShareDataSetRoot>
   );
 }
 
