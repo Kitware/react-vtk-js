@@ -87,9 +87,9 @@ const ParentedView = forwardRef(function ParentedView(
    * 1. Switch to targeted renderer.
    * 2. Switch to this View's interactor style.
    */
-  useEventListener(containerRef, 'pointerenter', (ev: PointerEvent) => {
+  const switchTarget = (): boolean => {
     const rendererAPI = rendererRef.current;
-    if (!rendererAPI) return;
+    if (!rendererAPI) return false;
 
     const interactor = getInteractor();
 
@@ -101,14 +101,25 @@ const ParentedView = forwardRef(function ParentedView(
     const oldContainer = interactor.getContainer();
     const newContainer = containerRef.current;
     if (oldContainer !== newContainer) {
-      if (oldContainer) {
-        interactor.unbindEvents();
-      }
-      if (newContainer) {
-        interactor.bindEvents(newContainer);
-      }
+      return interactor.setContainer(newContainer);
+    }
+    return false;
+  };
 
-      // forward event to interactor
+  // Use wheel events to cover the posibility of interacting
+  // with an out-of-focus browser window.
+  useEventListener(containerRef, 'wheel', (ev: WheelEvent) => {
+    if (switchTarget()) {
+      // forward wheel-event to interactor
+      const interactor = getInteractor();
+      interactor.handleWheel(ev);
+    }
+  });
+
+  useEventListener(containerRef, 'pointerenter', (ev: PointerEvent) => {
+    if (switchTarget()) {
+      // forward pointer-event to interactor
+      const interactor = getInteractor();
       interactor.handlePointerEnter(ev);
     }
   });
