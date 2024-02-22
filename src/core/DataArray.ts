@@ -8,7 +8,7 @@ import deletionRegistry from '../utils/DeletionRegistry';
 import useGetterRef from '../utils/useGetterRef';
 import { usePrevious } from '../utils/usePrevious';
 import useUnmount from '../utils/useUnmount';
-import { useDataset, useFieldData } from './contexts';
+import { useDatasetContext, useFieldDataContext } from './contexts';
 
 export interface DataArrayProps {
   /**
@@ -61,8 +61,8 @@ export default function DataArray(props: DataArrayProps) {
     return da;
   });
 
-  const getFieldData = useFieldData();
-  const dataset = useDataset();
+  const getFieldData = useFieldDataContext();
+  const dataset = useDatasetContext();
 
   const { registration = DefaultProps.registration } = props;
 

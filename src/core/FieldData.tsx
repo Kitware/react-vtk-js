@@ -1,8 +1,8 @@
 import { PropsWithChildren, useCallback } from 'react';
-import { FieldDataContext, useDataset } from './contexts';
+import { FieldDataContext, useDatasetContext } from './contexts';
 
 export default function FieldData(props: PropsWithChildren) {
-  const dataset = useDataset();
+  const dataset = useDatasetContext();
   const getFieldData = useCallback(() => {
     return dataset.getDataSet().getFieldData();
   }, [dataset]);

@@ -1,14 +1,14 @@
 import { vtkObject } from '@kitware/vtk.js/interfaces';
 import { useEffect } from 'react';
-import { useDownstream, useRepresentation } from './contexts';
+import { useDownstreamContext, useRepresentationContext } from './contexts';
 
 export interface DatasetProps {
   dataset: vtkObject | null;
 }
 
 export default function Dataset(props: DatasetProps) {
-  const representation = useRepresentation();
-  const downstream = useDownstream();
+  const representation = useRepresentationContext();
+  const downstream = useDownstreamContext();
 
   const { dataset } = props;
 

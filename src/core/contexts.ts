@@ -37,6 +37,12 @@ export const MultiViewRootContext = createContext<boolean>(false);
 
 export const ViewContext = createContext<IView | null>(null);
 
+export function useViewContext() {
+  const view = useContext(ViewContext);
+  if (!view) throw new Error('No View context!');
+  return view;
+}
+
 export function useRenderWindowContext() {
   const rw = useContext(RenderWindowContext);
   if (!rw) throw new Error('No RenderWindow context!');
@@ -49,31 +55,31 @@ export function useRendererContext() {
   return r;
 }
 
-export function useFieldData<T = vtkFieldData>() {
+export function useFieldDataContext<T = vtkFieldData>() {
   const fd = useContext(FieldDataContext);
   if (!fd) throw new Error('No FieldData context!');
   return fd as () => T;
 }
 
-export function useDataset<T = vtkDataSet>() {
+export function useDatasetContext<T = vtkDataSet>() {
   const ds = useContext(DatasetContext);
   if (!ds) throw new Error('No Dataset context!');
   return ds as IDataset<T>;
 }
 
-export function useRepresentation() {
+export function useRepresentationContext() {
   const rep = useContext(RepresentationContext);
   if (!rep) throw new Error('No Representation context!');
   return rep;
 }
 
-export function useDownstream() {
+export function useDownstreamContext() {
   const ds = useContext(DownstreamContext);
   if (!ds) throw new Error('No Downstream context!');
   return ds;
 }
 
-export function useShareDataSet() {
+export function useShareDataSetContext() {
   const share = useContext(ShareDataSetContext);
   if (!share) throw new Error('No ShareDataSet context!');
   return share;

@@ -5,7 +5,7 @@ import { Contexts } from '..';
 import deletionRegistry from '../utils/DeletionRegistry';
 import useGetterRef from '../utils/useGetterRef';
 import useUnmount from '../utils/useUnmount';
-import { useRepresentation } from './contexts';
+import { useRepresentationContext } from './contexts';
 
 export interface VolumeControllerProps {
   /**
@@ -35,7 +35,7 @@ export default function VolumeController(props: VolumeControllerProps) {
   const view = useContext(Contexts.ViewContext);
   if (!view) throw new Error('Need view context');
 
-  const volumeRep = useRepresentation();
+  const volumeRep = useRepresentationContext();
 
   const updateWidget = useCallback(() => {
     const volume = volumeRep.getMapper()?.getInputData() as

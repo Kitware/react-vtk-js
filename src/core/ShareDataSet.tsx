@@ -27,9 +27,9 @@ import {
   DownstreamContext,
   RepresentationContext,
   ShareDataSetContext,
-  useDownstream,
-  useRepresentation,
-  useShareDataSet,
+  useDownstreamContext,
+  useRepresentationContext,
+  useShareDataSetContext,
 } from './contexts';
 import useDataEvents from './modules/useDataEvents';
 
@@ -138,7 +138,7 @@ export interface RegisterDataSetProps extends PropsWithChildren {
 }
 
 export function RegisterDataSet(props: RegisterDataSetProps) {
-  const share = useShareDataSet();
+  const share = useShareDataSetContext();
   const { id } = props;
 
   // --- handle registrations --- //
@@ -206,10 +206,10 @@ export interface UseDataSetProps extends PropsWithChildren {
 
 export function UseDataSet(props: UseDataSetProps) {
   const { id, port = 0 } = props;
-  const share = useShareDataSet();
+  const share = useShareDataSetContext();
   // TODO if useDataSet is input to an algorithm, should representation be null?
-  const representation = useRepresentation();
-  const downstream = useDownstream();
+  const representation = useRepresentationContext();
+  const downstream = useDownstreamContext();
 
   useEffect(() => {
     return share.onDataAvailable(id, (ds) => {
