@@ -24,6 +24,7 @@ import useViewEvents, { ViewEvents } from '../modules/useViewEvents';
 import OpenGLRenderWindow from '../OpenGLRenderWindow';
 import Renderer from '../Renderer';
 import RenderWindow from '../RenderWindow';
+import { viewMountedEvent } from './events';
 import { DefaultProps, ViewProps } from './view-shared';
 
 /**
@@ -84,9 +85,16 @@ const SingleView = forwardRef(function SingleView(props: ViewProps, fwdRef) {
 
   // --- api --- //
 
+  let mounted = false;
+  useMount(() => {
+    mounted = true;
+    viewMountedEvent.trigger();
+  });
+
   const api = useMemo<IView>(
     () => ({
       isInMultiViewRoot: () => false,
+      isMounted: () => mounted,
       getViewContainer: () =>
         openGLRenderWindowRef.current?.getContainer() ?? null,
       getOpenGLRenderWindow: () => openGLRenderWindowRef.current,
@@ -99,7 +107,7 @@ const SingleView = forwardRef(function SingleView(props: ViewProps, fwdRef) {
       resetCamera: (boundsToUse?: Bounds) =>
         rendererRef.current?.resetCamera(boundsToUse),
     }),
-    [getInteractorStyle, setInteractorStyle]
+    [mounted, getInteractorStyle, setInteractorStyle]
   );
 
   useImperativeHandle(fwdRef, () => api);

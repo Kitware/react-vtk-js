@@ -45,6 +45,10 @@ const demos = new Map([
     lazy(() => import('./Tests/ChangeInteractorStyle')),
   ],
   ['MultiView', lazy(() => import('./MultiView'))],
+  [
+    'Suspense/GeometrySuspense',
+    lazy(() => import('./Suspense/GeometrySuspense')),
+  ],
 ]);
 
 function App() {
