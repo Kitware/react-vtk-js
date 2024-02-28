@@ -6,6 +6,7 @@ declare module '@kitware/vtk.js/type-patches' {
   export interface FixedVTKRenderWindowInteractor
     extends vtkRenderWindowInteractor {
     setCurrentRenderer(ren: vtkRenderer): void;
+    setContainer(el: HTMLElement | null): boolean;
   }
 
   export interface VtkRendererEvent {

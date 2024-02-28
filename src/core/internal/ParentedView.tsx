@@ -91,11 +91,9 @@ const ParentedView = forwardRef(function ParentedView(
     const rendererAPI = rendererRef.current;
     if (!rendererAPI) return false;
 
-    const interactor = getInteractor();
+    const interactor = getInteractor() as FixedVTKRenderWindowInteractor;
 
-    (interactor as FixedVTKRenderWindowInteractor).setCurrentRenderer(
-      rendererAPI.get()
-    );
+    interactor.setCurrentRenderer(rendererAPI.get());
     interactor.setInteractorStyle(getInteractorStyle());
 
     const oldContainer = interactor.getContainer();
@@ -108,21 +106,23 @@ const ParentedView = forwardRef(function ParentedView(
 
   // Use wheel events to cover the posibility of interacting
   // with an out-of-focus browser window.
-  useEventListener(containerRef, 'wheel', (ev: WheelEvent) => {
-    if (switchTarget()) {
-      // forward wheel-event to interactor
-      const interactor = getInteractor();
-      interactor.handleWheel(ev);
-    }
-  });
+  useEventListener(
+    containerRef,
+    'wheel',
+    () => {
+      switchTarget();
+    },
+    { capture: true }
+  );
 
-  useEventListener(containerRef, 'pointerenter', (ev: PointerEvent) => {
-    if (switchTarget()) {
-      // forward pointer-event to interactor
-      const interactor = getInteractor();
-      interactor.handlePointerEnter(ev);
-    }
-  });
+  useEventListener(
+    containerRef,
+    'pointerenter',
+    () => {
+      switchTarget();
+    },
+    { capture: true }
+  );
 
   // --- resize handling --- //
 
