@@ -11,7 +11,11 @@ import { IDataset } from '../types';
 import deletionRegistry from '../utils/DeletionRegistry';
 import useGetterRef from '../utils/useGetterRef';
 import useUnmount from '../utils/useUnmount';
-import { DatasetContext, useDownstream, useRepresentation } from './contexts';
+import {
+  DatasetContext,
+  useDownstreamContext,
+  useRepresentationContext,
+} from './contexts';
 
 export interface ImageDataProps extends PropsWithChildren {
   /**
@@ -63,8 +67,8 @@ export default forwardRef(function PolyData(props: ImageDataProps, fwdRef) {
     return im;
   });
 
-  const representation = useRepresentation();
-  const downstream = useDownstream();
+  const representation = useRepresentationContext();
+  const downstream = useDownstreamContext();
 
   // dataset API
   const dataset = useMemo<IDataset<vtkImageData>>(

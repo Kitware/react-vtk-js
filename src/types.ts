@@ -56,6 +56,7 @@ export interface IRenderer {
 
 export interface IView {
   isInMultiViewRoot(): boolean;
+  isMounted(): boolean;
   getViewContainer(): HTMLElement | null;
   getRenderer(): IRenderer | null;
   getRenderWindow(): IRenderWindow | null;

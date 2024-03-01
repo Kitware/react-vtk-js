@@ -27,6 +27,7 @@ import {
 } from '../modules/useInteractorStyle';
 import useViewEvents, { ViewEvents } from '../modules/useViewEvents';
 import Renderer from '../Renderer';
+import { viewMountedEvent } from './events';
 import { DefaultProps, ViewProps } from './view-shared';
 
 /**
@@ -172,9 +173,16 @@ const ParentedView = forwardRef(function ParentedView(
 
   // --- api --- //
 
+  let mounted = false;
+  useMount(() => {
+    mounted = true;
+    viewMountedEvent.trigger();
+  });
+
   const api = useMemo<IView>(
     () => ({
       isInMultiViewRoot: () => true,
+      isMounted: () => mounted,
       getViewContainer: () => containerRef.current,
       getOpenGLRenderWindow: () => openGLRenderWindowAPI,
       getRenderWindow: () => renderWindowAPI,
@@ -187,6 +195,7 @@ const ParentedView = forwardRef(function ParentedView(
         rendererRef.current?.resetCamera(boundsToUse),
     }),
     [
+      mounted,
       openGLRenderWindowAPI,
       renderWindowAPI,
       getInteractorStyle,

@@ -4,7 +4,7 @@ import vtk from '@kitware/vtk.js/vtk';
 import { PropsWithChildren, useCallback, useEffect, useRef } from 'react';
 import { VtkConstructor } from '../types';
 import deletionRegistry from '../utils/DeletionRegistry';
-import { useDownstream, useRepresentation } from './contexts';
+import { useDownstreamContext, useRepresentationContext } from './contexts';
 
 export interface ReaderProps extends PropsWithChildren {
   /**
@@ -71,7 +71,7 @@ export default function Reader(props: ReaderProps) {
     );
   }
 
-  const representation = useRepresentation();
+  const representation = useRepresentationContext();
 
   const createReader = useCallback(() => {
     if (typeof vtkClass === 'string') {
@@ -138,7 +138,7 @@ export default function Reader(props: ReaderProps) {
 
   // --- downstream registration --- //
 
-  const downstream = useDownstream();
+  const downstream = useDownstreamContext();
   const { port } = props;
 
   useEffect(() => {

@@ -8,8 +8,8 @@ import { usePrevious } from '../utils/usePrevious';
 import useUnmount from '../utils/useUnmount';
 import {
   DownstreamContext,
-  useDownstream,
-  useRepresentation,
+  useDownstreamContext,
+  useRepresentationContext,
 } from './contexts';
 
 export interface AlgorithmProps extends PropsWithChildren {
@@ -46,8 +46,8 @@ export default function Algorithm(props: AlgorithmProps) {
     return algo;
   });
 
-  const representation = useRepresentation();
-  const downstream = useDownstream();
+  const representation = useRepresentationContext();
+  const downstream = useDownstreamContext();
 
   useEffect(() => {
     let algoChanged = false;

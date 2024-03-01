@@ -17,7 +17,11 @@ import deletionRegistry from '../utils/DeletionRegistry';
 import useGetterRef from '../utils/useGetterRef';
 import { usePrevious } from '../utils/usePrevious';
 import useUnmount from '../utils/useUnmount';
-import { DatasetContext, useDownstream, useRepresentation } from './contexts';
+import {
+  DatasetContext,
+  useDownstreamContext,
+  useRepresentationContext,
+} from './contexts';
 
 export interface PolyDataProps extends PropsWithChildren {
   /**
@@ -103,8 +107,8 @@ export default forwardRef(function PolyData(props: PolyDataProps, fwdRef) {
     return pd;
   });
 
-  const representation = useRepresentation();
-  const downstream = useDownstream();
+  const representation = useRepresentationContext();
+  const downstream = useDownstreamContext();
 
   // dataset API
   const dataset = useMemo<IDataset<vtkPolyData>>(
