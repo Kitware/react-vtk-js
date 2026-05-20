@@ -2,7 +2,7 @@ import vtkImageResliceMapper, {
   vtkImageResliceMapper as IvtkImageResliceMapper,
 } from '@kitware/vtk.js/Rendering/Core/ImageResliceMapper';
 import { SlabTypes } from '@kitware/vtk.js/Rendering/Core/ImageResliceMapper/Constants';
-import { forwardRef, PropsWithChildren } from 'react';
+import { forwardRef, PropsWithChildren, useRef } from 'react';
 import useComparableEffect from '../utils/useComparableEffect';
 import SliceRepresentation, {
   SliceRepresentationProps,
@@ -49,9 +49,13 @@ export default forwardRef(function ResliceRepresentation(
     ...sliceProps
   } = props;
 
-  // Create reslice mapper if not provided
+  // Create reslice mapper once and reuse it across renders.
+  const internalMapperRef = useRef<IvtkImageResliceMapper | null>(null);
+  if (!internalMapperRef.current) {
+    internalMapperRef.current = vtkImageResliceMapper.newInstance();
+  }
   const mapperInstance = (providedMapper ||
-    vtkImageResliceMapper.newInstance()) as IvtkImageResliceMapper;
+    internalMapperRef.current) as IvtkImageResliceMapper;
 
   // Handle reslice-specific mapper updates
   useComparableEffect(
