@@ -226,3 +226,8 @@ export function UseDataSet(props: UseDataSetProps) {
 
   return null;
 }
+
+/**
+ * ShareDataSet is an alias for UseDataSet for backwards compatibility
+ */
+export const ShareDataSet = UseDataSet;

@@ -36,6 +36,7 @@ export { default as ResliceRepresentation } from './core/ResliceRepresentation';
 export type { ResliceRepresentationProps } from './core/ResliceRepresentation';
 export {
   RegisterDataSet,
+  ShareDataSet,
   ShareDataSetRoot,
   UseDataSet,
 } from './core/ShareDataSet';
