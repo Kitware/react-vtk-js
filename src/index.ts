@@ -32,6 +32,8 @@ export { default as PolyData } from './core/PolyData';
 export type { PolyDataProps } from './core/PolyData';
 export { default as Reader } from './core/Reader';
 export type { ReaderProps } from './core/Reader';
+export { default as ResliceRepresentation } from './core/ResliceRepresentation';
+export type { ResliceRepresentationProps } from './core/ResliceRepresentation';
 export {
   RegisterDataSet,
   ShareDataSetRoot,
