@@ -18,6 +18,37 @@ import {
   VolumeRepresentation,
 } from 'react-vtk-js';
 
+// Per-orientation config: plane normal, default slice position, slider max,
+// and the camera pose needed to view that plane face-on.
+const ORIENTATION_CONFIGS = {
+  Sagittal: {
+    normal: [1, 0, 0],
+    axis: 0,
+    defaultPos: 127,
+    max: 255,
+    cameraPosition: [1, 0, 0],
+    viewUp: [0, 0, -1],
+  },
+  Coronal: {
+    normal: [0, 1, 0],
+    axis: 1,
+    defaultPos: 127,
+    max: 255,
+    cameraPosition: [0, 1, 0],
+    viewUp: [0, 0, -1],
+  },
+  Axial: {
+    normal: [0, 0, 1],
+    axis: 2,
+    defaultPos: 94,
+    max: 188,
+    cameraPosition: [0, 0, 1],
+    viewUp: [0, -1, 0],
+  },
+};
+
+const VOLUME_CENTER = [127, 127, 94];
+
 const plane = newVtkPlaneInstance({
   origin: [127, 0, 0],
   normal: [1, 0, 0],
@@ -219,8 +250,51 @@ function SliceFunction(props) {
   );
 }
 
+function OrientationDropDown(props) {
+  const view = useContext(Contexts.ViewContext);
+  function onChange(e) {
+    const newOrientation = e.currentTarget.value;
+    const cfg = ORIENTATION_CONFIGS[newOrientation];
+    // Mutate the shared plane in-place so ResliceRepresentation picks it up.
+    plane.setNormal(...cfg.normal);
+    const origin = [...VOLUME_CENTER];
+    origin[cfg.axis] = cfg.defaultPos;
+    plane.setOrigin(...origin);
+    props.setOrientation(newOrientation);
+    props.setSlicePos(cfg.defaultPos);
+    props.setCamera({ position: cfg.cameraPosition, viewUp: cfg.viewUp });
+    setTimeout(view.requestRender, 0);
+    setTimeout(view.resetCamera, 0);
+  }
+  return (
+    <label
+      style={{
+        position: 'absolute',
+        zIndex: 100,
+        ...props.style,
+      }}
+    >
+      {props.label}
+      <select
+        value={props.orientation}
+        onChange={onChange}
+        style={{ position: 'sticky', zIndex: 100 }}
+      >
+        {Object.keys(ORIENTATION_CONFIGS).map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
 function PosSlider(props) {
-  plane.setOrigin(props.value, 0, 0);
+  const cfg = ORIENTATION_CONFIGS[props.orientation];
+  const origin = [...VOLUME_CENTER];
+  origin[cfg.axis] = props.value;
+  plane.setOrigin(...origin);
   return Slider(props);
 }
 
@@ -241,6 +315,8 @@ function Example(props) {
   const [slicePolyData, setSlicePolyData] = useState(null);
   const [slicePlane, setSlicePlane] = useState(plane);
   const [slicePos, setSlicePos] = useState(127);
+  const [orientation, setOrientation] = useState('Sagittal');
+  const [camera, setCamera] = useState(ORIENTATION_CONFIGS['Sagittal']);
   return (
     <div style={{ width: '100%', height: '100%' }}>
       <ShareDataSetRoot>
@@ -253,7 +329,7 @@ function Example(props) {
         <div style={{ width: '50vw', height: '100%', display: 'inline-block' }}>
           <View
             id='0'
-            camera={{ position: [1, 0, 0], viewUp: [0, 0, -1], parallelProjection: false }}
+            camera={{ position: camera.cameraPosition, viewUp: camera.viewUp, parallelProjection: false }}
             background={[0.34, 0.35, 0.34]}
           >
             <Slider
@@ -326,12 +402,21 @@ function Example(props) {
               setSlicePlane={setSlicePlane}
               style={{ top: '5px', left: '5px' }}
             />
+            <OrientationDropDown
+              label='Orientation: '
+              orientation={orientation}
+              setOrientation={setOrientation}
+              setSlicePos={setSlicePos}
+              setCamera={setCamera}
+              style={{ top: '5px', left: '255px' }}
+            />
             <PosSlider
               label='slicePosition'
-              max={255}
+              max={ORIENTATION_CONFIGS[orientation].max}
               value={slicePos}
               setValue={setSlicePos}
-              style={{ top: '5px', left: '255px' }}
+              orientation={orientation}
+              style={{ top: '5px', left: '455px' }}
             />
             <ResliceRepresentation
               slabThickness={slabThickness}
