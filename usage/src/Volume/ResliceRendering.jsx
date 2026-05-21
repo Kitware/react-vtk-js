@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useMemo } from 'react';
 import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps.js';
 import { SlabTypes } from '@kitware/vtk.js/Rendering/Core/ImageResliceMapper/Constants.js';
 import { InterpolationType } from '@kitware/vtk.js/Rendering/Core/ImageProperty/Constants.js';
@@ -262,7 +262,6 @@ function OrientationDropDown(props) {
     plane.setOrigin(...origin);
     props.setOrientation(newOrientation);
     props.setSlicePos(cfg.defaultPos);
-    props.setCamera({ position: cfg.cameraPosition, viewUp: cfg.viewUp });
     setTimeout(view.requestRender, 0);
     setTimeout(view.resetCamera, 0);
   }
@@ -316,7 +315,12 @@ function Example(props) {
   const [slicePlane, setSlicePlane] = useState(plane);
   const [slicePos, setSlicePos] = useState(127);
   const [orientation, setOrientation] = useState('Sagittal');
-  const [camera, setCamera] = useState(ORIENTATION_CONFIGS['Sagittal']);
+  // Memoize so the object reference only changes when orientation changes,
+  // preventing useCamera from firing (and resetting the view) on every render.
+  const cameraProps = useMemo(() => {
+    const cfg = ORIENTATION_CONFIGS[orientation];
+    return { position: cfg.cameraPosition, viewUp: cfg.viewUp, parallelProjection: false };
+  }, [orientation]);
   return (
     <div style={{ width: '100%', height: '100%' }}>
       <ShareDataSetRoot>
@@ -329,7 +333,7 @@ function Example(props) {
         <div style={{ width: '50vw', height: '100%', display: 'inline-block' }}>
           <View
             id='0'
-            camera={{ position: camera.cameraPosition, viewUp: camera.viewUp, parallelProjection: false }}
+            camera={cameraProps}
             background={[0.34, 0.35, 0.34]}
           >
             <Slider
@@ -407,7 +411,6 @@ function Example(props) {
               orientation={orientation}
               setOrientation={setOrientation}
               setSlicePos={setSlicePos}
-              setCamera={setCamera}
               style={{ top: '5px', left: '255px' }}
             />
             <PosSlider
