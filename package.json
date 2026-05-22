@@ -5,81 +5,101 @@
   "author": "Kitware Inc",
   "license": "BSD-3-Clause",
   "repository": "Kitware/react-vtk-js",
+  "type": "module",
   "main": "dist/umd/react-vtk.js",
   "module": "dist/esm/index.js",
-  "source": "src/index.js",
-  "exports": {
-    ".": {
-      "import": "./dist/esm/index.js",
-      "browser": "./dist/cjs/react-vtk.js",
-      "umd": "./dist/umd/react-vtk.js",
-      "package.json": "./package.json",
-      "default": "./dist/esm/index.js"
-    },
-    "./light": {
-      "import": "./dist/esm/light.js",
-      "package.json": "./package.json",
-      "default": "./dist/esm/light.js"
-    }
-  },
+  "types": "dist/esm/src/index.d.ts",
+  "source": "src/index.ts",
   "dependencies": {
-    "@babel/runtime": "^7.12.5"
+    "@babel/eslint-parser": "^7.19.1",
+    "@babel/runtime": "^7.19.0",
+    "deep-equal": "^2.0.5"
   },
   "scripts": {
-    "prebuild": "npm run fix",
-    "build": "rimraf dist && rollup ./src/index.ts -c",
+    "prebuild": "npm run test:lint",
+    "build": "rimraf dist && rollup -c",
     "prepare": "npm run build",
-    "test": "npm run test:lint && npm run test:build",
+    "test": "npm run test:lint && npm run test:build && npm run test:unit",
     "test:build": "npm run build",
     "test:lint": "eslint src",
-    "fix:prettier": "prettier --config .prettierrc --write \"src/**/*.{ts,tsx,jsx}\"",
+    "test:unit": "vitest run",
+    "fix:prettier": "prettier --config .prettierrc --write \"src/**/*.tsx?\"",
     "fix:eslint": "eslint --fix src",
     "fix": "npm run fix:prettier && npm run fix:eslint",
     "predeploy": "cd usage && npm install && npm run build",
     "deploy": "gh-pages -d usage/dist -f -r $GIT_PUBLISH_URL",
     "commit": "git cz",
     "semantic-release": "semantic-release",
-    "dev": "rollup ./src/index.js -c --watch"
+    "dev": "rollup -c --watch"
   },
   "peerDependencies": {
-    "@kitware/vtk.js": "^28.0.0",
-    "react": "^16.0.0"
+    "@kitware/vtk.js": "^35.15.2",
+    "react": "^18.2.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.10",
-    "@babel/plugin-transform-runtime": "^7.12.10",
-    "@babel/preset-env": "^7.12.11",
-    "@babel/preset-react": "^7.12.10",
-    "@kitware/vtk.js": "^28.0.0",
-    "@rollup/plugin-babel": "^5.2.2",
-    "@rollup/plugin-commonjs": "17.0.0",
-    "@rollup/plugin-eslint": "^8.0.1",
-    "@rollup/plugin-node-resolve": "^11.1.0",
-    "babel-eslint": "^10.0.3",
-    "commitizen": "4.2.2",
+    "@babel/plugin-transform-runtime": "^7.19.1",
+    "@babel/preset-env": "^7.19.1",
+    "@babel/preset-react": "^7.18.6",
+    "@babel/preset-typescript": "^7.18.6",
+    "@kitware/vtk.js": "^35.15.2",
+    "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-commonjs": "24.0.1",
+    "@rollup/plugin-eslint": "^9.0.3",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-terser": "^1.0.0",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^15.0.7",
+    "@types/deep-equal": "^1.0.1",
+    "@types/react": "^18.0.21",
+    "@typescript-eslint/eslint-plugin": "^5.40.1",
+    "@typescript-eslint/parser": "^5.40.1",
+    "commitizen": "^4.2.4",
     "cross-env": "^7.0.2",
-    "eslint": "^6.8.0",
-    "eslint-config-prettier": "^6.7.0",
-    "eslint-config-standard": "^14.1.0",
-    "eslint-config-standard-react": "^9.2.0",
-    "eslint-plugin-import": "^2.18.2",
+    "eslint": "^8.34.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-config-standard-react": "^13.0.0",
+    "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-node": "^11.0.0",
-    "eslint-plugin-prettier": "^3.1.1",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-react": "^7.17.0",
-    "eslint-plugin-standard": "^4.0.1",
-    "gh-pages": "^2.2.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-promise": "^6.0.1",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "gh-pages": "^5.0.0",
+    "jsdom": "^24.1.3",
     "npm-run-all": "^4.1.5",
-    "prettier": "^2.0.4",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "rimraf": "^3.0.2",
-    "rollup": "^2.37.1",
+    "prettier": "^2.8.4",
+    "prettier-plugin-organize-imports": "^3.1.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "rimraf": "^4.1.2",
+    "rollup": "^3.17.2",
     "rollup-plugin-analyzer": "^4.0.0",
-    "rollup-plugin-terser": "^7.0.2",
-    "semantic-release": "17.3.1"
+    "semantic-release": "^25.0.3",
+    "typescript": "^4.9.5",
+    "vitest": "^4.1.6"
   },
   "files": [
     "dist"
-  ]
+  ],
+  "release": {
+    "branches": [
+      "master"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      [
+        "@semantic-release/npm",
+        {
+          "registry": "https://registry.npmjs.org/"
+        }
+      ],
+      "@semantic-release/github"
+    ]
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }
