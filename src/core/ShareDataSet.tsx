@@ -160,12 +160,19 @@ export function RegisterDataSet(props: RegisterDataSetProps) {
 
   // --- //
 
+  // Store the connection function so it can be evaluated lazily when
+  // dataAvailable fires (i.e. after the async data load completes).
+  const connRef = useRef<(() => unknown) | null>(null);
+
   const downstream = useMemo<IDownstream>(
     () => ({
       setInputData(obj) {
         share.register(id, obj);
       },
       setInputConnection(conn) {
+        // Persist the port function; don't evaluate it yet — the upstream
+        // algorithm may not have data until an async operation completes.
+        connRef.current = conn;
         downstream.setInputData(conn());
       },
     }),
@@ -175,10 +182,14 @@ export function RegisterDataSet(props: RegisterDataSetProps) {
   const mockRepresentation = useMemo<IRepresentation>(
     () => ({
       dataChanged() {
+        // Re-evaluate the connection to capture the latest output.
+        if (connRef.current) share.register(id, connRef.current());
         share.dispatchDataChanged(id);
         dataChangedEvent.current.dispatchEvent();
       },
       dataAvailable() {
+        // Re-evaluate the connection NOW, when the data is actually ready.
+        if (connRef.current) share.register(id, connRef.current());
         share.dispatchDataAvailable(id);
         dataAvailableEvent.current.dispatchEvent();
       },
@@ -226,3 +237,8 @@ export function UseDataSet(props: UseDataSetProps) {
 
   return null;
 }
+
+/**
+ * ShareDataSet is an alias for UseDataSet for backwards compatibility
+ */
+export const ShareDataSet = UseDataSet;
